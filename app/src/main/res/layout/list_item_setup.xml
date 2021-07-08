@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:gravity="center_vertical"
+    android:baselineAligned="false"
+    android:descendantFocusability="blocksDescendants">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/setup_name_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textSize="@dimen/font_size_normal"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/setup_id_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ID2017-08-01 09:01:01"
+            android:textSize="@dimen/font_size_small"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/lock_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_lock_dark"
+        android:visibility="visible"/>
+
+    <LinearLayout
+        android:layout_width="@dimen/width_setup_item_details"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_marginStart="4dp">
+
+        <TextView
+            android:id="@+id/setup_details_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hardware Identifier: 123"
+            android:textSize="@dimen/font_size_small" />
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/popup_image_button"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_gravity="center_vertical"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        app:srcCompat="@drawable/ic_more_vert_black_24dp" />
+
+</LinearLayout>

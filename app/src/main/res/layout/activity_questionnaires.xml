@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.QuestionnairesActivity">
+
+    <TextView
+        android:id="@+id/continue_questionnaire_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="16dp"
+        android:visibility="gone"
+        android:textSize="@dimen/font_size_normal"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+
+    <View
+        android:id="@+id/continue_divider_view"
+        android:visibility="gone"
+        android:layout_height="2dp"
+        android:layout_width="match_parent"
+        android:background="@android:color/black" />
+
+    <ListView
+        android:id="@+id/questionnaires_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:fadeScrollbars="false"/>
+
+    <TextView
+        android:id="@+id/background_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/loading_ellipsis"
+        android:gravity="center_horizontal"
+        android:textSize="@dimen/font_size_title"
+        android:paddingTop="108dp"/>
+
+</LinearLayout>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.nomade.android.nomadeapp">
+
+    <uses-feature android:name="android.hardware.usb.accessory" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:name=".helperClasses.AppController"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:replace="android:allowBackup">
+        <activity android:name=".activities.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_ACCESSORY_DETACHED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
+                android:resource="@xml/accessory_filter" />
+            <meta-data
+                android:name="android.hardware.usb.action.USB_ACCESSORY_DETACHED"
+                android:resource="@xml/accessory_filter" />
+        </activity>
+        <activity
+            android:name=".activities.AboutActivity"
+            android:label="@string/menu_about"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".activities.BodyDragAndDropActivity" />
+        <activity android:name=".activities.GraphActivity"
+            android:label="@string/graphs"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.GraphConfigActivity"
+            android:label="@string/configure_graphs"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.GraphVariableActivity"
+            android:label="@string/configure_variable"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.MeasurementListActivity"
+            android:label="@string/measurement_list"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.MeasurementMenuActivity"
+            android:label="@string/measurement_menu"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.MeasurementNewActivity"
+            android:label="@string/new_measurement"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.QuestionnairesActivity"
+            android:label="@string/available_questionnaires"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.QuestionPerQuestionActivity"
+            android:label="@string/questionnaire"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:label="@string/menu_settings"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.SetupAddInstrumentActivity"
+            android:label="@string/add_instrument"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.SetupEditInstrumentActivity"
+            android:label="@string/instrument"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.SetupInfoActivity"
+            android:label="@string/setup"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.SetupListActivity"
+            android:label="@string/setup_list"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.SetupMenuActivity"
+            android:label="@string/setup_menu"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.SubmissionsActivity"
+            android:label="@string/submitted_questionnaires"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.SubmissionsFilterActivity"
+            android:label="@string/filter"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.SubmissionViewerActivity"
+            android:label="@string/submitted_questionnaire"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.TermsAndConditionsActivity"
+            android:label="@string/terms_label"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.UsbActivity"
+            android:label="@string/usb_communication"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activities.ValuesActivity"
+            android:label="@string/values"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <meta-data
+            android:name="google_analytics_adid_collection_enabled"
+            android:value="false" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+        <service android:name=".services.UsbAndTcpService" />
+    </application>
+
+</manifest>

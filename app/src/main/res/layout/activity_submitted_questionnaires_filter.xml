@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    tools:context=".activities.SubmissionsFilterActivity"
+    android:fadeScrollbars="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/start_date_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/start_date_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="0dp"
+                android:paddingEnd="4dp"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/start_date_colon"
+                android:textSize="@dimen/font_size_normal" />
+
+            <Button
+                android:id="@+id/start_date_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="@dimen/font_size_normal"
+                android:enabled="false"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/end_date_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/end_date_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="0dp"
+                android:paddingEnd="4dp"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/end_date_colon"
+                android:textSize="@dimen/font_size_normal" />
+
+            <Button
+                android:id="@+id/end_date_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="@dimen/font_size_normal"
+                android:enabled="false"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/questionnaire_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:visibility="visible"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/questionnaire_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="0dp"
+                android:paddingEnd="4dp"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/questionnaire_colon"
+                android:textSize="@dimen/font_size_normal" />
+
+            <Spinner
+                android:id="@+id/questionnaire_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:enabled="false"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/country_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/country_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="0dp"
+                android:paddingEnd="4dp"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/country_colon"
+                android:textSize="@dimen/font_size_normal" />
+
+            <Spinner
+                android:id="@+id/country_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:enabled="false"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/username_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/username_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="0dp"
+                android:paddingEnd="4dp"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/user_id_colon"
+                android:textSize="@dimen/font_size_normal" />
+
+            <EditText
+                android:id="@+id/user_name_edit_text"
+                android:inputType="textNoSuggestions"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="@dimen/font_size_normal"
+                android:enabled="false"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="24dp"
+            style="?android:attr/buttonBarStyle">
+
+            <Button
+                android:id="@+id/clear_filter_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="16dp"
+                android:text="@string/clear_filter"
+                android:textSize="@dimen/font_size_normal"
+                style="?android:attr/buttonBarButtonStyle"/>
+
+            <Button
+                android:id="@+id/apply_filter_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="16dp"
+                android:text="@string/set_filter"
+                android:textSize="@dimen/font_size_normal"
+                style="?android:attr/buttonBarButtonStyle"/>
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+
+</ScrollView>

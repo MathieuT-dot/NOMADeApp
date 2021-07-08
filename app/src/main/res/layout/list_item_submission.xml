@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:baselineAligned="false">
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/submission_title_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Title"
+            android:textSize="@dimen/font_size_normal"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/submission_username_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Description"
+            android:textSize="@dimen/font_size_small"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="@dimen/width_submission_item_details"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_marginStart="4dp">
+
+        <TextView
+            android:id="@+id/submission_details_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2017-08-01 09:01:01"
+            android:textSize="@dimen/font_size_small" />
+
+    </LinearLayout>
+</LinearLayout>

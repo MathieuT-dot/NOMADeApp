@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:baselineAligned="false"
+    android:descendantFocusability="blocksDescendants">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/name_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Title"
+            android:textSize="@dimen/font_size_normal"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/description_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Description"
+            android:textSize="@dimen/font_size_small"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="@dimen/width_submission_item_details"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_marginStart="4dp">
+
+        <TextView
+            android:id="@+id/details_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Details"
+            android:textSize="@dimen/font_size_small" />
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/popup_image_button"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_gravity="center_vertical"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        app:srcCompat="@drawable/ic_more_vert_black_24dp" />
+
+</LinearLayout>

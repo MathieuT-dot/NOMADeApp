@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_gravity="center_horizontal"
+    tools:context=".activities.MeasurementMenuActivity">
+
+    <Button
+        android:id="@+id/view_measurement_list_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/measurement_list"
+        android:textSize="@dimen/font_size_normal"
+        android:padding="@dimen/padding_button"
+        android:visibility="visible"/>
+
+    <Button
+        android:id="@+id/plan_new_measurement_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/plan_new_measurement"
+        android:textSize="@dimen/font_size_normal"
+        android:padding="@dimen/padding_button"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/start_new_measurement_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/start_new_measurement"
+        android:textSize="@dimen/font_size_normal"
+        android:padding="@dimen/padding_button"
+        android:visibility="visible"/>
+
+    <Button
+        android:id="@+id/stop_current_measurement_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/stop_current_measurement"
+        android:textSize="@dimen/font_size_normal"
+        android:padding="@dimen/padding_button"
+        android:visibility="visible"/>
+
+</LinearLayout>

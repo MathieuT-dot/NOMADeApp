@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="20dp"
+    android:baselineAligned="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <com.nomade.android.nomadeapp.helperClasses.BodyChartImageView
+            android:id="@+id/bodyChartImageView"
+            android:layout_width="@dimen/body_chart_size"
+            android:layout_height="@dimen/body_chart_size"
+            android:adjustViewBounds="true"
+            android:background="@drawable/body_chart"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="20dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_margin="@dimen/selector_margin"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/pain_level_1"
+                    android:layout_width="@dimen/selector"
+                    android:layout_height="@dimen/selector"
+                    android:background="@color/yellow"
+                    android:layout_margin="@dimen/selector_margin"
+                    app:srcCompat="@drawable/selector_normal"
+                    android:tag="1"/>
+
+                <ImageButton
+                    android:id="@+id/pain_level_2"
+                    android:layout_width="@dimen/selector"
+                    android:layout_height="@dimen/selector"
+                    android:background="@color/radar_orange"
+                    android:layout_margin="@dimen/selector_margin"
+                    app:srcCompat="@drawable/selector_normal"
+                    android:tag="2"/>
+
+                <ImageButton
+                    android:id="@+id/pain_level_3"
+                    android:layout_width="@dimen/selector"
+                    android:layout_height="@dimen/selector"
+                    android:background="@color/red"
+                    android:layout_margin="@dimen/selector_margin"
+                    app:srcCompat="@drawable/selector_normal"
+                    android:tag="3"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_margin="@dimen/selector_margin"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/pain_filled"
+                    android:layout_width="@dimen/selector"
+                    android:layout_height="@dimen/selector"
+                    android:background="@color/black"
+                    android:layout_margin="@dimen/selector_margin"
+                    app:srcCompat="@drawable/selector_normal"
+                    android:tag="filled"/>
+
+                <ImageButton
+                    android:id="@+id/pain_pins"
+                    android:layout_width="@dimen/selector"
+                    android:layout_height="@dimen/selector"
+                    android:background="@drawable/pins_and_needles"
+                    android:layout_margin="@dimen/selector_margin"
+                    app:srcCompat="@drawable/selector_normal"
+                    android:tag="pins_and_needles"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_margin="@dimen/selector_margin"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/pain_small"
+                    android:layout_width="@dimen/selector"
+                    android:layout_height="@dimen/selector"
+                    android:background="@color/black"
+                    android:layout_margin="@dimen/selector_margin"
+                    app:srcCompat="@drawable/selector_small"
+                    android:tag="small"/>
+
+                <ImageButton
+                    android:id="@+id/pain_normal"
+                    android:layout_width="@dimen/selector"
+                    android:layout_height="@dimen/selector"
+                    android:background="@color/black"
+                    android:layout_margin="@dimen/selector_margin"
+                    app:srcCompat="@drawable/selector_normal"
+                    android:tag="normal"/>
+
+                <ImageButton
+                    android:id="@+id/pain_big"
+                    android:layout_width="@dimen/selector"
+                    android:layout_height="@dimen/selector"
+                    android:background="@color/black"
+                    android:layout_margin="@dimen/selector_margin"
+                    app:srcCompat="@drawable/selector_big"
+                    android:tag="big"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/remove_button_linear_layout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

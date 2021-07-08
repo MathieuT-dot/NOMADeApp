@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="font_size_title">30sp</dimen>
+    <dimen name="font_size_normal">26sp</dimen>
+    <dimen name="font_size_small">22sp</dimen>
+    <dimen name="font_size_marker">41sp</dimen>
+
+    <dimen name="width_questionnaire_item_details">152dp</dimen>
+    <dimen name="width_connected_user_details">180dp</dimen>
+    <dimen name="width_submission_item_details">214dp</dimen>
+    <dimen name="width_setup_item_details">246dp</dimen>
+    <dimen name="width_general">450dp</dimen>
+
+    <dimen name="height_button">94dp</dimen>
+    <dimen name="height_logo">187dp</dimen>
+
+    <dimen name="padding_parent">4dp</dimen>
+    <dimen name="padding_button">30dp</dimen>
+    <dimen name="padding_scale">75dp</dimen>
+    <dimen name="padding_seek_bar">15dp</dimen>
+
+    <dimen name="body_chart_size">540dp</dimen>
+    <dimen name="selector">56.25dp</dimen>
+    <dimen name="selector_edge_small">16.875dp</dimen>
+    <dimen name="selector_edge_normal">11.25dp</dimen>
+    <dimen name="selector_edge_big">5.625dp</dimen>
+    <dimen name="selector_margin">3.75dp</dimen>
+    <dimen name="brush_size_small">4.5dp</dimen>
+    <dimen name="brush_size_normal">9dp</dimen>
+    <dimen name="brush_size_big">13.5dp</dimen>
+
+</resources>

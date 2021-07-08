@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_create_pdf"
+        android:icon="@drawable/ic_action_pdf"
+        android:title="@string/menu_download_pdf"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_question_overview"
+        android:icon="@drawable/ic_action_format_list_numbered"
+        android:title="@string/menu_question_overview"
+        app:showAsAction="ifRoom"/>
+
+</menu>

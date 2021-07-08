@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.MainActivity"
+    android:fillViewport="true"
+    android:fadeScrollbars="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="center_horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <LinearLayout
+                android:id="@+id/login_linear_layout"
+                android:layout_width="@dimen/width_general"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:visibility="invisible">
+
+                <EditText
+                    android:id="@+id/username_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textNoSuggestions"
+                    android:hint="@string/username"
+                    android:textSize="@dimen/font_size_normal"
+                    android:layout_marginTop="12dp"/>
+
+                <EditText
+                    android:id="@+id/password_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textSize="@dimen/font_size_normal"
+                    android:hint="@string/password" />
+
+                <Button
+                    android:id="@+id/login_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/login"
+                    android:textSize="@dimen/font_size_normal"
+                    android:padding="@dimen/padding_button"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/buttons_linear_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/upload_questionnaires_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/upload_remaining_questionnaires"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:textSize="@dimen/font_size_normal"
+                    android:visibility="gone"
+                    android:textStyle="bold" />
+
+                <View
+                    android:id="@+id/upload_divider_view"
+                    android:layout_height="2dp"
+                    android:layout_width="match_parent"
+                    android:visibility="gone"
+                    android:background="@color/default_text"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/login_status_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/not_logged_in"
+                    android:layout_margin="6dp"
+                    android:textSize="@dimen/font_size_normal"
+                    android:gravity="center_horizontal"/>
+
+                <Button
+                    android:id="@+id/view_questionnaires_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/fill_in_questionnaire"
+                    android:textSize="@dimen/font_size_normal"
+                    android:padding="@dimen/padding_button"/>
+
+                <Button
+                    android:id="@+id/view_submitted_questionnaires_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/view_submitted_questionnaires"
+                    android:textSize="@dimen/font_size_normal"
+                    android:padding="@dimen/padding_button"/>
+
+                <Button
+                    android:id="@+id/setup_menu_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setup_menu"
+                    android:textSize="@dimen/font_size_normal"
+                    android:padding="@dimen/padding_button"
+                    android:visibility="gone"/>
+
+                <Button
+                    android:id="@+id/measurement_menu_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/measurement_menu"
+                    android:textSize="@dimen/font_size_normal"
+                    android:padding="@dimen/padding_button"
+                    android:visibility="gone"/>
+
+                <Button
+                    android:id="@+id/usb_communication_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/usb_communication"
+                    android:textSize="@dimen/font_size_normal"
+                    android:padding="@dimen/padding_button"
+                    android:visibility="gone"/>
+
+                <Button
+                    android:id="@+id/oas_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/obstacle_alerting_system"
+                    android:textSize="@dimen/font_size_normal"
+                    android:padding="@dimen/padding_button"
+                    android:visibility="gone"/>
+
+                <Button
+                    android:id="@+id/graph_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/graphs"
+                    android:textSize="@dimen/font_size_normal"
+                    android:padding="@dimen/padding_button"
+                    android:visibility="gone"/>
+
+                <Button
+                    android:id="@+id/values_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/values"
+                    android:textSize="@dimen/font_size_normal"
+                    android:padding="@dimen/padding_button"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:id="@+id/button_terms_and_conditions_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/terms_label"
+                android:padding="6dp"
+                android:textSize="@dimen/font_size_normal"/>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height_logo"
+                android:src="@drawable/nomade_logo"
+                android:contentDescription="@string/nomade_logo"
+                android:paddingBottom="6dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

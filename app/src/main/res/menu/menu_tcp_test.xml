@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/ask_connection" android:title="Ask Connection"/>
+    <item android:id="@+id/connect" android:title="Connect"/>
+    <item android:id="@+id/disconnect" android:title="Disconnect"/>
+    <item android:id="@+id/send_quit" android:title="Send &quot;quit&quot;"/>
+    <item android:id="@+id/send_shutdown" android:title="Send &quot;shutdown&quot;"/>
+</menu>

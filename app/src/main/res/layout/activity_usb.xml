@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:keepScreenOn="true"
+    tools:context=".activities.UsbActivity">
+
+    <ListView android:id="@+id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:transcriptMode="alwaysScroll"
+        android:cacheColorHint="#00000000"
+        android:listSelector="@android:color/transparent"
+        android:fadeScrollbars="false"/>
+
+    <LinearLayout android:id="@+id/footer"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="bottom">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/init_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+
+                android:textAllCaps="false"
+                android:text="@string/initialise_communication" />
+
+            <Button
+                android:id="@+id/config_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+
+                android:textAllCaps="false"
+                android:visibility="gone"
+                android:text="@string/config" />
+
+            <Button
+                android:id="@+id/auto_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:textAllCaps="false"
+                android:text="@string/auto"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/ask_address_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:textAllCaps="false"
+                android:visibility="gone"
+                android:text="@string/ask_address" />
+
+            <Button
+                android:id="@+id/ack_miss_config_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:textAllCaps="false"
+                android:visibility="gone"
+                android:text="@string/miss_config" />
+
+            <Button
+                android:id="@+id/ack_exis_config_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:textAllCaps="false"
+                android:visibility="gone"
+                android:text="@string/exis_config" />
+
+            <Button
+                android:id="@+id/setup_raw_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:textAllCaps="false"
+                android:text="@string/send_setup" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/setup_json_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:textAllCaps="false"
+                android:visibility="gone"
+                android:text="@string/send_json_setup" />
+
+            <Button
+                android:id="@+id/start_stream_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:textAllCaps="false"
+                android:text="@string/start_stream" />
+
+            <Button
+                android:id="@+id/stop_stream_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:textAllCaps="false"
+                android:text="@string/stop_stream" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/request_json_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:textAllCaps="false"
+                android:visibility="gone"
+                android:text="@string/request_json_setup" />
+
+            <Button
+                android:id="@+id/start_measurement_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:textAllCaps="false"
+                android:visibility="visible"
+                android:text="@string/start_measurement" />
+
+            <Button
+                android:id="@+id/stop_current_measurement_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:textAllCaps="false"
+                android:visibility="visible"
+                android:text="@string/stop_measurement" />
+
+            <Button
+                android:id="@+id/send_measurement_list_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:textAllCaps="false"
+                android:visibility="gone"
+                android:text="@string/send_measurement_list" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

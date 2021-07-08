@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".activities.BodyDragAndDropActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/floating_parent">
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_margin="8dp">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:scaleType="fitXY"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignTop="@id/grid_parent"
+            android:layout_alignBottom="@id/grid_parent"
+            android:layout_alignStart="@id/grid_parent"
+            android:layout_alignEnd="@id/grid_parent"
+            android:src="@drawable/body_chart" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/grid_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/drag_view_container_text_view"
+        android:text="@string/instruments_to_be_placed"
+        android:layout_marginStart="4dp"
+        android:textSize="@dimen/font_size_normal"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/drag_view_parent"
+        android:visibility="gone">
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_margin="8dp"
+        android:orientation="horizontal"
+        android:id="@+id/delete_container"
+        android:background="@color/red"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="2dp"
+            android:src="@drawable/ic_action_delete" />
+
+    </LinearLayout>
+
+</LinearLayout>

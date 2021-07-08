@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.SubmissionViewerActivity"
+    android:fadeScrollbars="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/view_original_submission_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/view_original_submission"
+            android:gravity="center"
+            android:padding="16dp"
+            android:textSize="@dimen/font_size_normal"
+            android:visibility="gone"
+            android:textStyle="bold" />
+
+        <View
+            android:id="@+id/divider_view"
+            android:layout_height="2dp"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:background="@color/default_text"
+            android:layout_marginBottom="4dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/not_the_latest_version_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/not_the_latest_version"
+                android:textSize="@dimen/font_size_normal"
+                android:paddingBottom="8dp"
+                android:visibility="gone"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/name_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/loading_ellipsis"
+                android:textSize="@dimen/font_size_title"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/date_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/font_size_normal" />
+
+            <TextView
+                android:id="@+id/description_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/font_size_normal" />
+
+            <LinearLayout
+                android:id="@+id/submitted_questionnaire_container_linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginBottom="32dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

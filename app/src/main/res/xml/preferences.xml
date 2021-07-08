@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="preference_screen">
+
+    <Preference
+        android:key="accessibility_settings"
+        android:title="@string/accessibility_settings_title"
+        android:summary="@string/accessibility_settings_summary"
+        android:layout="@layout/activity_settings"/>
+
+    <CheckBoxPreference
+        android:key="setting_enable_logging"
+        android:title="@string/enable_logging_title"
+        android:summary="@string/enable_logging_summary"
+        android:defaultValue="false"
+        android:layout="@layout/activity_settings"/>
+
+    <Preference
+        android:key="export_log_files"
+        android:title="@string/export_log_files_title"
+        android:summary="@string/export_log_files_summary"
+        android:layout="@layout/activity_settings"/>
+
+    <Preference
+        android:key="clear_log_files"
+        android:title="@string/clear_log_files_title"
+        android:summary="@string/clear_log_files_summary"
+        android:layout="@layout/activity_settings"/>
+
+    <CheckBoxPreference
+        android:key="setting_qnr_draft_view"
+        android:title="@string/display_drafts_title"
+        android:summary="@string/display_drafts_summary"
+        android:defaultValue="false"
+        android:layout="@layout/activity_settings"/>
+
+    <CheckBoxPreference
+        android:key="setting_qnr_draft_submit"
+        android:title="@string/submit_drafts_title"
+        android:summary="@string/submit_drafts_summary"
+        android:defaultValue="false"
+        android:layout="@layout/activity_settings"/>
+
+    <CheckBoxPreference
+        android:key="setting_automatic_usb_communication"
+        android:title="Automatic USB communication"
+        android:summary="If enabled, the app will automatically set up the USB communication and start streaming when connected"
+        android:defaultValue="false"
+        android:layout="@layout/activity_settings"/>
+
+    <CheckBoxPreference
+        android:key="setting_hide_unchangeable parameters"
+        android:title="Hide unchangeable parameters"
+        android:summary="If enabled, the app will hide unchangeable parameters while configuring an instrument"
+        android:defaultValue="true"
+        android:layout="@layout/activity_settings"/>
+
+    <EditTextPreference
+        android:key="setting_server_api_url_laravel_https"
+        android:title="API URL"
+        android:summary="URL that is currently used"
+        android:defaultValue="@string/api_url"
+        android:layout="@layout/activity_settings"/>
+
+    <CheckBoxPreference
+        android:key="setting_server_custom_url"
+        android:title="Enable custom URL"
+        android:summary="If enabled, the app will use the custom URL, this custom URL can be set using the setting above, the custom URL has priority over the developer URL"
+        android:defaultValue="false"
+        android:layout="@layout/activity_settings"/>
+
+    <CheckBoxPreference
+        android:key="setting_server_developer_url"
+        android:title="Enable developer URL"
+        android:summary="If enabled, the app will use the developer URL"
+        android:defaultValue="false"
+        android:layout="@layout/activity_settings"/>
+
+</PreferenceScreen>

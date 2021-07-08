@@ -1,0 +1,572 @@
+<resources>
+    <string name="app_name" translatable="false">NOMADe App</string>
+    <string name="api_url" translatable="false">https://nomade.clouddb.myriade.be/api/</string>
+
+    <!--Activity Labels-->
+    <string name="available_questionnaires">Available questionnaires</string>
+    <string name="fill_in_questionnaire">Fill in a questionnaire</string>
+    <string name="view_submitted_questionnaires">View submitted questionnaires</string>
+    <string name="submitted_questionnaires">Submitted questionnaires</string>
+    <string name="submitted_questionnaire">Submitted questionnaire</string>
+    <string name="edit_setup">Edit the setup</string>
+    <string name="connected_users">Connected users</string>
+    <string name="measurement_menu">Measurement menu</string>
+    <string name="measurement_list">Measurement list</string>
+    <string name="new_measurement">New Measurement</string>
+    <string name="usb_communication">USB Communication</string>
+    <string name="obstacle_alerting_system" translatable="false">Obstacle Alerting System</string>
+    <string name="graphs">Graphs</string>
+    <string name="configure_graphs">Configure graphs</string>
+    <string name="configure_variable">Configure variable</string>
+    <string name="values">Values</string>
+    <string name="tcp_communication">TCP Communication</string>
+    <string name="usb_and_tcp_communication">USB and TCP Communication</string>
+    <string name="developer_console">Developer console</string>
+    <string name="alarm_distance_simulation">Alarm Distance Simulation</string>
+
+    <!--Setups-->
+    <string name="setup_menu">Setup menu</string>
+    <string name="view_setup_list">View the setup list</string>
+    <string name="setup_list">Setup list</string>
+    <string name="setups">Setups</string>
+    <string name="setup">Setup</string>
+    <string name="setup_info">Setup Information</string>
+    <string name="view_instrument_list">View the instrument list</string>
+    <string name="instrument_list">Instrument list</string>
+    <string name="instrumentArrayList">Instruments</string>
+    <string name="instruments_colon">"Instruments: "</string>
+    <string name="instrument">Instrument</string>
+    <string name="new_setup">New setup</string>
+    <string name="cant_add_instrument_without_setup_id">Can\'t add an instrument to a new setup without ID</string>
+    <string name="choose_instrument_type">Choose an instrument type</string>
+    <string name="set_parameters">Set parameters</string>
+    <string name="id_colon">"ID: "</string>
+    <string name="setup_id_colon">"Setup ID: "</string>
+    <string name="address_colon">"Address: "</string>
+    <string name="name_colon">Name: </string>
+    <string name="parameters_colon">"Parameters: "</string>
+    <string name="no_parameters">No parameters for this type of instrument</string>
+    <string name="type">Type</string>
+    <string name="parameter">Parameter</string>
+    <string name="back">Back</string>
+    <string name="add_instrument">Add instrument</string>
+    <string name="description_colon">"Description: "</string>
+    <string name="locked_colon">"Locked: "</string>
+    <string name="level_colon" translatable="false">"Level: "</string>
+    <string name="data_type_colon" translatable="false">"Data type: "</string>
+    <string name="main_board_colon" translatable="false">"Main board: "</string>
+    <string name="minimum_colon">"Minimum: "</string>
+    <string name="maximum_colon">"Maximum: "</string>
+    <string name="default_value_colon">"Default: "</string>
+    <string name="value_colon">"Value: "</string>
+    <string name="value_description_colon">"Value description: "</string>
+    <string name="hardware_identifier_colon">"Hardware ID: "</string>
+    <string name="company_id_colon">"Company ID: "</string>
+    <string name="hardware_identifier">Hardware ID</string>
+    <string name="company_id">Company ID</string>
+    <string name="version">Version</string>
+    <string name="type_id_colon">"Type ID: "</string>
+    <string name="type_name_colon">"Type name: "</string>
+    <string name="category_colon">"Category: "</string>
+    <string name="input_bytes_colon">"Input bytes: "</string>
+    <string name="output_bytes_colon">"Output bytes: "</string>µ
+    <string name="version_colon">"Version: "</string>
+    <string name="create_new_setup">Create new setup</string>
+    <string name="parameter_not_supported">This parameter is not yet supported in the app!</string>
+    <string name="none">None</string>
+    <string name="please_provide_details">Please provide the following details</string>
+    <string name="setup_in_memory_has_id_and_version">The setup in the memory of the Android device has ID %1$d and version %2$d.</string>
+    <string name="no_setup_in_memory">There is no setup in the memory of the Android device</string>
+    <string name="setup_in_main_board_has_id_and_version">The setup in the main board has ID %1$d and version %2$d.</string>
+    <string name="no_setup_in_main_board">There is no setup in the main board.</string>
+    <string name="no_instruments_available">No instruments available</string>
+    <string name="no_setups_available">No setups available</string>
+    <string name="distance_colon">Distance: %d cm</string>
+    <string name="speed_colon">Speed: %d km/h</string>
+    <string name="slope_start_colon">Slope start: %d cm</string>
+    <string name="slope_percentage_colon">Slope percentage: %d %%</string>
+    <string name="slope_end_colon">Slope end: %d cm</string>
+    <string name="alarm_distance_colon">Alarm distance: %d cm</string>
+    <string name="show_setup_info">Show the setup info</string>
+    <string name="edit_setup_name">Edit the setup name</string>
+    <string name="graphs_error">There is a problem with the setup in the memory of the device, please reboot the PWC and restart the app. If the problem persists, check the setup and resend it to the DMU when necessary.</string>
+
+    <!--ListView and ExpandableListView Items-->
+    <string name="list_questionnaire_id_colon">Quest. ID: %1$d</string>
+    <string name="list_group_id_colon">Group ID: %1$d</string>
+    <string name="list_version_colon">Version: %1$d</string>
+    <string name="list_count_colon">Count: %1$d</string>
+    <string name="list_user_colon">User: %1$s</string>
+    <string name="list_date_colon">Date: %1$s</string>
+    <string name="list_child_details_colon">Quest. ID: %1$d Version: %2$d</string>
+    <string name="list_submission_details_colon">Quest. ID: %1$d\nVersion: %2$d\n%3$s</string>
+    <string name="list_submission_date_colon">"Submission date: "</string>
+    <string name="list_last_edit_colon">"Last edit: "</string>
+
+    <!--Filter-->
+    <string name="filter">Filter</string>
+    <string name="start_date_colon">"Start date: "</string>
+    <string name="end_date_colon">"End date: "</string>
+    <string name="country_colon">"Country: "</string>
+    <string name="user_id_colon">"User ID: "</string>
+    <string name="clear_filter">Clear filter</string>
+    <string name="set_filter">Apply filter</string>
+    <string name="dates_in_right_order">Please make sure the start date is before the end date.</string>
+
+    <!--Random-->
+    <string name="bullet" translatable="false">&#8226;</string>
+    <string name="loading_ellipsis">Loading&#8230;</string>
+    <string name="ellipsis" translatable="false">&#8230;</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="ok" translatable="false">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="create">Create</string>
+    <string name="question">Question</string>
+    <string name="upload_remaining_questionnaires">Upload %1$d remaining questionnaire(s)</string>
+    <string name="nomade_logo" translatable="false">NOMADe Logo</string>
+    <string name="no_submissions">No submitted questionnaires available</string>
+    <string name="select_update_frequency">Select update frequency</string>
+    <string name="menu_save_setup">Save setup</string>
+    <string name="close">Close</string>
+    <string name="tooltip">Tooltip</string>
+    <string name="save_changes">Save changes</string>
+    <string name="quit">Quit</string>
+    <string name="saving_failed">Saving failed</string>
+    <string name="saved_edit">Saved edit</string>
+    <string name="edit">Edit</string>
+    <string name="copy_">Copy</string>
+    <string name="select_ellipsis">Select&#8230;</string>
+    <string name="resume">Resume</string>
+    <string name="pause">Pause</string>
+    <string name="no_graphs_configured">No graphs configured</string>
+    <string name="no_connected_users">No connected users</string>
+    <string name="started_at_colon">"Started at: "</string>
+    <string name="finished_at_colon">"Finished at: "</string>
+    <string name="view_original_submission">View the original submission</string>
+    <string name="not_the_latest_version">This is not the latest version of this submission!</string>
+    <string name="_for_">" for "</string>
+    <string name="remove_site_x">Remove site %1$d</string>
+    <string name="instruments_to_be_placed">Instruments to be placed</string>
+    <string name="graph_1">Graph 1</string>
+    <string name="graph_2">Graph 2</string>
+    <string name="graph_3">Graph 3</string>
+    <string name="graph_4">Graph 4</string>
+    <string name="add_variable">Add Variable</string>
+    <string name="save">Save</string>
+    <string name="instrument_colon">Instrument: </string>
+    <string name="variable_colon">Variable: </string>
+    <string name="color_colon">Color: </string>
+    <string name="remove">Remove</string>
+    <string name="add">Add</string>
+    <string name="daily_diary" translatable="false">Daily Diary</string>
+
+    <!--Measurements-->
+    <string name="no_measurements">No measurements</string>
+    <string name="please_select_a_date">Please select a date</string>
+    <string name="please_select_a_time">Please select a time</string>
+    <string name="please_select_a_start_date">Please select a start date</string>
+    <string name="please_select_a_start_time">Please select a start time</string>
+    <string name="please_select_an_end_date">Please select an end date</string>
+    <string name="please_select_an_end_time">Please select an end time</string>
+    <string name="start_time_after_end_time">Please the make sure the start time takes place before the end time</string>
+    <string name="start_time_same_as_end_time">Make sure the start time is different from the end time</string>
+    <string name="please_provide_a_name">Please provide a name</string>
+    <string name="create_a_new_measurement_colon">"Create a new measurement: "</string>
+    <string name="select_a_user_colon">"Select a user: "</string>
+    <string name="select_a_setup_colon">"Select a setup: "</string>
+    <string name="give_a_name_for_the_measurement_colon">"Give a name for the measurement: "</string>
+    <string name="description">Description</string>
+    <string name="start_time_colon">"Start time: "</string>
+    <string name="end_time_colon">"End time: "</string>
+    <string name="create_a_new_measuremet_before_starting_it">Create a new measurement before starting it.</string>
+    <string name="measurement_stopped">Measurement stopped</string>
+    <string name="do_you_want_to_keep_the_measurement">Do you want to keep the measurement?</string>
+    <string name="plan_new_measurement">Plan new measurement</string>
+    <string name="start_new_measurement">Start new measurement</string>
+    <string name="stop_current_measurement">Stop current measurement</string>
+    <string name="measurement">Measurement</string>
+    <string name="edit_measurement_name">Edit the measurement name</string>
+    <string name="show_measurement_info">Show the measurement info</string>
+    <string name="new_setup_template">New setup from template</string>
+
+    <!--Action Bar Menu-->
+    <string name="menu_log_out">Log out</string>
+    <string name="menu_about">About</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_download_pdf">Create PDF</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_add_instrument">Add a new instrument</string>
+    <string name="menu_setup_info">Show setup info</string>
+    <string name="menu_filter">Filter</string>
+    <string name="menu_question_overview">Question overview</string>
+
+    <!--QuestionnairesActivity-->
+    <string name="continue_questionnaire">Continue with your last questionnaire:</string>
+    <string name="do_you_want_new_questionnaire">Do you want to open a new questionnaire?</string>
+    <string name="answers_will_be_deleted">The answers of the open questionnaire will be deleted!</string>
+    <string name="draft">%1$s (Draft)</string>
+    <string name="no_questionnaires">No questionnaires available</string>
+    <string name="questionnaire_colon" translatable="false">"Questionnaire: "</string>
+
+    <!--QuestionPerQuestionActivity-->
+    <string name="button_previous">Previous</string>
+    <string name="button_next">Next</string>
+    <string name="button_submit">Submit</string>
+    <string name="questionnaire">Questionnaire</string>
+    <string name="questionnaire_completed">Questionnaire completed</string>
+    <string name="submit_of_return">You can submit your answers at the bottom of this page or go back to change your answers.</string>
+    <string name="hint">Answer here</string>
+
+    <!--Dialog Titles-->
+    <string name="warning">Warning</string>
+    <string name="log_out">Log out</string>
+    <string name="storage_permission">Storage permission</string>
+    <string name="notice">Notice</string>
+    <string name="general_notice">General notice</string>
+    <string name="update_required">Update required</string>
+    <string name="update_available">Update available</string>
+    <string name="yourself_or_other_user">Yourself or other user?</string>
+    <string name="select_file_export">Select a log file to export (total: %1$s)</string>
+    <string name="adding_failed">Adding failed</string>
+    <string name="updating_failed">Updating failed</string>
+    <string name="create_new_setup_template">Create new setup from template</string>
+
+    <!--Dialogs-->
+    <string name="getting_available_questionnaires_ellipsis">Getting available questionnaires&#8230;</string>
+    <string name="getting_submitted_questionnaires_ellipsis">Getting submitted questionnaires&#8230;</string>
+    <string name="getting_selected_questionnaire_ellipsis">Getting selected questionnaire&#8230;</string>
+    <string name="submitting_your_answers_ellipsis">Submitting your answers&#8230;</string>
+    <string name="creating_pdf_version_ellipsis">Creating the PDF version&#8230;</string>
+    <string name="msg_storage_permission">You need to allow access to the internal storage</string>
+    <string name="do_you_want_to_log_out">Do you want to log out? This will erase all files created by the app!</string>
+    <string name="update_the_app">There is a new version available, do you want to update now?</string>
+    <string name="update_the_app_lower_minimum">Your app version is lower than the required minimum version, do you want to update now? If you don\'t update, we can\'t guarantee the correct functioning of the app.</string>
+    <string name="getting_setups_ellipsis">Getting setups&#8230;</string>
+    <string name="getting_selected_setup_ellipsis">Getting selected setup&#8230;</string>
+    <string name="getting_instruments_ellipsis">Getting instrumentArrayList&#8230;</string>
+    <string name="getting_selected_instrument_ellipsis">Getting selected instrument&#8230;</string>
+    <string name="updating_type_list_ellipsis">Updating the type list&#8230;</string>
+    <string name="requesting_selected_type_ellipsis">Requesting the data for the selected type&#8230;</string>
+    <string name="updating_parameter_list_ellipsis">Updating the parameter list&#8230;</string>
+    <string name="submitting_failed">Submitting failed</string>
+    <string name="couldnt_submit_questionnaire">Couldn\'t successfully submit questionnaire. Do you want to try again? Otherwise your answers will be saved for later upload.</string>
+    <string name="quit_save_changes">Do you want to save changes?</string>
+    <string name="quit_setup_screen">Do you want to quit the setup screen?</string>
+    <string name="couldnt_save_changes">Couldn\'t save some changes, do you want to try again?</string>
+    <string name="saving_changes_ellipsis">Saving changes&#8230;</string>
+    <string name="adding_new_instrument_ellipsis">Adding a new instrument&#8230;</string>
+    <string name="creating_new_setup_ellipsis">Creating new setup&#8230;</string>
+    <string name="do_you_want_edit">Do you want to edit this submitted questionnaire?</string>
+    <string name="do_you_want_copy">Do you want to make a copy of this submitted questionnaire?</string>
+    <string name="already_edited">There is already a saved edit of this questionnaire stored locally, if you make a new edit, the saved edit will be removed. Do you want to continue?</string>
+    <string name="checking_saved_edits">Checking for saved edits&#8230;</string>
+    <string name="removing_saved_edit">Removing the saved edit&#8230;</string>
+    <string name="open_questionnaire">Open questionnaire</string>
+    <string name="do_you_want_to_load_answers">Do you want to load the saved answers?</string>
+    <string name="alarm_volume_warning">The buzzer function depends on the alarm volume of your Android device, please check if the alarm volume is high enough and isn\'t muted. The current volume is set at %1$d %%.</string>
+    <string name="getting_user_list_ellipsis">Getting user list&#8230;</string>
+    <string name="getting_connected_users_ellipsis">Getting connected users&#8230;</string>
+    <string name="connecting_the_user_to_the_setup_ellipsis">Connecting the user to the setup&#8230;</string>
+    <string name="creating_a_new_measurement_ellipsis">Creating a new measurement&#8230;</string>
+    <string name="complete_questionnaire_yourself_other_user">Do you want to complete this questionnaire for yourself or for an other user?</string>
+    <string name="myself">Myself</string>
+    <string name="other_user">Other user</string>
+    <string name="clear_log_files_question">Do you want to clear the log files in the SharedPreferences?</string>
+    <string name="adding_instruments_template">Adding instruments from template&#8230;</string>
+    <string name="couldnt_add_all_instruments">Couldn\'t add all instruments from the template, do you want to try again?</string>
+    <string name="couldnt_update_all_instruments">Couldn\'t update all instruments from the template, do you want to try again?</string>
+    <string name="please_provide_details_template">Please provide the following details, then you may pick a setup to use as a template.</string>
+    <string name="pick_setup_template">Pick setup as template</string>
+
+    <!--Toasts-->
+    <string name="questionnaire_successfully_submitted">Questionnaire successfully submitted</string>
+    <string name="questionnaires_submitted">%1$d questionnaire(s) successfully submitted, %2$d failed</string>
+    <string name="error_colon">"Error: "</string>
+    <string name="questionnaire_not_found">Questionnaire is not found</string>
+    <string name="download_complete">Download complete</string>
+    <string name="storage_permission_denied">Storage permission denied</string>
+    <string name="no_internet_access_offline_data">No internet access available, displaying the offline data</string>
+    <string name="no_internet_access_questionnaire_saved">No internet access available, your answers are saved for later upload</string>
+    <string name="questionnaire_saved">Your answers are saved for later upload</string>
+    <string name="drafts_cant_be_submitted">Drafts can\'t be submitted</string>
+    <string name="username_password_fields_empty">The username and/or password field is empty</string>
+    <string name="no_connection_to_server">No connection to the server, please check if you have an active internet connection.</string>
+    <string name="cant_check_for_new_version">Can\'t check for a new version at the moment.</string>
+    <string name="connection_to_the_dmu_is_active">Connection to the DMU is active</string>
+    <string name="no_connection_to_the_dmu">No connection to the DMU</string>
+    <string name="pdf_not_saved">PDF not saved</string>
+    <string name="pdf_saved">PDF saved successfully</string>
+    <string name="pdf_failed">Saving PDF failed</string>
+    <string name="log_file_exported">Log file exported</string>
+    <string name="error_log_file_export">An error occurred while exporting the log file</string>
+
+    <!--Network Errors-->
+    <string name="auto_logout">Error: Logged out automatically because you logged in on another device</string>
+    <string name="wrong_credentials">Error: wrong login credentials</string>
+    <string name="unknown_error_colon">"Unknown error: "</string>
+
+    <string name="timeout_error" translatable="false">Timeout error</string>
+    <string name="no_connection_error" translatable="false">No connection error</string>
+    <string name="auth_failure_error" translatable="false">Auth failure error</string>
+    <string name="client_error" translatable="false">Client error</string>
+    <string name="server_error" translatable="false">Server error</string>
+    <string name="network_error" translatable="false">Network error</string>
+    <string name="parse_error" translatable="false">Parse error</string>
+    <string name="volley_error" translatable="false">Volley error</string>
+    <string name="no_response_from_server">No response from the server</string>
+    <string name="no_internet_access">No internet access available</string>
+    <string name="server_unreachable">The server is unreachable</string>
+    <string name="displaying_offline_data">, the offline data is displayed</string>
+    <string name="logged_in_other_device">Logged out automatically because you logged in on another device</string>
+    <string name="wrong_login_credentials">Wrong login credentials</string>
+    <string name="no_offline_data">No offline data available</string>
+
+    <!--Input checks-->
+    <string name="fill_in_the_field">Fill in the field for answer %1$s</string>
+    <string name="check_a_button">Check a radio button</string>
+    <string name="check_one_checkbox">Check at least one checkbox</string>
+    <string name="value_out_of_range_int">The value for answer %1$s must be between %2$d and %3$d</string>
+    <string name="value_out_of_range_double">The value for answer %1$s must be between %2$.2f and %3$.2f</string>
+    <string name="touch_seekbar_once">Touch the slider at least once for answer %1$s</string>
+    <string name="address_greater_than_zero">The address must be greater than zero</string>
+    <string name="address_must_be_number">The address must be a number</string>
+    <string name="parameter_value_less">The value of parameter \"%1$s\" must be less than or equal to %2$s</string>
+    <string name="parameter_value_greater">The value of parameter \"%1$s\" must be greater than or equal to %2$s</string>
+    <string name="parameter_value_decimal">The value of parameter \"%1$s\" must be a decimal number</string>
+    <string name="parameter_slope_start_greater_than_slope_end">The distance at the start of the slope must be less than or equal to the distance at the end of the slope</string>
+
+    <!--Login-->
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="logging_in_ellipsis">Logging in&#8230;</string>
+    <string name="login_successful">Login successful</string>
+    <string name="login_failed">Login failed</string>
+    <string name="not_logged_in">Not logged in</string>
+    <string name="logged_in_as">Logged in as</string>
+    <string name="testing_server_ellipsis">Testing the connection to the server&#8230;</string>
+    <string name="server_test_successful">The server is available</string>
+    <string name="server_test_unsuccessful">The server is unavailable</string>
+    <string name="checking_server_and_login_ellipsis">Checking the server and login status&#8230;</string>
+
+    <!--Settings-->
+    <string name="no_settings_available">No settings available</string>
+    <string name="accessibility_settings_title">Accessibility options</string>
+    <string name="accessibility_settings_summary">Go to the accessibility options of your Android device to change font size, zoom level&#8230;</string>
+    <string name="enable_logging_title">Enable logging</string>
+    <string name="enable_logging_summary">When enabled, the log files will be saved in the SharedPreferences of the EDUCAT App, the log files can be exported using the option underneath</string>
+    <string name="export_log_files_title">Export log files</string>
+    <string name="export_log_files_summary">Export log files from the SharedPreferences to text files</string>
+    <string name="clear_log_files_title">Clear log files</string>
+    <string name="clear_log_files_summary">Clear the log files in the SharedPreferences</string>
+    <string name="display_drafts_title">Display drafts</string>
+    <string name="display_drafts_summary">Display drafts in the list of available questionnaires</string>
+    <string name="submit_drafts_title">Submit drafts</string>
+    <string name="submit_drafts_summary">Enables the ability to submit drafts</string>
+    <string name="oas_vibrate">Enable vibration alerts</string>
+    <string name="oas_vibrate_summary">Warning: this feature will probably drain your battery faster than normal.</string>
+    <string name="oas_sound">Enable sound alerts</string>
+    <string name="oas_sound_summary">Warning: this audible warning depends on the alarm volume of your Android device.</string>
+
+    <!--Countries-->
+    <string name="belgium">Belgium</string>
+    <string name="france">France</string>
+    <string name="the_netherlands">The Netherlands</string>
+    <string name="united_kingdom">United Kingdom</string>
+
+    <!--OasActivity-->
+    <string name="buzzer_colon">"Buzzer: "</string>
+    <string name="haptic_colon">"Haptic: "</string>
+    <string name="visual_colon">"Visual: "</string>
+    <string name="voice_colon">"Voice: "</string>
+    <string name="active">Active</string>
+    <string name="inactive">Inactive</string>
+
+    <!--UsbActivity-->
+    <string name="initialise_communication">Initialise communication</string>
+    <string name="config" translatable="false">Config</string>
+    <string name="auto" translatable="false">Auto</string>
+    <string name="ask_address" translatable="false">Ask address</string>
+    <string name="miss_config" translatable="false">Miss config</string>
+    <string name="exis_config" translatable="false">Exis config</string>
+    <string name="send_setup">Send setup</string>
+    <string name="send_json_setup" translatable="false">Send JSON Setup</string>
+    <string name="start_stream">Start stream</string>
+    <string name="stop_stream">Stop stream</string>
+    <string name="request_json_setup" translatable="false">Request JSON Setup</string>
+    <string name="start_measurement">Start measurement</string>
+    <string name="stop_measurement">Stop measurement</string>
+    <string name="send_measurement_list" translatable="false">Send measurement list</string>
+
+    <!--Symbols-->
+    <string name="lock_symbol" translatable="false">"\uD83D\uDD12"</string>
+
+    <!--Services-->
+    <string name="tcp_service_started">TCP service is started</string>
+    <string name="tcp_service_stopped">TCP service is stopped</string>
+    <string name="usb_service_started">USB service is started</string>
+    <string name="usb_service_stopped">USB service is stopped</string>
+
+    <!--Notification Channel ID names-->
+    <string name="channel_id__name_general">General</string>
+    <string name="channel_id__name_usb_service">USB service</string>
+    <string name="channel_id__name_tcp_service">TCP service</string>
+
+    <!--Sort options-->
+    <string name="sort">Sort</string>
+    <string name="select_the_sorting_order">Select the sorting order</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="select_how_to_sort">Select how to sort the list</string>
+    <string name="measurement_id">Measurement ID</string>
+    <string name="start_time">Start time</string>
+    <string name="setup_id">Setup ID</string>
+    <string name="instrument_id">Instrument ID</string>
+    <string name="name">Name</string>
+    <string name="instrument_type_id">Instrument Type ID</string>
+    <string name="questionnaire_id" translatable="false">Questionnaire ID</string>
+    <string name="title">Title</string>
+
+    <!--AboutActivity-->
+    <string name="about_website_key">Website</string>
+    <string name="about_version_key">Version</string>
+    <string name="about_locale_key" translatable="false">Locale</string>
+    <string name="about_changelog_key">Changelog</string>
+    <string name="about_changelog_value" translatable="false"><Data>
+        <![CDATA[
+
+        <b>Version 0.11</b><br/>
+        ??/??/2021<br/>
+        - ...<br/><br/>
+
+        <b>Version 0.10</b><br/>
+        25/06/2021<br/>
+        - Added support for 100 Hz instruments to the graphs<br/><br/>
+
+        <b>Version 0.9</b><br/>
+        08/06/2021<br/>
+        - Fixed a bug that occurred while creating a new setup from an other locked setup<br/>
+        - Fixed a crash that occurred very occasionally while in the Graphs screen<br/>
+        - Enabled the filter on questionnaire option in the submitted questionnaires list<br/>
+        - Added new data types for full IMU data and full IMU data at 100 Hz<br/><br/>
+
+        <b>Version 0.8</b><br/>
+        31/05/2021<br/>
+        - Simplified and streamlined the UI of the USB Activity<br/>
+        - Set RTC time is added to the communication with the DCU<br/><br/>
+
+        <b>Version 0.7</b><br/>
+        19/05/2021<br/>
+        - Fixed a crash that occurred very occasionally when trying to show a dialog for an Activity that was already finished<br/>
+        - Fixed a bug in the exporting of the log files resulting in empty log files<br/>
+        - Fixed an app crash caused by a String that was nullified while communicating with the DMU<br/><br/>
+
+        <b>Version 0.6</b><br/>
+        11/05/2021<br/>
+        - Partly fixed an issue where special characters were replaced by question marks in the generated PDF files<br/>
+        - It is now possible to add clickable hyperlinks in the question tooltips<br/>
+        - Optimized the new logging method<br/>
+        - Added the option to use a locked setup as template to create a new setup<br/><br/>
+
+        <b>Version 0.5</b><br/>
+        27/04/2021<br/>
+        - Updated the creation process of PDF files to comply with the new Google Play Policy<br/>
+        - Updated the logging method to comply with the new Google Play Policy<br/><br/>
+
+        <b>Version 0.4</b><br/>
+        26/03/2021<br/>
+        - Made some changes to the accessible parts of the app based on permissions of the user<br/>
+        - Fixed a bug where the progress dialog could get stuck on screen while creating the PDF<br/>
+        - Fixed some progress dialog messages where the ellipsis was displayed incorrectly<br/>
+        - Fixed a bug where the app would crash while parsing a setup without the instrument type and instrument parameter lists<br/><br/>
+
+        <b>Version 0.3</b><br/>
+        23/02/2021<br/>
+        - Fixed a bug where some users would be logged out automatically under certain circumstances<br/><br/>
+
+        <b>Version 0.2</b><br/>
+        27/01/2021<br/>
+        - Solved a bug that would result in multiple instances of the USB communication service causing problems with transferring the data to the database<br/>
+        - Made some small changes to the (submitted) questionnaire formatting<br/>
+        - The (general) notice is displayed only once now<br/>
+        - Added sorting options to the questionnaires list<br/>
+        - Added the option to submit a questionnaire for an other user<br/>
+        - Fixed a bug causing the app to crash when a submitted questionnaire with a specific answer type was opened<br/><br/>
+
+        <b>Version 0.1</b><br/>
+        01/10/2020<br/>
+        - Initial release<br/>
+
+    ]]></Data></string>
+
+    <!--TermsAndConditionsActivity-->
+    <string name="terms_title">Please agree to the terms and conditions listed below</string>
+    <string name="terms_label" translatable="false">Privacy policy</string>
+    <string name="terms_text" translatable="false"><Data>
+        <![CDATA[
+
+        <p>The NOMADe project team attaches a high importance on data protection, and on compliance
+        with the GDPR. For additional information and remarks on data protection and GDPR
+        compliance, please contact a project partner. The aim of this privacy notice is to outline
+        how we will collect and use information during our project activities and by our forms.</p>
+
+        <h4>Information Collection</h4>
+
+        <p>The NOMADe project team collects information through its forms at several stages
+        (registration forms, expression of interest forms, post-event evaluation forms, etc.) and
+        through its experiments and dedicated questionnaires.</p>
+
+        <h6>Information Provided by You</h6>
+
+        <p>In general, we collect the following information: names, telephone numbers, addresses,
+        email addresses, geographical locations, company name, etc. We may also collect medical
+        information which will be saved in an anonymized database.</p>
+
+        <h4>Information Usage</h4>
+
+        <h6>Primary Use of Personal Information</h6>
+
+        <p>The information collected by the NOMADe project team will be used for event
+        administration and for maintaining an up to date contact database.</p>
+
+        <p>The information which you give will be used for the following purposes: to enable the
+        project team to create a computer and paper record of your participation in NOMADe and its
+        related activities, and to enable the project team to compile statistics. No information
+        that would identify you as an individual will be published without your prior agreement.
+        The information will be kept securely, and will be kept no longer than necessary.</p>
+
+        <h6>Secondary Use of Personal Information</h6>
+
+        <p>Registered participants to the NOMADe project and any NOMADe related activities may
+        receive additional communications from us about NOMADe support services, newsletters, etc.
+        Anyone wishing to no longer receive any information must notify a project partner to be
+        removed from any contact lists.</p>
+
+        <h6>Use of Information gathered during Experiments and Dedicated Questionnaires</h6>
+
+        <p>This information is always saved and treated in an anonymized way. Only generalized
+        conclusions will be published.</p>
+
+        <h6>Sharing Data with Third Parties</h6>
+
+        <p>We may share personal information data with the following institutions, partners in the
+        NOMADe project: Catholic University Leuven, University of Antwerp, CeREF, University of
+        Mons, University of Lille, University of Picardy Jules Verne, Polytechnic University of
+        Hauts-de-France and University of Reims Champagne-Ardenne.</p>
+
+        <h6>Links from our Websites</h6>
+
+        <p>We offer links to other websites. Please note: when you click on links to other websites,
+         we encourage you to read their privacy policies. Their standards may differ from ours.</p>
+
+        <h4>Use of pictures and videos</h4>
+
+        <p>Occasionally, pictures and videos taken during project activities will be used in the
+        communication activities of the project.</p>
+
+    ]]></Data></string>
+
+</resources>

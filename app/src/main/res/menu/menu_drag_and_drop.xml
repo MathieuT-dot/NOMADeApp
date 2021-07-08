@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_setup_info"
+        android:icon="@drawable/ic_action_info_white"
+        android:title="@string/menu_setup_info"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_save_setup"
+        android:icon="@drawable/ic_action_save"
+        android:title="@string/menu_save_setup"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
+
+    <item
+        android:id="@+id/action_add_instrument"
+        android:icon="@drawable/ic_action_add"
+        android:title="@string/menu_add_instrument"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
+
+    <item
+        android:id="@+id/action_lock_setup"
+        android:title="Lock setup"
+        app:showAsAction="never"
+        android:visible="false"/>
+
+</menu>
