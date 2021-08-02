@@ -13,6 +13,11 @@ import com.nomade.android.nomadeapp.setups.Measurement;
 
 import java.util.ArrayList;
 
+/**
+ * MeasurementAdapter
+ *
+ * Adapter to populate the MeasurementListActivity
+ */
 public class MeasurementAdapter extends ArrayAdapter<Measurement> {
 
     private static final String TAG = "MeasurementAdapter";

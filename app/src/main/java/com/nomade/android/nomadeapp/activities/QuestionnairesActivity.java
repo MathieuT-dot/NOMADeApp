@@ -157,7 +157,15 @@ public class QuestionnairesActivity extends AppCompatActivity implements SimpleD
             savedAnswersPresent = true;
             MyLog.d(TAG, "Getting the saved answers from SharedPreferences");
             String answers_json = questionnairesSharedPreferences.getString("answers_json", "null");
-            savedAnswers = gson.fromJson(answers_json, SubmittingQuestionnaire.class);
+
+            try {
+                savedAnswers = gson.fromJson(answers_json, SubmittingQuestionnaire.class);
+            }
+            catch (Exception e) {
+                MyLog.e(TAG, "Saved answers corrupt, removing from SharedPreferences (" + e.getMessage() + ")");
+                questionnairesEditor.remove("answers_json");
+                savedAnswersPresent = false;
+            }
         } else {
             savedAnswersPresent = false;
         }

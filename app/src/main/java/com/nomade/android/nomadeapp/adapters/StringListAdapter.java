@@ -11,6 +11,11 @@ import com.nomade.android.nomadeapp.R;
 
 import java.util.ArrayList;
 
+/**
+ * StringListAdapter
+ *
+ * Adapter to populate the debug list in the UsbActivity
+ */
 public class StringListAdapter extends BaseAdapter {
 
     private static final String TAG = "StringListAdapter";

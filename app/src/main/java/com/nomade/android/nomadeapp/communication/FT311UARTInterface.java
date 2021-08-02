@@ -20,6 +20,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * FT311UARTInterface
+ *
+ * Class to handle the communication over USB with an FT311D or FT312D chip from FTDI Chip
+ */
 public class FT311UARTInterface {
 
     private static final String TAG = "FT311UARTInterface";

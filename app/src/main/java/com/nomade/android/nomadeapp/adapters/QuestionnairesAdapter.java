@@ -21,7 +21,7 @@ public class QuestionnairesAdapter extends ArrayAdapter<Questionnaire> {
 
     private static final String TAG = "QuestionnairesAdapter";
     private Context context;
-    private boolean developer;
+    private boolean debug;
 
     // View lookup cache
     private static class ViewHolder {
@@ -30,10 +30,10 @@ public class QuestionnairesAdapter extends ArrayAdapter<Questionnaire> {
         TextView textViewDetails;
     }
 
-    public QuestionnairesAdapter(Context context, ArrayList<Questionnaire> data, boolean developer) {
+    public QuestionnairesAdapter(Context context, ArrayList<Questionnaire> data, boolean debug) {
         super(context, R.layout.list_item_questionnaire, data);
         this.context = context;
-        this.developer = developer;
+        this.debug = debug;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class QuestionnairesAdapter extends ArrayAdapter<Questionnaire> {
             viewHolder.textViewDescription = convertView.findViewById(R.id.description_text_view);
             viewHolder.textViewDetails = convertView.findViewById(R.id.details_text_view);
 
-            if (!developer){
+            if (!debug){
                 convertView.findViewById(R.id.details_linear_layout).setVisibility(View.GONE);
             }
 

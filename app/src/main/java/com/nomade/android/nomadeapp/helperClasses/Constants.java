@@ -15,6 +15,7 @@ public class Constants {
     // change this to insert a new url
     // change setting name in preferences.xml
     public static final String SETTING_SERVER_API_URL = "setting_server_api_url_laravel_https";
+    public static final String SERVER_API_IP = "server_api_ip";
 
     public static final String TIME_SERVER = "pool.ntp.org";
 

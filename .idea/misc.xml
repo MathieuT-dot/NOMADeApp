@@ -5,6 +5,16 @@
       <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
     </configurations>
   </component>
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/Mathieu/AndroidStudioProjects/NOMADeApp/app/src/main/res/layout/activity_submitted_questionnaire_viewer.xml" value="0.36820652173913043" />
+        <entry key="..\:/Users/Mathieu/AndroidStudioProjects/NOMADeApp/app/src/main/res/layout/activity_submitted_questionnaires.xml" value="0.23822463768115942" />
+        <entry key="..\:/Users/Mathieu/AndroidStudioProjects/NOMADeApp/app/src/main/res/layout/body_chart.xml" value="0.23822463768115942" />
+        <entry key="..\:/Users/Mathieu/AndroidStudioProjects/NOMADeApp/app/src/main/res/menu/menu_submitted_questionnaires.xml" value="0.36666666666666664" />
+      </map>
+    </option>
+  </component>
   <component name="MarkdownProjectSettings">
     <PreviewSettings splitEditorLayout="SPLIT" splitEditorPreview="PREVIEW" useGrayscaleRendering="false" zoomFactor="1.0" maxImageWidth="0" showGitHubPageIfSynced="false" allowBrowsingInPreview="false" synchronizePreviewPosition="true" highlightPreviewType="NONE" highlightFadeOut="5" highlightOnTyping="true" synchronizeSourcePosition="true" verticallyAlignSourceAndPreviewSyncPosition="true" showSearchHighlightsInPreview="true" showSelectionInPreview="true">
       <PanelProvider>

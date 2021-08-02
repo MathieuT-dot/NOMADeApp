@@ -89,12 +89,12 @@ public class BodyChartImageView extends androidx.appcompat.widget.AppCompatImage
     private void setupDrawing(){
 
         //prepare for drawing and setup selector_normal stroke properties
-        brushSize = 20;
+        brushSize = 2;
         drawPath = new Path();
         drawPaint = new Paint();
         drawPaint.setColor(paintColor);
         drawPaint.setAntiAlias(true);
-        drawPaint.setStrokeWidth(brushSize);
+        drawPaint.setStrokeWidth(getWidth() * 0.02f * brushSize);
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -113,22 +113,24 @@ public class BodyChartImageView extends androidx.appcompat.widget.AppCompatImage
     //draw the view - will be called after touch event
     @Override
     protected void onDraw(Canvas canvas) {
-        getParent().requestDisallowInterceptTouchEvent(true);
+        if (getParent() != null) {
+            getParent().requestDisallowInterceptTouchEvent(true);
+        }
 
         canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
         canvas.drawPath(drawPath, drawPaint);
 
-        for (int i = 0; i < areas.size(); i++) {
+        for (int j = 0; j < areas.size(); j++) {
             float averageX = 0;
             float averageY = 0;
-            for (Marker marker : areas.get(i).markerArrayList) {
+            for (Marker marker : areas.get(j).markerArrayList) {
                 averageX += marker.x;
                 averageY += marker.y;
             }
-            averageX /= areas.get(i).markerArrayList.size();
-            averageY /= areas.get(i).markerArrayList.size();
+            averageX /= areas.get(j).markerArrayList.size();
+            averageY /= areas.get(j).markerArrayList.size();
 
-            canvas.drawCircle(averageX, averageY, 10, textPaint);
+            canvas.drawCircle(averageX, averageY, getWidth() * 0.01f, textPaint);
             float verticalCorrection = 0f;
             float yScaled = averageY / (float) getHeight() * 100f;
             if (yScaled <= 25) {
@@ -140,7 +142,17 @@ public class BodyChartImageView extends androidx.appcompat.widget.AppCompatImage
             else if (yScaled >= 75) {
                 verticalCorrection = 0f;
             }
-            canvas.drawText("" + (i + 1), averageX + 20, averageY + verticalCorrection, textPaint);
+            textPaint.setTextSize(getWidth() * 0.075f);
+            canvas.drawText("" + (j + 1), averageX + getWidth() * 0.02f, averageY + verticalCorrection, textPaint);
+        }
+
+        if (brushSize < 4) {
+            // new width based implementation
+            drawPaint.setStrokeWidth(getWidth() * 0.02f * brushSize);
+        }
+        else {
+            // legacy implementation based on values from resources
+            drawPaint.setStrokeWidth(brushSize);
         }
     }
 
@@ -187,7 +199,7 @@ public class BodyChartImageView extends androidx.appcompat.widget.AppCompatImage
     }
 
     //update color
-    public void setPainLevel(int painLevel){
+    public void setPainLevel(int painLevel) {
 //        invalidate();
         this.painLevel = painLevel;
         switch (painLevel) {
@@ -212,7 +224,7 @@ public class BodyChartImageView extends androidx.appcompat.widget.AppCompatImage
     }
 
     // update pattern
-    public void setPattern(String pattern){
+    public void setPattern(String pattern) {
 //        invalidate();
         this.pattern = pattern;
         //check whether filled or pattern name
@@ -238,12 +250,18 @@ public class BodyChartImageView extends androidx.appcompat.widget.AppCompatImage
     }
 
     //set brush size
-    public void setBrushSize(float newSize){
-//        invalidate();
-        float pixelAmount = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                newSize, getResources().getDisplayMetrics());
-        brushSize=pixelAmount;
-        drawPaint.setStrokeWidth(brushSize);
+    public void setBrushSize(float newSize) {
+        if (newSize < 4) {
+            // new width based implementation
+            brushSize = newSize;
+            drawPaint.setStrokeWidth(getWidth() * 0.02f * brushSize);
+        }
+        else {
+            // legacy implementation based on values from resources
+            brushSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    newSize, getResources().getDisplayMetrics());
+            drawPaint.setStrokeWidth(brushSize);
+        }
     }
 
     //get and set maximum areas
@@ -307,9 +325,9 @@ public class BodyChartImageView extends androidx.appcompat.widget.AppCompatImage
 
     public void setAreas(String[] stringAreas) {
         areas.clear();
-        for (int i = 0; i < stringAreas.length; i++) {
+        for (String stringArea : stringAreas) {
             try {
-                JSONObject jsonObject = new JSONObject(stringAreas[i]);
+                JSONObject jsonObject = new JSONObject(stringArea);
                 float brushSize = (float) jsonObject.getDouble("brush_size");
                 int painLevel = jsonObject.getInt("pain_level");
                 String pattern = jsonObject.getString("pattern");
@@ -321,7 +339,7 @@ public class BodyChartImageView extends androidx.appcompat.widget.AppCompatImage
                     float yScaled = (float) jsonMarker.getDouble("y");
                     float x = xScaled / 100f * (float) getWidth();
                     float y = yScaled / 100f * (float) getHeight();
-                    markerArrayList.add(new Marker(x,y));
+                    markerArrayList.add(new Marker(x, y));
                 }
                 areas.add(new Area(brushSize, painLevel, pattern, markerArrayList));
             } catch (JSONException e) {
@@ -355,7 +373,14 @@ public class BodyChartImageView extends androidx.appcompat.widget.AppCompatImage
         drawPath = new Path();
         for (Area area : areas) {
             brushSize = area.brushSize;
-            drawPaint.setStrokeWidth(brushSize);
+            if (brushSize < 4) {
+                // new width based implementation
+                drawPaint.setStrokeWidth(getWidth() * 0.02f * brushSize);
+            }
+            else {
+                // legacy implementation based on values from resources
+                drawPaint.setStrokeWidth(brushSize);
+            }
             setPainLevel(area.painLevel);
             setPattern(area.pattern);
 
@@ -370,7 +395,14 @@ public class BodyChartImageView extends androidx.appcompat.widget.AppCompatImage
         }
 
         brushSize = lastBrushSize;
-        drawPaint.setStrokeWidth(brushSize);
+        if (brushSize < 4) {
+            // new width based implementation
+            drawPaint.setStrokeWidth(getWidth() * 0.02f * brushSize);
+        }
+        else {
+            // legacy implementation based on values from resources
+            drawPaint.setStrokeWidth(brushSize);
+        }
         setPainLevel(lastPainLevel);
         if (lastPattern != null) {
             setPattern(lastPattern);

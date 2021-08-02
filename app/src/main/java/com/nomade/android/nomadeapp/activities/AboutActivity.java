@@ -20,6 +20,8 @@ import java.util.Locale;
  */
 public class AboutActivity extends AppCompatActivity {
 
+    private static final String TAG = "AboutActivity";
+
     private String versionName;
     private int versionCode;
 

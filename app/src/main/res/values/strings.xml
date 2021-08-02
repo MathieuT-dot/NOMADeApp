@@ -202,6 +202,7 @@
     <string name="menu_setup_info">Show setup info</string>
     <string name="menu_filter">Filter</string>
     <string name="menu_question_overview">Question overview</string>
+    <string translatable="false" name="menu_download_all_pdf_files">Download all PDF files</string>
 
     <!--QuestionnairesActivity-->
     <string name="continue_questionnaire">Continue with your last questionnaire:</string>
@@ -438,9 +439,17 @@
     <string name="about_changelog_value" translatable="false"><Data>
         <![CDATA[
 
+        <b>Version 0.12</b><br/>
+        02/08/2021<br/>
+        - The IP address for the TCP connection is now dynamically resolved from the URL<br/>
+        - Migrated to a new PDF library, which results in faster creation, smaller file sizes, no corrupt characters, better image quality...<br/>
+        - Made some changes to the body chart, unifying the drawn paths across devices, both in-app and in generated PDF files<br/><br/>
+
         <b>Version 0.11</b><br/>
-        ??/??/2021<br/>
-        - ...<br/><br/>
+        12/07/2021<br/>
+        - Enabled the filter on questionnaire option in the submitted questionnaires list<br/>
+        - Solved a bug where users with old data in SharedPreferences would sometimes experience a crash<br/>
+        - Removed unused code, resources, images...<br/><br/>
 
         <b>Version 0.10</b><br/>
         25/06/2021<br/>

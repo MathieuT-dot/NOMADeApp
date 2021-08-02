@@ -22,7 +22,8 @@ public class SubmissionsAdapter extends ArrayAdapter<SubmittedQuestionnaire> {
     private static final String TAG = "SubmissionsAdapter";
     private Context context;
 
-    private boolean developer;
+    private boolean showUsers;
+    private boolean debug;
 
     // View lookup cache
     private static class ViewHolder {
@@ -31,10 +32,11 @@ public class SubmissionsAdapter extends ArrayAdapter<SubmittedQuestionnaire> {
         TextView textViewDetails;
     }
 
-    public SubmissionsAdapter(Context context, ArrayList<SubmittedQuestionnaire> data, boolean developer) {
+    public SubmissionsAdapter(Context context, ArrayList<SubmittedQuestionnaire> data, boolean showUsers, boolean debug) {
         super(context, R.layout.list_item_submission, data);
         this.context = context;
-        this.developer = developer;
+        this.showUsers = showUsers;
+        this.debug = debug;
     }
 
     @Override
@@ -58,10 +60,20 @@ public class SubmissionsAdapter extends ArrayAdapter<SubmittedQuestionnaire> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.textViewTitle.setText(submittedQuestionnaire.getTitle());
+        if (debug) {
+            viewHolder.textViewTitle.setText(submittedQuestionnaire.getTitle() + " (" + submittedQuestionnaire.getId() + ")");
+        }
+        else {
+            viewHolder.textViewTitle.setText(submittedQuestionnaire.getTitle());
+        }
 
-        if (developer){
-            viewHolder.textViewUsername.setText(context.getString(R.string.list_user_colon, submittedQuestionnaire.getUserName()) + " (" + submittedQuestionnaire.getUserId() + ")");
+        if (showUsers) {
+            if (debug) {
+                viewHolder.textViewUsername.setText(context.getString(R.string.list_user_colon, submittedQuestionnaire.getUserName()) + " (" + submittedQuestionnaire.getUserId() + ")");
+            }
+            else {
+                viewHolder.textViewUsername.setText(context.getString(R.string.list_user_colon, submittedQuestionnaire.getUserName()));
+            }
         }
         else {
             viewHolder.textViewUsername.setVisibility(View.GONE);

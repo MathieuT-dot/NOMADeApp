@@ -3,4 +3,3 @@ rootProject.name='NOMADe App'
 
 include ':kuleuvenlibrary'
 project(':kuleuvenlibrary').projectDir = new File(settingsDir, '../Libraries/kuleuvenlibrary')
-include ':apwlibrary'

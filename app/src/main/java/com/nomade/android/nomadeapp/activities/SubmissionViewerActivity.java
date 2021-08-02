@@ -47,21 +47,30 @@ import com.kuleuven.android.kuleuvenlibrary.getQuestionnaireClasses.Questionnair
 import com.kuleuven.android.kuleuvenlibrary.submittedQuestionnaireClasses.SubmittedQuestionnaire;
 import com.kuleuven.android.kuleuvenlibrary.submittedQuestionnaireClasses.SubmittedQuestionnaireAnswer;
 import com.kuleuven.android.kuleuvenlibrary.submittedQuestionnaireClasses.SubmittedQuestionnaireQuestion;
+import com.tom_roush.pdfbox.pdmodel.PDDocument;
+import com.tom_roush.pdfbox.pdmodel.PDPage;
+import com.tom_roush.pdfbox.pdmodel.PDPageContentStream;
+import com.tom_roush.pdfbox.pdmodel.common.PDRectangle;
+import com.tom_roush.pdfbox.pdmodel.font.PDFont;
+import com.tom_roush.pdfbox.pdmodel.font.PDType1Font;
+import com.tom_roush.pdfbox.pdmodel.graphics.image.LosslessFactory;
+import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import crl.android.pdfwriter.PDFWriter;
-import crl.android.pdfwriter.StandardCharsets;
-import crl.android.pdfwriter.StandardFonts;
 import eltos.simpledialogfragment.SimpleDialog;
 
 /**
@@ -106,18 +115,15 @@ public class SubmissionViewerActivity extends AppCompatActivity implements Simpl
     TextView[] answerTextViews;
     BodyChartImageView bodyChartImageView;
 
-    private PDFWriter mPDFWriter;
-    private int defaultLeftMargin = 50;
-    private int questionLeftMargin = 70;
-    private int answerLeftMargin = 90;
-    private int currentTopPositionFromBottom = 772;
-    private int defaultFontSize = 12;
-    private int titleFontSize = 20;
-    private int defaultInterlinearDistance = 10;
-    private int smallInterlinearDistance = 5;
-    private int bigInterlinearDistance = 25;
-    private static final int A4_WIDTH = 595;
-    private static final int A4_HEIGHT = 842;
+    private PDDocument document;
+    private PDPage page;
+    private PDPageContentStream contentStream;
+    private float width;
+    private float startY;
+    private float endY;
+    private float heightCounter;
+    private float currentXPosition;
+    private float wrapOffsetY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -474,207 +480,348 @@ public class SubmissionViewerActivity extends AppCompatActivity implements Simpl
      * @param data contains the save location
      */
     private void createPdfFile(Intent data) {
-        Bitmap bulletBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.bullet);
+        // Enable Android asset loading
+        PDFBoxResourceLoader.init(getApplicationContext());
 
-        mPDFWriter = new PDFWriter();
+        document = new PDDocument();
+        page = new PDPage(PDRectangle.A4);
+        document.addPage(page);
 
-        mPDFWriter.setFont(StandardFonts.SUBTYPE, StandardFonts.TIMES_BOLD);
-        addText(defaultLeftMargin, currentTopPositionFromBottom, titleFontSize, submittedQuestionnaire.getTitle());
-        mPDFWriter.setFont(StandardFonts.SUBTYPE, StandardFonts.TIMES_ROMAN);
+        PDRectangle mediaBox = page.getMediaBox();
+        float marginY = 80;
+        float marginX = 60;
+        width = mediaBox.getWidth() - 2 * marginX;
+        float startX = mediaBox.getLowerLeftX() + marginX;
+        float endX = mediaBox.getUpperRightX() - marginX;
+        startY = mediaBox.getUpperRightY() - marginY;
+        endY = mediaBox.getLowerLeftY() + marginY;
+        heightCounter = startY;
+        currentXPosition = 0;
+        float answerPositionX = startX + 10;
 
-        currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, titleFontSize, defaultInterlinearDistance);
-        if (username != null && !username.equals("")) {
-            addText(defaultLeftMargin, currentTopPositionFromBottom, defaultFontSize, getString(R.string.list_user_colon, username));
-            currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, defaultInterlinearDistance);
-        }
-        addText(defaultLeftMargin, currentTopPositionFromBottom, defaultFontSize, getString(R.string.user_id_colon) + submittedQuestionnaire.getUserId());
+        float smallOffsetY = 8;
+        float normalOffsetY = 20;
+        wrapOffsetY = 2;
 
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.nomade_logo_small);
-        mPDFWriter.addImageKeepRatio(420, 735, 65, 65, bitmap);
+        Paint titleTextPaint = new TextPaint();
+        float titleFontSize = 20;
+        titleTextPaint.setTextSize(titleFontSize);
+        titleTextPaint.setTypeface(Typeface.create("Helvetica", Typeface.BOLD));
+        Paint.FontMetrics titleFontMetrics = titleTextPaint.getFontMetrics();
+        float titleFontHeight = titleFontMetrics.descent - titleFontMetrics.ascent;
 
-        if (submittedQuestionnaire.getEditDate().equals("null") || submittedQuestionnaire.getDate().equals(submittedQuestionnaire.getEditDate())) {
-            currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, bigInterlinearDistance);
-            addText(defaultLeftMargin, currentTopPositionFromBottom, defaultFontSize, getString(R.string.list_submission_date_colon) + submittedQuestionnaire.getDate());
-            currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, defaultInterlinearDistance);
-            addText(defaultLeftMargin, currentTopPositionFromBottom, defaultFontSize, getString(R.string.started_at_colon) + submittedQuestionnaire.getStartedAt());
-            currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, defaultInterlinearDistance);
-            addText(defaultLeftMargin, currentTopPositionFromBottom, defaultFontSize, getString(R.string.finished_at_colon) + submittedQuestionnaire.getFinishedAt());
-        } else {
-            currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, bigInterlinearDistance);
-            addText(defaultLeftMargin, currentTopPositionFromBottom, defaultFontSize, getString(R.string.list_submission_date_colon) + submittedQuestionnaire.getDate());
-            currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, defaultInterlinearDistance);
-            addText(defaultLeftMargin, currentTopPositionFromBottom, defaultFontSize, getString(R.string.list_last_edit_colon) + submittedQuestionnaire.getEditDate());
-            currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, defaultInterlinearDistance);
-            addText(defaultLeftMargin, currentTopPositionFromBottom, defaultFontSize, getString(R.string.started_at_colon) + submittedQuestionnaire.getStartedAt());
-            currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, defaultInterlinearDistance);
-            addText(defaultLeftMargin, currentTopPositionFromBottom, defaultFontSize, getString(R.string.finished_at_colon) + submittedQuestionnaire.getFinishedAt());
-        }
+        Paint defaultTextPaint = new TextPaint();
+        float defaultFontSize = 12;
+        defaultTextPaint.setTextSize(defaultFontSize);
+        defaultTextPaint.setTypeface(Typeface.create("Helvetica", Typeface.NORMAL));
+        Paint.FontMetrics defaultFontMetrics = defaultTextPaint.getFontMetrics();
+        float defaultFontHeight = defaultFontMetrics.descent - defaultFontMetrics.ascent;
 
-        String descriptionString = submittedQuestionnaire.getDescription();
-
-        if (descriptionString.length() > 0) {
-            String[] splitDescription = descriptionString.split(System.lineSeparator());
-            for (String s : splitDescription) {
-                currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, bigInterlinearDistance);
-                addText(defaultLeftMargin, currentTopPositionFromBottom, defaultFontSize, s);
-            }
-        }
-
-        SubmittedQuestionnaireQuestion submittedQuestionnaireQuestion;
-        SubmittedQuestionnaireAnswer submittedQuestionnaireAnswer;
-
-        for (int i = 0; i < submittedQuestionnaire.getQuestionsList().size(); i++) {
-
-            submittedQuestionnaireQuestion = submittedQuestionnaire.getQuestionsList().get(i);
-
-            String questionString = parseAlternateQuestionNumbering(i + 1, submittedQuestionnaireQuestion.getQuestion());
-            questionString = questionString.replaceAll("\\/","\\\\/");
-            questionString = questionString.replaceAll("\\(","\\\\(");
-            questionString = questionString.replaceAll("\\)","\\\\)");
-            questionString = questionString.replaceAll("–","-");
-            questionString = questionString.replaceAll("’","'");
-
-            String[] splitQuestion = questionString.split(System.lineSeparator());
-
-            for (int k = 0; k < splitQuestion.length; k++) {
-
-                if (k == 0) {
-                    currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, bigInterlinearDistance);
-                }
-                else {
-                    currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, smallInterlinearDistance);
-                }
-                addText(questionLeftMargin, currentTopPositionFromBottom, defaultFontSize, splitQuestion[k]);
-            }
-
-            if (submittedQuestionnaireQuestion.getBulletType() == Question.NO_BULLETS || submittedQuestionnaireQuestion.getBulletType() == Question.RADIO_BUTTONS || submittedQuestionnaireQuestion.getBulletType() == Question.CHECKBOXES) {
-
-                for (int j = 0; j < submittedQuestionnaireQuestion.getAnswersList().size(); j++) {
-
-                    submittedQuestionnaireAnswer = submittedQuestionnaireQuestion.getAnswersList().get(j);
-
-                    String answerValue = submittedQuestionnaireAnswer.getAnswer();
-
-                    // Special case for the "Yes/No Scale"
-                    if (submittedQuestionnaireAnswer.getTypeId() == Answer.YES_NO) {
-                        if (answerValue.equals("1")) {
-                            answerValue = getString(R.string.yes);
-                        } else {
-                            answerValue = getString(R.string.no);
-                        }
-                    }
-
-                    if (!submittedQuestionnaireAnswer.getPrefix().equals("null") && !submittedQuestionnaireAnswer.getPrefix().equals("") && !submittedQuestionnaireAnswer.getPrefix().equals(" ") && !submittedQuestionnaireAnswer.getPrefix().trim().equals(":")) {
-
-                        if (!answerValue.equals("") && !answerValue.equals("null")) {
-                            switch (submittedQuestionnaireAnswer.getPrefix().substring(submittedQuestionnaireAnswer.getPrefix().length() - 1)) {
-                                case ":":
-                                case "?":
-                                case "!":
-                                    answerValue = String.format("%s %s", parseAlternateAnswerNumbering(submittedQuestionnaireAnswer.getPrefix()), answerValue);
-                                    break;
-
-                                default:
-                                    answerValue = String.format("%s: %s", parseAlternateAnswerNumbering(submittedQuestionnaireAnswer.getPrefix()), answerValue);
-                            }
-
-                        } else {
-                            answerValue = parseAlternateAnswerNumbering(submittedQuestionnaireAnswer.getPrefix());
-                        }
-
-                    }
-
-                    currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, defaultInterlinearDistance);
-                    mPDFWriter.addImageKeepRatio(answerLeftMargin, currentTopPositionFromBottom + 1, 5, 5, bulletBitmap);
-                    addText(answerLeftMargin + 10, currentTopPositionFromBottom, defaultFontSize, answerValue);
-                }
-
-            }
-            else if (submittedQuestionnaireQuestion.getBulletType() == Question.BODY_CHART) {
-                if (bodyChartImageView != null) {
-                    Bitmap bodyChartBitmap = getBitmapFromView(bodyChartImageView);
-                    currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, 200);
-                    if (currentTopPositionFromBottom == 772) {
-                        currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, 200);
-                    }
-                    mPDFWriter.addImageKeepRatio(answerLeftMargin, currentTopPositionFromBottom, 200, 200, bodyChartBitmap);
-                    currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, defaultFontSize, defaultInterlinearDistance);
-                }
-            }
-
-        }
-
-        int pageCount = mPDFWriter.getPageCount();
-        for (int i = 0; i < pageCount; i++) {
-            mPDFWriter.setCurrentPage(i);
-            mPDFWriter.addText(550, 30, 10, (i + 1) + " / " + pageCount);
-        }
-
-        String pdfContent = mPDFWriter.asString();
+        // Create font objects
+        PDFont titleFont = PDType1Font.HELVETICA_BOLD;
+        PDFont defaultFont = PDType1Font.HELVETICA;
 
         try {
+            // Define a content stream for adding to the PDF
+            contentStream = new PDPageContentStream(document, page);
+
+            // Load in logo
+            InputStream in = getAssets().open("nomade_logo_small.png");
+
+            // Draw the logo
+            Bitmap bitmap = BitmapFactory.decodeStream(in);
+            PDImageXObject xImage = LosslessFactory.createFromImage(document, bitmap);
+            contentStream.drawImage(xImage, endX - 148, startY - 63, 148, 63);
+
+            // Write title
+            contentStream.beginText();
+
+            addParagraph(startX, 0, true, titleFont, titleFontSize, titleFontHeight, submittedQuestionnaire.getTitle(), width - 148);
+
+            if (username != null && !username.equals("")) {
+                // Write username
+                addParagraph(startX, normalOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.list_user_colon, username));
+                // Write user ID
+                addParagraph(startX, smallOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.user_id_colon) + submittedQuestionnaire.getUserId());
+            }
+            else {
+                // Write user ID
+                addParagraph(startX, normalOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.user_id_colon) + submittedQuestionnaire.getUserId());
+            }
+
+            if (submittedQuestionnaire.getEditDate().equals("null") || submittedQuestionnaire.getDate().equals(submittedQuestionnaire.getEditDate())) {
+                addParagraph(startX, normalOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.list_submission_date_colon) + submittedQuestionnaire.getDate());
+                addParagraph(startX, smallOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.started_at_colon) + submittedQuestionnaire.getStartedAt());
+                addParagraph(startX, smallOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.finished_at_colon) + submittedQuestionnaire.getFinishedAt());
+            } else {
+                addParagraph(startX, normalOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.list_submission_date_colon) + submittedQuestionnaire.getDate());
+                addParagraph(startX, smallOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.list_last_edit_colon) + submittedQuestionnaire.getEditDate());
+                addParagraph(startX, smallOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.started_at_colon) + submittedQuestionnaire.getStartedAt());
+                addParagraph(startX, smallOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.finished_at_colon) + submittedQuestionnaire.getFinishedAt());
+            }
+
+            String descriptionString = submittedQuestionnaire.getDescription();
+
+            if (descriptionString.length() > 0) {
+                String[] splitDescription = descriptionString.split(System.lineSeparator());
+                for (int k = 0; k < splitDescription.length; k++) {
+                    if (k == 0) {
+                        addParagraph(startX, normalOffsetY, defaultFont, defaultFontSize, defaultFontHeight, splitDescription[k]);
+                    }
+                    else {
+                        addParagraph(startX, wrapOffsetY, defaultFont, defaultFontSize, defaultFontHeight, splitDescription[k]);
+                    }
+                }
+            }
+
+            SubmittedQuestionnaireQuestion submittedQuestionnaireQuestion;
+            SubmittedQuestionnaireAnswer submittedQuestionnaireAnswer;
+
+            for (int i = 0; i < submittedQuestionnaire.getQuestionsList().size(); i++) {
+
+                submittedQuestionnaireQuestion = submittedQuestionnaire.getQuestionsList().get(i);
+
+                String questionString = parseAlternateQuestionNumbering(i + 1, submittedQuestionnaireQuestion.getQuestion());
+                String[] splitQuestion = questionString.split(System.lineSeparator());
+                for (int k = 0; k < splitQuestion.length; k++) {
+                    if (k == 0) {
+                        addParagraph(startX, normalOffsetY, defaultFont, defaultFontSize, defaultFontHeight, splitQuestion[k]);
+                    }
+                    else {
+                        addParagraph(startX, wrapOffsetY, defaultFont, defaultFontSize, defaultFontHeight, splitQuestion[k]);
+                    }
+                }
+
+                if (submittedQuestionnaireQuestion.getBulletType() == Question.NO_BULLETS || submittedQuestionnaireQuestion.getBulletType() == Question.RADIO_BUTTONS || submittedQuestionnaireQuestion.getBulletType() == Question.CHECKBOXES) {
+
+                    for (int j = 0; j < submittedQuestionnaireQuestion.getAnswersList().size(); j++) {
+
+                        submittedQuestionnaireAnswer = submittedQuestionnaireQuestion.getAnswersList().get(j);
+
+                        String answerValue = submittedQuestionnaireAnswer.getAnswer();
+
+                        // Special case for the "Yes/No Scale"
+                        if (submittedQuestionnaireAnswer.getTypeId() == Answer.YES_NO) {
+                            if (answerValue.equals("1")) {
+                                answerValue = getString(R.string.yes);
+                            } else {
+                                answerValue = getString(R.string.no);
+                            }
+                        }
+
+                        if (!submittedQuestionnaireAnswer.getPrefix().equals("null") && !submittedQuestionnaireAnswer.getPrefix().equals("") && !submittedQuestionnaireAnswer.getPrefix().equals(" ") && !submittedQuestionnaireAnswer.getPrefix().trim().equals(":")) {
+
+                            if (!answerValue.equals("") && !answerValue.equals("null")) {
+                                switch (submittedQuestionnaireAnswer.getPrefix().substring(submittedQuestionnaireAnswer.getPrefix().length() - 1)) {
+                                    case ":":
+                                    case "?":
+                                    case "!":
+                                        answerValue = String.format("%s %s", parseAlternateAnswerNumbering(submittedQuestionnaireAnswer.getPrefix()), answerValue);
+                                        break;
+
+                                    default:
+                                        answerValue = String.format("%s: %s", parseAlternateAnswerNumbering(submittedQuestionnaireAnswer.getPrefix()), answerValue);
+                                }
+
+                            } else {
+                                answerValue = parseAlternateAnswerNumbering(submittedQuestionnaireAnswer.getPrefix());
+                            }
+
+                        }
+
+                        addParagraph(answerPositionX, smallOffsetY, defaultFont, defaultFontSize, defaultFontHeight, "•");
+                        addParagraph(answerPositionX + 15, -defaultFontHeight, defaultFont, defaultFontSize, defaultFontHeight, answerValue);
+                    }
+
+                }
+                else if (submittedQuestionnaireQuestion.getBulletType() == Question.BODY_CHART) {
+                    if (bodyChartImageView != null) {
+                        addParagraph(startX, normalOffsetY + 200 - titleFontHeight, titleFont, titleFontSize, titleFontHeight, " ");
+                        contentStream.endText();
+
+                        Bitmap bodyChartBitmap = getBitmapFromView(bodyChartImageView);
+                        PDImageXObject xImageBodyChart = LosslessFactory.createFromImage(document, bodyChartBitmap);
+                        contentStream.drawImage(xImageBodyChart, answerPositionX, heightCounter, 200, 200);
+
+                        contentStream.beginText();
+                        addParagraph(startX, -defaultFontHeight, true, titleFont, titleFontSize, titleFontHeight, " ");
+                    }
+                }
+            }
+
+            contentStream.endText();
+
+            contentStream.close();
+
+            // Adding page numbers to the whole document
+            int pageCount = document.getNumberOfPages();
+            for (int i = 0; i < pageCount; i++) {
+                String pageNumberString = (i + 1) + " / " + pageCount;
+                float size = defaultFontSize * defaultFont.getStringWidth(pageNumberString) / 1000;
+                page = document.getPage(i);
+                contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true);
+                contentStream.beginText();
+                contentStream.setFont(defaultFont, defaultFontSize);
+                contentStream.newLineAtOffset(endX + marginX - endY + defaultFontHeight - size, endY - defaultFontHeight);
+                contentStream.showText(pageNumberString);
+                contentStream.endText();
+                contentStream.close();
+            }
+
+            // Make sure that the content stream is closed:
+            contentStream.close();
+
+            // Save the final pdf document to a file
             Uri uri = data.getData();
-
             OutputStream outputStream = getContentResolver().openOutputStream(uri);
-
-            outputStream.write(pdfContent.getBytes(StandardCharsets.ISO_8859_1));
-
+            document.save(outputStream);
             outputStream.close();
+            document.close();
 
             hideDialog();
             runOnUiThread(() -> Utilities.displayToast(context, getString(R.string.pdf_saved)));
+
         } catch (IOException e) {
+            e.printStackTrace();
             hideDialog();
             runOnUiThread(() -> Utilities.displayToast(context, getString(R.string.pdf_failed)));
         }
     }
 
     /**
-     * Adds text to the PDF file.
-     * If the text is too long, the text will be split and printed on the next line.
+     * Adds one or multiple lines of text to the PDF
+     *
+     * @param positionX X position to write the text
+     * @param offsetY Y offset to write the text
+     * @param font to display the text
+     * @param fontSize to display the text
+     * @param fontHeight to determine the extra Y offset
+     * @param text string to write
      */
-    private void addText(int leftPosition, int topPositionFromBottom, int fontSize, String text) {
-        Paint paint = new TextPaint();
-        paint.setTextSize(fontSize);
-        paint.setTypeface(Typeface.create("Times New Roman", Typeface.NORMAL));
-        float textLength = paint.measureText(text);
+    private void addParagraph(float positionX, float offsetY, PDFont font, float fontSize, float fontHeight, String text) throws IOException {
+        addParagraph(positionX, offsetY, false, font, fontSize, fontHeight, text, width);
+    }
 
-        if (leftPosition + textLength > A4_WIDTH - 40) {
-            int lastSpace = text.lastIndexOf(' ');
-            String truncatedText = text.substring(0, lastSpace);
-            textLength = paint.measureText(truncatedText);
+    /**
+     * Adds one or multiple lines of text to the PDF
+     *
+     * @param positionX X position to write the text
+     * @param offsetY Y offset to write the text
+     * @param setYToHeightCounter set Y location to height counter
+     * @param font to display the text
+     * @param fontSize to display the text
+     * @param fontHeight to determine the extra Y offset
+     * @param text string to write
+     */
+    private void addParagraph(float positionX, float offsetY, boolean setYToHeightCounter, PDFont font, float fontSize, float fontHeight, String text) throws IOException {
+        addParagraph(positionX, offsetY, setYToHeightCounter, font, fontSize, fontHeight, text, width);
+    }
 
-            while (leftPosition + textLength > A4_WIDTH - 40) {
-                lastSpace = truncatedText.lastIndexOf(' ');
-                if (lastSpace == -1) {
-                    break;
+    /**
+     * Adds one or multiple lines of text to the PDF
+     *
+     * @param positionX X position to write the text
+     * @param offsetY Y offset to write the text
+     * @param setYToHeightCounter set Y location to height counter
+     * @param font to display the text
+     * @param fontSize to display the text
+     * @param fontHeight to determine the extra Y offset
+     * @param text string to write
+     * @param width available width
+     */
+    private void addParagraph(float positionX, float offsetY, boolean setYToHeightCounter, PDFont font, float fontSize, float fontHeight, String text, float width) throws IOException {
+        List<String> lines = parseLines(text.replaceAll("\\p{Cntrl}", ""), width, font, fontSize);
+        contentStream.setFont(font, fontSize);
+
+        float neededHeight = lines.size() * (wrapOffsetY + fontHeight) + offsetY - wrapOffsetY;
+
+        if (heightCounter - neededHeight < endY) {
+            // Create new page
+            contentStream.endText();
+            contentStream.close();
+            page = new PDPage(PDRectangle.A4);
+            document.addPage(page);
+            contentStream = new PDPageContentStream(document, page);
+            contentStream.beginText();
+            contentStream.setFont(font, fontSize);
+
+            for (int i = 0; i < lines.size(); i++) {
+                if (i == 0) {
+                    contentStream.newLineAtOffset(positionX, startY - fontHeight);
+                    heightCounter = startY - fontHeight;
+                    currentXPosition = positionX;
                 }
-                truncatedText = truncatedText.substring(0, lastSpace);
-                textLength = paint.measureText(truncatedText);
+                else {
+                    contentStream.newLineAtOffset(0, - wrapOffsetY - fontHeight);
+                    heightCounter -= wrapOffsetY + fontHeight;
+                }
+                contentStream.showText(lines.get(i));
             }
-
-            mPDFWriter.addText(leftPosition, topPositionFromBottom, fontSize, truncatedText);
-
-            currentTopPositionFromBottom = moveCursor(currentTopPositionFromBottom, fontSize, smallInterlinearDistance);
-            addText(leftPosition, currentTopPositionFromBottom, defaultFontSize, text.substring(lastSpace + 1));
+        }
+        else if (setYToHeightCounter) {
+            for (int i = 0; i < lines.size(); i++) {
+                if (i == 0) {
+                    contentStream.newLineAtOffset(positionX, heightCounter - offsetY - fontHeight);
+                    heightCounter -= offsetY + fontHeight;
+                    currentXPosition = positionX;
+                }
+                else {
+                    contentStream.newLineAtOffset(0, - wrapOffsetY - fontHeight);
+                    heightCounter -= wrapOffsetY + fontHeight;
+                }
+                contentStream.showText(lines.get(i));
+            }
         }
         else {
-            mPDFWriter.addText(leftPosition, topPositionFromBottom, fontSize, text);
+            for (int i = 0; i < lines.size(); i++) {
+                if (i == 0) {
+                    contentStream.newLineAtOffset(positionX - currentXPosition, - offsetY - fontHeight);
+                    heightCounter -= offsetY + fontHeight;
+                    currentXPosition += positionX - currentXPosition;
+                }
+                else {
+                    contentStream.newLineAtOffset(0, - wrapOffsetY - fontHeight);
+                    heightCounter -= wrapOffsetY + fontHeight;
+                }
+                contentStream.showText(lines.get(i));
+            }
         }
     }
 
     /**
-     * Moves the cursor for the PDF writer, creates new page if needed.
-     * @return new cursor position
+     * Splits up the text depending on the available width, the font and the font size
+     *
+     * @param text string to split
+     * @param width available width
+     * @param font font for the text
+     * @param fontSize font size for the text
+     * @return a list of split strings
      */
-    private int moveCursor(int currentTopPositionFromBottom, int previousFontSize, int interlinearDistance) {
-        if (currentTopPositionFromBottom < 80) {
-            mPDFWriter.newPage();
-            return 772;
+    private static List<String> parseLines(String text, float width, PDFont font, float fontSize) throws IOException {
+        List<String> lines = new ArrayList<String>();
+        int lastSpace = -1;
+        while (text.length() > 0) {
+            int spaceIndex = text.indexOf(' ', lastSpace + 1);
+            if (spaceIndex < 0)
+                spaceIndex = text.length();
+            String subString = text.substring(0, spaceIndex);
+            float size = fontSize * font.getStringWidth(subString) / 1000;
+            if (size > width) {
+                if (lastSpace < 0){
+                    lastSpace = spaceIndex;
+                }
+                subString = text.substring(0, lastSpace);
+                lines.add(subString);
+                text = text.substring(lastSpace).trim();
+                lastSpace = -1;
+            } else if (spaceIndex == text.length()) {
+                lines.add(text);
+                text = "";
+            } else {
+                lastSpace = spaceIndex;
+            }
         }
-        else {
-            return currentTopPositionFromBottom - previousFontSize - interlinearDistance;
-        }
+        return lines;
     }
 
     public static Bitmap getBitmapFromView(View view) {

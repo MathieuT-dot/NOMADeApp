@@ -50,8 +50,8 @@ import eltos.simpledialogfragment.SimpleDialog;
 
 /**
  * Interreg VA 2 Seas – Project NOMADe
- * Date 2020/09, Author Mathieu Troch
- * Version Number 0.4
+ * Date 2021/07, Author Mathieu Troch
+ * Version Number 0.12
  * NOMADe App
  *
  * MainActivity
