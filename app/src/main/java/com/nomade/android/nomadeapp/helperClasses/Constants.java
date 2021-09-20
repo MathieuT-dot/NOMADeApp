@@ -238,9 +238,6 @@ public class Constants {
 
     public static final String SETTING_HIDE_UNCHANGEABLE_PARAMETERS = "setting_hide_unchangeable parameters";
 
-    public static final String SETTING_SERVER_CUSTOM_URL = "setting_server_custom_url";
-    public static final String SETTING_SERVER_DEVELOPER_URL = "setting_server_developer_url";
-
     public static final int MAX_LENGTH_OF_EDIT_TEXT = 50000;
 
     public static final String[] COUNTRIES = new String[]{

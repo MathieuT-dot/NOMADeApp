@@ -56,13 +56,6 @@ public class AboutActivity extends AppCompatActivity {
         versionValueTextView.setText(String.format("%s (%s)", versionName, versionCode));
 
 
-        TextView localeKeyTextView = findViewById(R.id.about_locale_key_text_view);
-        localeKeyTextView.setText(getString(R.string.about_locale_key));
-
-        TextView localeValueTextView = findViewById(R.id.about_locale_value_text_view);
-        localeValueTextView.setText(String.format("%s-%s", Locale.getDefault().getLanguage().toUpperCase(), Locale.getDefault().getCountry()));
-
-
         TextView changelogKeyTextView = findViewById(R.id.changelog_key_text_view);
         changelogKeyTextView.setText(getString(R.string.about_changelog_key));
 

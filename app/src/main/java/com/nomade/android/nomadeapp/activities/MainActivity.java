@@ -50,8 +50,8 @@ import eltos.simpledialogfragment.SimpleDialog;
 
 /**
  * Interreg VA 2 Seas – Project NOMADe
- * Date 2021/07, Author Mathieu Troch
- * Version Number 0.12
+ * Date 2021/08, Author Mathieu Troch
+ * Version Number 0.13
  * NOMADe App
  *
  * MainActivity
@@ -366,9 +366,6 @@ public class MainActivity extends AppCompatActivity implements SimpleDialog.OnDi
 
             defaultEditor.putBoolean(username + "_" + Constants.SETTING_QNR_DRAFT_SUBMIT, defaultSharedPreferences.getBoolean(Constants.SETTING_QNR_DRAFT_SUBMIT, false)).apply();
             defaultEditor.putBoolean(Constants.SETTING_QNR_DRAFT_SUBMIT, false).apply();
-
-//            defaultEditor.putString(username + "_" + Constants.SETTING_SERVER_API_URL, defaultSharedPreferences.getString(Constants.SETTING_SERVER_API_URL, Constants.API_URL)).apply();
-//            defaultEditor.putString(Constants.SETTING_SERVER_API_URL, Constants.API_URL).apply();
         }
 
         loginEditor.putBoolean("logged_in", false).apply();
@@ -414,62 +411,6 @@ public class MainActivity extends AppCompatActivity implements SimpleDialog.OnDi
                             MyLog.d(TAG, "updateUrl: " + updateUrl);
                             String developmentUrl = Utilities.extractUrl(response, "development");
                             MyLog.d(TAG, "developmentUrl: " + developmentUrl);
-
-                            if (!defaultSharedPreferences.getBoolean(Constants.SETTING_SERVER_CUSTOM_URL, false)){
-                                // custom url is disabled
-                                MyLog.d(TAG, "custom url is disabled");
-                                if (!developmentUrl.equals("") && defaultSharedPreferences.getBoolean(Constants.SETTING_SERVER_DEVELOPER_URL, false)){
-                                    // the developer url is not empty and the developer url is enabled
-                                    MyLog.d(TAG, "the developer url is not empty and the developer url is enabled");
-                                    if (!developmentUrl.equals(defaultSharedPreferences.getString(Constants.SETTING_SERVER_API_URL, Constants.API_URL))){
-                                        // the current url is not equal to the developer url
-                                        MyLog.d(TAG, "the current url is not equal to the developer url");
-                                        defaultEditor.putString(Constants.SETTING_SERVER_API_URL, developmentUrl).apply();
-                                        forceLogOut();
-                                        hideDialog();
-                                        return;
-                                    }
-                                }
-                                else {
-                                    // the developer url is empty or the developer url is disabled
-                                    MyLog.d(TAG, "the developer url is empty or the developer url is disabled");
-                                    if (developmentUrl.equals(defaultSharedPreferences.getString(Constants.SETTING_SERVER_API_URL, Constants.API_URL))){
-                                        // the developer url is disabled but it still used, reset to standard url
-                                        MyLog.d(TAG, "the developer url is disabled but it still used, reset to standard url");
-                                        defaultEditor.putString(Constants.SETTING_SERVER_API_URL, Constants.API_URL).apply();
-                                        forceLogOut();
-                                        hideDialog();
-                                        return;
-                                    }
-
-                                    if (!updateUrl.equals("")){
-                                        // the update url is not empty
-                                        MyLog.d(TAG, "the update url is not empty");
-                                        if (!updateUrl.equals(defaultSharedPreferences.getString(Constants.SETTING_SERVER_API_URL, Constants.API_URL))){
-                                            // the update url is not equal to the developer url
-                                            MyLog.d(TAG, "the update url is not equal to the developer url");
-                                            defaultEditor.putString(Constants.SETTING_SERVER_API_URL, updateUrl).apply();
-                                            forceLogOut();
-                                            hideDialog();
-                                            return;
-                                        }
-                                    }
-                                    else {
-                                        if (!localUrl.equals("")){
-                                            // the local url is not empty
-                                            MyLog.d(TAG, "the local url is not empty");
-                                            if (!localUrl.equals(defaultSharedPreferences.getString(Constants.SETTING_SERVER_API_URL, Constants.API_URL))){
-                                                // the local url is not equal to the developer url
-                                                MyLog.d(TAG, "the local url is not equal to the developer url");
-                                                defaultEditor.putString(Constants.SETTING_SERVER_API_URL, localUrl).apply();
-                                                forceLogOut();
-                                                hideDialog();
-                                                return;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
 
                             try {
                                 currentVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
@@ -520,29 +461,15 @@ public class MainActivity extends AppCompatActivity implements SimpleDialog.OnDi
                             }
 
                         } else {
-                            if (defaultSharedPreferences.getString((Constants.SETTING_SERVER_API_URL), Constants.API_URL).equals(Constants.API_URL)) {
-                                hideDialog();
-                                Utilities.displayToast(context, getString(R.string.server_test_unsuccessful));
-                                MyLog.d(TAG, getString(R.string.server_test_unsuccessful));
-                            } else {
-                                Utilities.displayToast(context, "Custom URL not available, resetting to NOMADe URL");
-                                MyLog.d(TAG, "Custom URL not available, resetting to NOMADe URL");
-                                defaultEditor.putString(Constants.SETTING_SERVER_API_URL, Constants.API_URL).apply();
-                                checkConnectionToServer();
-                            }
+                            hideDialog();
+                            Utilities.displayToast(context, getString(R.string.server_test_unsuccessful));
+                            MyLog.d(TAG, getString(R.string.server_test_unsuccessful));
                         }
                     },
                     e -> {
-                        if (defaultSharedPreferences.getString((Constants.SETTING_SERVER_API_URL), Constants.API_URL).equals(Constants.API_URL)) {
-                            MyLog.e(TAG, "Volley Error: " + e.toString() + ", " + e.getMessage() + ", " + e.getLocalizedMessage());
-                            hideDialog();
-                            Utilities.displayVolleyError(context, e);
-                        } else {
-                            Utilities.displayToast(context, "Custom URL not available, resetting to NOMADe URL");
-                            MyLog.d(TAG, "Custom URL not available, resetting to NOMADe URL");
-                            defaultEditor.putString(Constants.SETTING_SERVER_API_URL, Constants.API_URL).apply();
-                            checkConnectionToServer();
-                        }
+                        MyLog.e(TAG, "Volley Error: " + e.toString() + ", " + e.getMessage() + ", " + e.getLocalizedMessage());
+                        hideDialog();
+                        Utilities.displayVolleyError(context, e);
                     }){
 
                 @Override

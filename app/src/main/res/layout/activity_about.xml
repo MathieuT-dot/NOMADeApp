@@ -94,22 +94,6 @@
             android:textSize="@dimen/font_size_normal" />
 
         <TextView
-            android:id="@+id/about_locale_key_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/about_locale_key"
-            android:textSize="@dimen/font_size_normal"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/about_locale_value_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="en-uk"
-            android:textSize="@dimen/font_size_normal" />
-
-        <TextView
             android:id="@+id/changelog_key_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

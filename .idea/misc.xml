@@ -8,10 +8,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Mathieu/AndroidStudioProjects/NOMADeApp/app/src/main/res/layout/activity_about.xml" value="0.25679347826086957" />
         <entry key="..\:/Users/Mathieu/AndroidStudioProjects/NOMADeApp/app/src/main/res/layout/activity_submitted_questionnaire_viewer.xml" value="0.36820652173913043" />
         <entry key="..\:/Users/Mathieu/AndroidStudioProjects/NOMADeApp/app/src/main/res/layout/activity_submitted_questionnaires.xml" value="0.23822463768115942" />
         <entry key="..\:/Users/Mathieu/AndroidStudioProjects/NOMADeApp/app/src/main/res/layout/body_chart.xml" value="0.23822463768115942" />
         <entry key="..\:/Users/Mathieu/AndroidStudioProjects/NOMADeApp/app/src/main/res/menu/menu_submitted_questionnaires.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Mathieu/AndroidStudioProjects/NOMADeApp/app/src/main/res/xml/preferences.xml" value="0.26132246376811596" />
       </map>
     </option>
   </component>

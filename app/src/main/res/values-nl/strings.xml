@@ -357,4 +357,5 @@
     <string name="stop_stream">Stream stoppen</string>
     <string name="stop_measurement">Meting stoppen</string>
     <string name="graphs_error">Er is een probleem met de setup in het geheugen van het apparaat, start de PWC opnieuw op en start de app opnieuw. Als het probleem aanhoudt, controleer dan de setup en stuur deze indien nodig opnieuw naar de DMU.</string>
+    <string name="api_url_summary">Wijzig de URL die door de app wordt gebruikt om verbinding te maken met de database. Gebruik het volgende formaat: \"https://…/api/\". Vergeet niet het aangepaste SSL-certificaat aan Android toe te voegen als u een aangepast certificaat gebruikt. Als je dit naar de standaard wilt terugzetten, wis dan gewoon de app-gegevens in de instellingen van je Android-apparaat.</string>
 </resources>

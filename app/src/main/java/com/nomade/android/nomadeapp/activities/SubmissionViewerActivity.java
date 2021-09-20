@@ -239,6 +239,13 @@ public class SubmissionViewerActivity extends AppCompatActivity implements Simpl
             if (submittedQuestionnaire != null && username != null && !username.equals("")) {
                 submittedQuestionnaire.setUserName(username);
             }
+            else {
+                String sharedPreferencesUsername = getSharedPreferences(Constants.LOGIN_CACHE, MODE_PRIVATE).getString("username", "");
+                int sharedPreferencesUserId = getSharedPreferences(Constants.LOGIN_CACHE, MODE_PRIVATE).getInt("user_id", -1);
+                if (sharedPreferencesUserId == submittedQuestionnaire.getUserId() && sharedPreferencesUsername != null && !sharedPreferencesUsername.equals("")) {
+                    submittedQuestionnaire.setUserName(sharedPreferencesUsername);
+                }
+            }
 
             if (submittedQuestionnaire != null) {
                 displaySubmittedQuestionnaire();
@@ -436,7 +443,23 @@ public class SubmissionViewerActivity extends AppCompatActivity implements Simpl
      * Creates the intent to let the user choose the location to save the PDF file.
      */
     private void createPdfIntent() {
-        String name = "submitted_questionnaire_" + submittedQuestionnaire.getUserId() + "_" + submittedQuestionnaireId + ".pdf";
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(submittedQuestionnaireId).append("_").append(submittedQuestionnaire.getDate().substring(0, 10)).append("_");
+        if (submittedQuestionnaire.getUserName() != null && !submittedQuestionnaire.getUserName().equals("") && !submittedQuestionnaire.getUserName().equals("null")) {
+            stringBuilder.append(submittedQuestionnaire.getUserName());
+        }
+        else {
+            stringBuilder.append(submittedQuestionnaire.getUserId());
+        }
+        stringBuilder.append("_").append(submittedQuestionnaire.getTitle());
+        if (submittedQuestionnaire.getPreviousSubmissionId() != 0) {
+            stringBuilder.append("_PREV_").append(submittedQuestionnaire.getPreviousSubmissionId());
+        }
+        if (submittedQuestionnaire.getNextSubmissionId() != 0) {
+            stringBuilder.append("_NEXT_").append(submittedQuestionnaire.getNextSubmissionId());
+        }
+        stringBuilder.append(".pdf");
+        String name = stringBuilder.toString();
 
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);

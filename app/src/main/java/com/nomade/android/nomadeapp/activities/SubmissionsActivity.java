@@ -1068,7 +1068,23 @@ public class SubmissionsActivity extends AppCompatActivity {
 
             OutputStream outputStream;
 
-            String name = submittedQuestionnaireId + "_" + submittedQuestionnaire.getDate().substring(0, 10) + "_" + submittedQuestionnaire.getUserName() + "_" + submittedQuestionnaire.getTitle() + ".pdf";
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(submittedQuestionnaireId).append("_").append(submittedQuestionnaire.getDate().substring(0, 10)).append("_");
+            if (submittedQuestionnaire.getUserName() != null && !submittedQuestionnaire.getUserName().equals("") && !submittedQuestionnaire.getUserName().equals("null")) {
+                stringBuilder.append(submittedQuestionnaire.getUserName());
+            }
+            else {
+                stringBuilder.append(submittedQuestionnaire.getUserId());
+            }
+            stringBuilder.append("_").append(submittedQuestionnaire.getTitle());
+            if (submittedQuestionnaire.getPreviousSubmissionId() != 0) {
+                stringBuilder.append("_PREV_").append(submittedQuestionnaire.getPreviousSubmissionId());
+            }
+            if (submittedQuestionnaire.getNextSubmissionId() != 0) {
+                stringBuilder.append("_NEXT_").append(submittedQuestionnaire.getNextSubmissionId());
+            }
+            stringBuilder.append(".pdf");
+            String name = stringBuilder.toString();
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 MyLog.d(TAG, "MediaStore used");

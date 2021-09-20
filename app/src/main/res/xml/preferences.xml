@@ -9,6 +9,13 @@
         android:summary="@string/accessibility_settings_summary"
         android:layout="@layout/activity_settings"/>
 
+    <EditTextPreference
+        android:key="setting_server_api_url_laravel_https"
+        android:title="@string/api_url_setting"
+        android:summary="@string/api_url_summary"
+        android:defaultValue="@string/api_url"
+        android:layout="@layout/activity_settings"/>
+
     <CheckBoxPreference
         android:key="setting_enable_logging"
         android:title="@string/enable_logging_title"
@@ -54,27 +61,6 @@
         android:title="Hide unchangeable parameters"
         android:summary="If enabled, the app will hide unchangeable parameters while configuring an instrument"
         android:defaultValue="true"
-        android:layout="@layout/activity_settings"/>
-
-    <EditTextPreference
-        android:key="setting_server_api_url_laravel_https"
-        android:title="API URL"
-        android:summary="URL that is currently used"
-        android:defaultValue="@string/api_url"
-        android:layout="@layout/activity_settings"/>
-
-    <CheckBoxPreference
-        android:key="setting_server_custom_url"
-        android:title="Enable custom URL"
-        android:summary="If enabled, the app will use the custom URL, this custom URL can be set using the setting above, the custom URL has priority over the developer URL"
-        android:defaultValue="false"
-        android:layout="@layout/activity_settings"/>
-
-    <CheckBoxPreference
-        android:key="setting_server_developer_url"
-        android:title="Enable developer URL"
-        android:summary="If enabled, the app will use the developer URL"
-        android:defaultValue="false"
         android:layout="@layout/activity_settings"/>
 
 </PreferenceScreen>
