@@ -29,6 +29,7 @@ import com.nomade.android.nomadeapp.adapters.StringListAdapter;
 import com.nomade.android.nomadeapp.helperClasses.AppController;
 import com.nomade.android.nomadeapp.helperClasses.Constants;
 import com.nomade.android.nomadeapp.helperClasses.MyLog;
+import com.nomade.android.nomadeapp.helperClasses.StatusCodes;
 import com.nomade.android.nomadeapp.setups.Setup;
 import com.nomade.android.nomadeapp.helperClasses.MessageCodes;
 import com.nomade.android.nomadeapp.helperClasses.Utilities;
@@ -61,6 +62,8 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
     private static final String TAG = "UsbActivity";
     private final Context context = this;
     private ProgressDialog pDialog;
+
+    private SharedPreferences defaultSharedPreferences;
 
     private Button initButton, setupRawButton, startStreamButton, stopStreamButton, startMeasurementButton, stopMeasurementButton;
 
@@ -116,6 +119,8 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
         // Progress dialog
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
+
+        defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         setupSharedPreferences = getSharedPreferences(Constants.SETUP_DATA, MODE_PRIVATE);
         jsonTypeInfoList = setupSharedPreferences.getString(Constants.API_INSTRUMENT_TYPES, "");
@@ -214,12 +219,6 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
             sendMessageToService(MessageCodes.USB_MSG_STOP_MEASUREMENT);
         });
 
-        Button sendMeasurementListButton = findViewById(R.id.send_measurement_list_button);
-        sendMeasurementListButton.setOnClickListener(v -> {
-            // Sends the list of the measurements.
-            sendMessageToService(MessageCodes.USB_MSG_SEND_MEASUREMENT_LIST);
-        });
-
         updateUi();
 
         CheckIfServiceIsRunning();
@@ -255,18 +254,26 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
                     showCurrentSetup();
                     break;
                 case MessageCodes.USB_MSG_MANUAL_MEASUREMENT_STARTED:
-//                    startStreamButton.setEnabled(false);
-//                    startMeasurementButton.setEnabled(false);
-//                    stopMeasurementButton.setEnabled(true);
-                    startStreamButton.setEnabled(true);
-                    startMeasurementButton.setEnabled(true);
-                    stopMeasurementButton.setEnabled(true);
+                    if (defaultSharedPreferences.getBoolean(Constants.SETTING_ONLY_ENABLE_RELEVANT_BUTTONS, true)) {
+                        startStreamButton.setEnabled(false);
+                        startMeasurementButton.setEnabled(false);
+                        stopMeasurementButton.setEnabled(true);
+                    }
+                    else {
+                        startStreamButton.setEnabled(true);
+                        startMeasurementButton.setEnabled(true);
+                        stopMeasurementButton.setEnabled(true);
+                    }
                     break;
                 case MessageCodes.USB_MSG_MANUAL_MEASUREMENT_STOPPED:
-//                    startMeasurementButton.setEnabled(true);
-//                    stopMeasurementButton.setEnabled(false);
-                    startMeasurementButton.setEnabled(true);
-                    stopMeasurementButton.setEnabled(true);
+                    if (defaultSharedPreferences.getBoolean(Constants.SETTING_ONLY_ENABLE_RELEVANT_BUTTONS, true)) {
+                        startMeasurementButton.setEnabled(true);
+                        stopMeasurementButton.setEnabled(false);
+                    }
+                    else {
+                        startMeasurementButton.setEnabled(true);
+                        stopMeasurementButton.setEnabled(true);
+                    }
                     break;
                 case MessageCodes.USB_MSG_STORE_OR_DELETE:
                     showStoreOrDelete();
@@ -282,71 +289,81 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
 
     private void updateUi() {
         if (UsbAndTcpService.isRunning()) {
-            switch (UsbAndTcpService.getStatusCode()) {
-//                case StatusCodes.UTS_NOT_INIT:
-//                    initButton.setEnabled(true);
-//                    setupRawButton.setEnabled(false);
-//                    startStreamButton.setEnabled(false);
-//                    stopStreamButton.setEnabled(false);
-//                    startMeasurementButton.setEnabled(false);
-//                    stopMeasurementButton.setEnabled(false);
-//                    break;
-//                case StatusCodes.UTS_INIT:
-//                    initButton.setEnabled(false);
-//                    setupRawButton.setEnabled(false);
-//                    startStreamButton.setEnabled(false);
-//                    stopStreamButton.setEnabled(false);
-//                    startMeasurementButton.setEnabled(false);
-//                    stopMeasurementButton.setEnabled(false);
-//                    break;
-//                case StatusCodes.UTS_ADDRESS:
-//                    initButton.setEnabled(false);
-//                    setupRawButton.setEnabled(true);
-//                    startStreamButton.setEnabled(true);
-//                    stopStreamButton.setEnabled(false);
-//                    startMeasurementButton.setEnabled(true);
-//                    stopMeasurementButton.setEnabled(false);
-//                    break;
-//                case StatusCodes.UTS_WATCHDOG:
-//                    initButton.setEnabled(false);
-//                    setupRawButton.setEnabled(true);
-//                    startStreamButton.setEnabled(true);
-//                    stopStreamButton.setEnabled(false);
-//                    startMeasurementButton.setEnabled(true);
-//                    stopMeasurementButton.setEnabled(false);
-//                    break;
-//                case StatusCodes.UTS_NO_SETUP:
-//                    initButton.setEnabled(false);
-//                    setupRawButton.setEnabled(true);
-//                    startStreamButton.setEnabled(false);
-//                    stopStreamButton.setEnabled(false);
-//                    startMeasurementButton.setEnabled(false);
-//                    stopMeasurementButton.setEnabled(false);
-//                    break;
-//                case StatusCodes.UTS_STREAM_BUSY:
-//                    initButton.setEnabled(false);
-//                    setupRawButton.setEnabled(false);
-//                    startStreamButton.setEnabled(false);
-//                    stopStreamButton.setEnabled(true);
-//                    startMeasurementButton.setEnabled(false);
-//                    stopMeasurementButton.setEnabled(false);
-//                    break;
-//                case StatusCodes.UTS_MEASUREMENT_BUSY:
-//                    initButton.setEnabled(false);
-//                    setupRawButton.setEnabled(false);
-//                    startStreamButton.setEnabled(false);
-//                    stopStreamButton.setEnabled(false);
-//                    startMeasurementButton.setEnabled(false);
-//                    stopMeasurementButton.setEnabled(true);
-//                    break;
-                default:
-                    initButton.setEnabled(true);
-                    setupRawButton.setEnabled(true);
-                    startStreamButton.setEnabled(true);
-                    stopStreamButton.setEnabled(true);
-                    startMeasurementButton.setEnabled(true);
-                    stopMeasurementButton.setEnabled(true);
-                    break;
+            if (defaultSharedPreferences.getBoolean(Constants.SETTING_ONLY_ENABLE_RELEVANT_BUTTONS, true)) {
+                switch (UsbAndTcpService.getStatusCode()) {
+                    case StatusCodes.UTS_NOT_INIT:
+                        initButton.setEnabled(true);
+                        setupRawButton.setEnabled(false);
+                        startStreamButton.setEnabled(false);
+                        stopStreamButton.setEnabled(false);
+                        startMeasurementButton.setEnabled(false);
+                        stopMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_INIT:
+                        initButton.setEnabled(false);
+                        setupRawButton.setEnabled(false);
+                        startStreamButton.setEnabled(false);
+                        stopStreamButton.setEnabled(false);
+                        startMeasurementButton.setEnabled(false);
+                        stopMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_ADDRESS:
+                        initButton.setEnabled(false);
+                        setupRawButton.setEnabled(true);
+                        startStreamButton.setEnabled(true);
+                        stopStreamButton.setEnabled(false);
+                        startMeasurementButton.setEnabled(true);
+                        stopMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_WATCHDOG:
+                        initButton.setEnabled(false);
+                        setupRawButton.setEnabled(true);
+                        startStreamButton.setEnabled(true);
+                        stopStreamButton.setEnabled(false);
+                        startMeasurementButton.setEnabled(true);
+                        stopMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_NO_SETUP:
+                        initButton.setEnabled(false);
+                        setupRawButton.setEnabled(true);
+                        startStreamButton.setEnabled(false);
+                        stopStreamButton.setEnabled(false);
+                        startMeasurementButton.setEnabled(false);
+                        stopMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_STREAM_BUSY:
+                        initButton.setEnabled(false);
+                        setupRawButton.setEnabled(false);
+                        startStreamButton.setEnabled(false);
+                        stopStreamButton.setEnabled(true);
+                        startMeasurementButton.setEnabled(false);
+                        stopMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_MEASUREMENT_BUSY:
+                        initButton.setEnabled(false);
+                        setupRawButton.setEnabled(false);
+                        startStreamButton.setEnabled(false);
+                        stopStreamButton.setEnabled(false);
+                        startMeasurementButton.setEnabled(false);
+                        stopMeasurementButton.setEnabled(true);
+                        break;
+                    default:
+                        initButton.setEnabled(true);
+                        setupRawButton.setEnabled(true);
+                        startStreamButton.setEnabled(true);
+                        stopStreamButton.setEnabled(true);
+                        startMeasurementButton.setEnabled(true);
+                        stopMeasurementButton.setEnabled(true);
+                        break;
+                }
+            }
+            else {
+                initButton.setEnabled(true);
+                setupRawButton.setEnabled(true);
+                startStreamButton.setEnabled(true);
+                stopStreamButton.setEnabled(true);
+                startMeasurementButton.setEnabled(true);
+                stopMeasurementButton.setEnabled(true);
             }
         }
         else {

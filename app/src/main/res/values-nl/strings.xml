@@ -358,4 +358,10 @@
     <string name="stop_measurement">Meting stoppen</string>
     <string name="graphs_error">Er is een probleem met de setup in het geheugen van het apparaat, start de PWC opnieuw op en start de app opnieuw. Als het probleem aanhoudt, controleer dan de setup en stuur deze indien nodig opnieuw naar de DMU.</string>
     <string name="api_url_summary">Wijzig de URL die door de app wordt gebruikt om verbinding te maken met de database. Gebruik het volgende formaat: \"https://…/api/\". Vergeet niet het aangepaste SSL-certificaat aan Android toe te voegen als u een aangepast certificaat gebruikt. Als je dit naar de standaard wilt terugzetten, wis dan gewoon de app-gegevens in de instellingen van je Android-apparaat.</string>
+    <string name="automatic_usb_title">Automatische USB-communicatie</string>
+    <string name="automatic_usb_summary">Indien ingeschakeld, zal de app automatisch de USB-communicatie instellen wanneer deze is aangesloten</string>
+    <string name="only_enable_relevant_buttons_title">Schakel alleen relevante knoppen in</string>
+    <string name="only_enable_relevant_buttons_summary">Indien ingeschakeld, zal de app automatisch de knoppen voor de USB-communicatie in- en uitschakelen</string>
+    <string name="hide_unchangeable_parameters_title">Onveranderlijke parameters verbergen</string>
+    <string name="hide_unchangeable_parameters_summary">Indien ingeschakeld, zal de app onveranderlijke parameters verbergen tijdens het configureren van een instrument</string>
 </resources>

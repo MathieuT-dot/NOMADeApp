@@ -371,8 +371,14 @@
     <string name="oas_vibrate_summary">Warning: this feature will probably drain your battery faster than normal.</string>
     <string name="oas_sound">Enable sound alerts</string>
     <string name="oas_sound_summary">Warning: this audible warning depends on the alarm volume of your Android device.</string>
-    <string name="api_url_setting" translatable="false">API URL</string>
+    <string name="api_url_title" translatable="false">API URL</string>
     <string name="api_url_summary">Change the URL used by the app to connect to the database. Use the following format: \"https://…/api/\". Don\'t forget to add the custom SSL certificate to Android if you use a custom one. If you want to reset this to default, just clear the app data in the settings of your Android device.</string>
+    <string name="automatic_usb_title">Automatic USB communication</string>
+    <string name="automatic_usb_summary">If enabled, the app will automatically set up the USB communication when connected</string>
+    <string name="only_enable_relevant_buttons_title">Only enable relevant buttons</string>
+    <string name="only_enable_relevant_buttons_summary">If enabled, the app will automatically enable and disable buttons for the USB communication</string>
+    <string name="hide_unchangeable_parameters_title">Hide unchangeable parameters</string>
+    <string name="hide_unchangeable_parameters_summary">If enabled, the app will hide unchangeable parameters while configuring an instrument</string>
 
     <!--Countries-->
     <string name="belgium">Belgium</string>
@@ -440,6 +446,10 @@
     <string name="about_changelog_key">Changelog</string>
     <string name="about_changelog_value" translatable="false"><Data>
         <![CDATA[
+
+        <b>Version 0.14</b><br/>
+        20/09/2021<br/>
+        - Added a new setting to only enable relevant buttons for the USB communication<br/><br/>
 
         <b>Version 0.13</b><br/>
         20/09/2021<br/>

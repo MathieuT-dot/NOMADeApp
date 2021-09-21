@@ -168,16 +168,6 @@
                 android:visibility="visible"
                 android:text="@string/stop_measurement" />
 
-            <Button
-                android:id="@+id/send_measurement_list_button"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-
-                android:textAllCaps="false"
-                android:visibility="gone"
-                android:text="@string/send_measurement_list" />
-
         </LinearLayout>
 
     </LinearLayout>

@@ -235,8 +235,9 @@ public class Constants {
     public static final String SETTING_SHOW_DETAILED_DATA = "setting_show_detailed_data";
 
     public static final String SETTING_AUTOMATIC_USB_COMMUNICATION = "setting_automatic_usb_communication";
+    public static final String SETTING_ONLY_ENABLE_RELEVANT_BUTTONS = "setting_only_enable_relevant_buttons";
 
-    public static final String SETTING_HIDE_UNCHANGEABLE_PARAMETERS = "setting_hide_unchangeable parameters";
+    public static final String SETTING_HIDE_UNCHANGEABLE_PARAMETERS = "setting_hide_unchangeable_parameters";
 
     public static final int MAX_LENGTH_OF_EDIT_TEXT = 50000;
 

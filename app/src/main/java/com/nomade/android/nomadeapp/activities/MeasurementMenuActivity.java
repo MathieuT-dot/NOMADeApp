@@ -28,6 +28,7 @@ import com.nomade.android.nomadeapp.helperClasses.AppController;
 import com.nomade.android.nomadeapp.helperClasses.Constants;
 import com.nomade.android.nomadeapp.helperClasses.MessageCodes;
 import com.nomade.android.nomadeapp.helperClasses.MyLog;
+import com.nomade.android.nomadeapp.helperClasses.StatusCodes;
 import com.nomade.android.nomadeapp.helperClasses.Utilities;
 import com.nomade.android.nomadeapp.services.UsbAndTcpService;
 import com.nomade.android.nomadeapp.setups.Setup;
@@ -56,6 +57,8 @@ public class MeasurementMenuActivity extends AppCompatActivity implements Simple
     private static final String TAG = "MeasurementMenuActivity";
     private final Context context = this;
     private ProgressDialog pDialog;
+
+    private SharedPreferences defaultSharedPreferences;
 
     private Messenger mService = null;
     private boolean mIsBound;
@@ -93,6 +96,8 @@ public class MeasurementMenuActivity extends AppCompatActivity implements Simple
         // Progress dialog
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
+
+        defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         setupSharedPreferences = getSharedPreferences(Constants.SETUP_DATA, MODE_PRIVATE);
         jsonTypeInfoList = setupSharedPreferences.getString(Constants.API_INSTRUMENT_TYPES, "");
@@ -391,21 +396,25 @@ public class MeasurementMenuActivity extends AppCompatActivity implements Simple
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-//                case MessageCodes.USB_MSG_SEND_STRING:
-//                    String str1 = msg.getData().getString("str1");
-//                    MyLog.d(TAG, "handleMessage: " + str1);
-//                    break;
                 case MessageCodes.USB_MSG_MANUAL_MEASUREMENT_STARTED:
-//                    startNewMeasurementButton.setEnabled(false);
-//                    stopCurrentMeasurementButton.setEnabled(true);
-                    startNewMeasurementButton.setEnabled(true);
-                    stopCurrentMeasurementButton.setEnabled(true);
+                    if (defaultSharedPreferences.getBoolean(Constants.SETTING_ONLY_ENABLE_RELEVANT_BUTTONS, true)) {
+                        startNewMeasurementButton.setEnabled(false);
+                        stopCurrentMeasurementButton.setEnabled(true);
+                    }
+                    else {
+                        startNewMeasurementButton.setEnabled(true);
+                        stopCurrentMeasurementButton.setEnabled(true);
+                    }
                     break;
                 case MessageCodes.USB_MSG_MANUAL_MEASUREMENT_STOPPED:
-//                    startNewMeasurementButton.setEnabled(true);
-//                    stopCurrentMeasurementButton.setEnabled(false);
-                    startNewMeasurementButton.setEnabled(true);
-                    stopCurrentMeasurementButton.setEnabled(true);
+                    if (defaultSharedPreferences.getBoolean(Constants.SETTING_ONLY_ENABLE_RELEVANT_BUTTONS, true)) {
+                        startNewMeasurementButton.setEnabled(true);
+                        stopCurrentMeasurementButton.setEnabled(false);
+                    }
+                    else {
+                        startNewMeasurementButton.setEnabled(true);
+                        stopCurrentMeasurementButton.setEnabled(true);
+                    }
                     break;
                 case MessageCodes.USB_MSG_STORE_OR_DELETE:
                     showStoreOrDelete();
@@ -421,39 +430,45 @@ public class MeasurementMenuActivity extends AppCompatActivity implements Simple
 
     private void updateUi() {
         if (UsbAndTcpService.isRunning()) {
-            switch (UsbAndTcpService.getStatusCode()) {
-//                case StatusCodes.UTS_NOT_INIT:
-//                    startNewMeasurementButton.setEnabled(false);
-//                    stopCurrentMeasurementButton.setEnabled(false);
-//                    break;
-//                case StatusCodes.UTS_INIT:
-//                    startNewMeasurementButton.setEnabled(false);
-//                    stopCurrentMeasurementButton.setEnabled(false);
-//                    break;
-//                case StatusCodes.UTS_ADDRESS:
-//                    startNewMeasurementButton.setEnabled(true);
-//                    stopCurrentMeasurementButton.setEnabled(false);
-//                    break;
-//                case StatusCodes.UTS_WATCHDOG:
-//                    startNewMeasurementButton.setEnabled(true);
-//                    stopCurrentMeasurementButton.setEnabled(false);
-//                    break;
-//                case StatusCodes.UTS_NO_SETUP:
-//                    startNewMeasurementButton.setEnabled(false);
-//                    stopCurrentMeasurementButton.setEnabled(false);
-//                    break;
-//                case StatusCodes.UTS_STREAM_BUSY:
-//                    startNewMeasurementButton.setEnabled(false);
-//                    stopCurrentMeasurementButton.setEnabled(false);
-//                    break;
-//                case StatusCodes.UTS_MEASUREMENT_BUSY:
-//                    startNewMeasurementButton.setEnabled(false);
-//                    stopCurrentMeasurementButton.setEnabled(true);
-//                    break;
-                default:
-                    startNewMeasurementButton.setEnabled(true);
-                    stopCurrentMeasurementButton.setEnabled(true);
-                    break;
+            if (defaultSharedPreferences.getBoolean(Constants.SETTING_ONLY_ENABLE_RELEVANT_BUTTONS, true)) {
+                switch (UsbAndTcpService.getStatusCode()) {
+                    case StatusCodes.UTS_NOT_INIT:
+                        startNewMeasurementButton.setEnabled(false);
+                        stopCurrentMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_INIT:
+                        startNewMeasurementButton.setEnabled(false);
+                        stopCurrentMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_ADDRESS:
+                        startNewMeasurementButton.setEnabled(true);
+                        stopCurrentMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_WATCHDOG:
+                        startNewMeasurementButton.setEnabled(true);
+                        stopCurrentMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_NO_SETUP:
+                        startNewMeasurementButton.setEnabled(false);
+                        stopCurrentMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_STREAM_BUSY:
+                        startNewMeasurementButton.setEnabled(false);
+                        stopCurrentMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_MEASUREMENT_BUSY:
+                        startNewMeasurementButton.setEnabled(false);
+                        stopCurrentMeasurementButton.setEnabled(true);
+                        break;
+                    default:
+                        startNewMeasurementButton.setEnabled(true);
+                        stopCurrentMeasurementButton.setEnabled(true);
+                        break;
+                }
+            }
+            else {
+                startNewMeasurementButton.setEnabled(true);
+                stopCurrentMeasurementButton.setEnabled(true);
             }
         }
         else {

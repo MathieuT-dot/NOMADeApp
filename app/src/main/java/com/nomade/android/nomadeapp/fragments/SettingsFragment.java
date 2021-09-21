@@ -10,7 +10,6 @@ import android.provider.Settings;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.CheckBoxPreference;
-import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
@@ -74,6 +73,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Simple
             CheckBoxPreference preferenceQnrDraftView = (CheckBoxPreference) findPreference(Constants.SETTING_QNR_DRAFT_VIEW);
             CheckBoxPreference preferenceQnrDraftSubmit = (CheckBoxPreference) findPreference(Constants.SETTING_QNR_DRAFT_SUBMIT);
             CheckBoxPreference preferenceAutomaticUsbComm = (CheckBoxPreference) findPreference(Constants.SETTING_AUTOMATIC_USB_COMMUNICATION);
+            CheckBoxPreference preferenceOnlyEnableRelevantButtons = (CheckBoxPreference) findPreference(Constants.SETTING_ONLY_ENABLE_RELEVANT_BUTTONS);
             CheckBoxPreference preferenceHideUnchangeableParameters = (CheckBoxPreference) findPreference(Constants.SETTING_HIDE_UNCHANGEABLE_PARAMETERS);
 
             SharedPreferences permissionsSharedPreferences;
@@ -146,6 +146,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Simple
 
                 if (preferenceAutomaticUsbComm != null && (!permissionsSharedPreferences.getBoolean(Constants.PERMISSION_SETUP_CREATE, false) || !MainActivity.loggedIn)) {
                     preferenceScreen.removePreference(preferenceAutomaticUsbComm);
+                }
+
+                if (preferenceOnlyEnableRelevantButtons != null && (!permissionsSharedPreferences.getBoolean(Constants.PERMISSION_SETUP_CREATE, false) || !MainActivity.loggedIn)) {
+                    preferenceScreen.removePreference(preferenceOnlyEnableRelevantButtons);
                 }
 
                 if (preferenceHideUnchangeableParameters != null && (!permissionsSharedPreferences.getBoolean(Constants.PERMISSION_SETUP_CREATE, false) || !MainActivity.loggedIn)) {

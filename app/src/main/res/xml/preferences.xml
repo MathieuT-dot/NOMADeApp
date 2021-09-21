@@ -11,7 +11,7 @@
 
     <EditTextPreference
         android:key="setting_server_api_url_laravel_https"
-        android:title="@string/api_url_setting"
+        android:title="@string/api_url_title"
         android:summary="@string/api_url_summary"
         android:defaultValue="@string/api_url"
         android:layout="@layout/activity_settings"/>
@@ -51,15 +51,22 @@
 
     <CheckBoxPreference
         android:key="setting_automatic_usb_communication"
-        android:title="Automatic USB communication"
-        android:summary="If enabled, the app will automatically set up the USB communication and start streaming when connected"
+        android:title="@string/automatic_usb_title"
+        android:summary="@string/automatic_usb_summary"
         android:defaultValue="false"
         android:layout="@layout/activity_settings"/>
 
     <CheckBoxPreference
-        android:key="setting_hide_unchangeable parameters"
-        android:title="Hide unchangeable parameters"
-        android:summary="If enabled, the app will hide unchangeable parameters while configuring an instrument"
+        android:key="setting_only_enable_relevant_buttons"
+        android:title="@string/only_enable_relevant_buttons_title"
+        android:summary="@string/only_enable_relevant_buttons_summary"
+        android:defaultValue="true"
+        android:layout="@layout/activity_settings"/>
+
+    <CheckBoxPreference
+        android:key="setting_hide_unchangeable_parameters"
+        android:title="@string/hide_unchangeable_parameters_title"
+        android:summary="@string/hide_unchangeable_parameters_summary"
         android:defaultValue="true"
         android:layout="@layout/activity_settings"/>
 

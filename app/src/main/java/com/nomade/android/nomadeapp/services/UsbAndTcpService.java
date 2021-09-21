@@ -148,8 +148,6 @@ public class UsbAndTcpService extends Service {
     private static boolean measurementRunning = false;
     private static boolean manualMeasurement = false;
     private int currentUserId = -1;
-    // TODO get company ID from user (send measurement list and start measurement from list is not implemented, so this is not needed anymore)
-    private int currentUserCompanyId = 0;
     private int currentSetupId = -1;
     private int currentSetupVersion = -1;
     private static int measurementId = -1;
@@ -187,11 +185,6 @@ public class UsbAndTcpService extends Service {
     private int delayIndex = 0;
     private Timer reconnectTimer;
     private boolean reconnectDelayInProgress = false;
-
-    private int measurementMode = 0;
-    private static final int START_MEASUREMENT_MODE = 1;
-    private static final int SEND_MEASUREMENT_LIST_MODE = 2;
-    private static final int START_MEASUREMENT_FROM_LIST_MODE = 3;
 
     private int actualSpeedValueIndex = -1;
 
@@ -595,7 +588,6 @@ public class UsbAndTcpService extends Service {
 
                     manualMeasurement = true;
 
-                    measurementMode = START_MEASUREMENT_MODE;
                     Bundle data = msg.getData();
                     currentUserId = data.getInt("user_id");
                     currentSetupId = data.getInt("setup_id");
@@ -610,22 +602,6 @@ public class UsbAndTcpService extends Service {
                         manualMeasurement = false;
                         sendMessageToUI(MessageCodes.USB_MSG_MANUAL_MEASUREMENT_STOPPED);
                     }
-                    break;
-                case MessageCodes.USB_MSG_SEND_MEASUREMENT_LIST:
-                    measurementMode = SEND_MEASUREMENT_LIST_MODE;
-                    currentUserId = getSharedPreferences(Constants.LOGIN_CACHE, MODE_PRIVATE).getInt("user_id", -1);
-                    if (currentUserId < 0){
-                        MyLog.e(TAG, "Current user ID is not valid (" + currentUserId + ")");
-                        Utilities.displayToast(context, "Current user ID is not valid (" + currentUserId + ")");
-                        break;
-                    }
-                    if (currentSetupId < 0){
-                        MyLog.e(TAG, "Current setup ID is not valid (" + currentSetupId + ")");
-                        Utilities.displayToast(context, "Current setup ID is not valid (" + currentSetupId + ")");
-                        break;
-                    }
-                    localLog(TAG, "Preparing the measurement list");
-                    getMeasurementList();
                     break;
                 case MessageCodes.USB_MSG_STORE_OR_DELETE:
                     if (msg.arg1 == 1 && measurementName != null) {
@@ -1215,50 +1191,10 @@ public class UsbAndTcpService extends Service {
                                 // DU contains measurement ID (4 bytes)
                                 if (dsap == (byte) 0x20 && ssap == (byte) 0x80){
                                     if (defaultSharedPreferences.getBoolean(Constants.SETTING_SHOW_DETAILED_DATA, false)){
-                                        localLog(TAG, "R: Measurement start asked | UsbTelegram: " + Utilities.bytesToHex(usbTelegramBytes));
+                                        localLog(TAG, "R: Measurement start asked not implemented! | UsbTelegram: " + Utilities.bytesToHex(usbTelegramBytes));
                                     }
                                     else {
-                                        localLog(TAG, "R: Measurement start asked");
-                                    }
-
-                                    measurementId = Utilities.intFromByteArray(du);
-
-                                    if (measurementId > 0){
-
-                                        UsbTelegram newUsbTelegram = new UsbTelegram(UsbTelegram.SD2, boardAddress, ownAddress, (byte) 0x00, (byte) 0x80, (byte) 0x20, new byte[]{});
-                                        byte[] bytes = newUsbTelegram.ConvertToByteArray();
-
-                                        if (uartInterface != null){
-                                            uartInterface.SendData(bytes.length, bytes);
-
-                                            if (defaultSharedPreferences.getBoolean(Constants.SETTING_SHOW_DETAILED_DATA, false)){
-                                                localLog(TAG, "S: Start measurement acknowledged | UsbTelegram: " + Utilities.bytesToHex(bytes));
-                                            }
-                                            else {
-                                                localLog(TAG, "S: Start measurement acknowledged");
-                                            }
-                                        }
-                                        else {
-                                            localLog(TAG, "UART Interface is null!");
-                                        }
-
-                                        previousCycleCounter = 0;
-                                        currentCycleCounter = 1;
-                                        lastSentCycleCounter = 0;
-                                        missingCycleCounters = 0;
-                                        tcpReadyForData = false;
-                                        writeTcpTelegramIndex = 0;
-                                        readTcpTelegramIndex = 0;
-
-                                        measurementMode = START_MEASUREMENT_FROM_LIST_MODE;
-
-                                        getMeasurementList();
-                                    }
-                                    else if (measurementId == 0){
-                                        localLog(TAG, "Measurement ID is 0, exception is not yet implemented!");
-                                    }
-                                    else {
-                                        localLog(TAG, "Measurement ID is smaller than 0, exception is not yet implemented!");
+                                        localLog(TAG, "R: Measurement start asked not implemented!");
                                     }
                                 }
 
@@ -2499,238 +2435,6 @@ public class UsbAndTcpService extends Service {
 
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
-    }
-
-    /**
-     * Creates and executes a request to get the list of measurements.
-     */
-    private void getMeasurementList(){
-        String tag_string_req = "get_measurement_list";
-
-        MyLog.d("StringRequest", PreferenceManager.getDefaultSharedPreferences(AppController.getInstance().getApplicationContext()).getString(Constants.SETTING_SERVER_API_URL, Constants.API_URL) + "measurements/");
-
-        StringRequest strReq = new StringRequest(
-                Request.Method.GET,
-                PreferenceManager.getDefaultSharedPreferences(AppController.getInstance().getApplicationContext()).getString(Constants.SETTING_SERVER_API_URL, Constants.API_URL) + "measurements/",
-                response -> {
-                    LibUtilities.printGiantLog(TAG, "JSON Response: " + response, false);
-                    setupDataEditor.putString("measurement_list_json", response).apply();
-                    parseMeasurementList(response);
-                }, e -> {
-            MyLog.e(TAG, "Volley Error: " + e.toString() + ", " + e.getMessage() + ", " + e.getLocalizedMessage());
-            Utilities.displayVolleyError(context, e);
-        }) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String>  headers = new HashMap<>();
-                headers.put("Accept-Language", Locale.getDefault().getLanguage() + "-" + Locale.getDefault().getCountry());
-                headers.put("X-GET-Draft", "0");
-
-                return headers;
-            }
-        };
-
-        // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
-    }
-
-    /**
-     * Parses the JSON string containing the list of measurements.
-     *
-     * @param jsonMeasurementList JSON string containing the list of measurements
-     */
-    private void parseMeasurementList(String jsonMeasurementList){
-
-        measurementArrayList.clear();
-
-        SimpleDateFormat sdfDateAndTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        SimpleDateFormat sdfDateAndTimeLaravel = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault());
-        sdfDateAndTimeLaravel.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        try {
-            JSONObject jObj = new JSONObject(jsonMeasurementList);
-
-            JSONArray jMeasurementsArray = jObj.getJSONArray("data");
-
-            measurementArrayList = new ArrayList<>();
-            measurementIndex = 0;
-
-            JSONObject currentMeasurement;
-
-            for (int i = 0; i < jMeasurementsArray.length(); i++){
-
-                currentMeasurement = jMeasurementsArray.getJSONObject(i);
-
-                int mMeasurementId = currentMeasurement.getInt("id");
-                int measurementCategoryId = currentMeasurement.getInt("measurement_category_id");
-                int setupId = currentMeasurement.getInt("setup_id");
-                int userId = currentMeasurement.getInt("user_id");
-                String name = currentMeasurement.getString("name_en");
-                String description = currentMeasurement.getString("description_en");
-
-                Integer max;
-                try {
-                    max = currentMeasurement.getInt("max");
-                }
-                catch (JSONException e){
-                    max = null;
-                }
-
-                Integer count;
-                try {
-                    count = currentMeasurement.getInt("count");
-                }
-                catch (JSONException e){
-                    count = null;
-                }
-
-                String stringStartTime = currentMeasurement.getString("started_at");
-                String stringEndTime = currentMeasurement.getString("stopped_at");
-
-                Long startTime = 0L;
-                try {
-                    startTime = sdfDateAndTimeLaravel.parse(stringStartTime).getTime();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                Long endTime = 0L;
-                try {
-                    endTime = sdfDateAndTimeLaravel.parse(stringEndTime).getTime();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                try {
-                    stringStartTime = sdfDateAndTime.format(sdfDateAndTimeLaravel.parse(stringStartTime));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                try {
-                    stringEndTime = sdfDateAndTime.format(sdfDateAndTimeLaravel.parse(stringEndTime));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                if (measurementMode == SEND_MEASUREMENT_LIST_MODE && currentUserId == userId && currentSetupId == setupId){
-                    measurementArrayList.add(new Measurement(measurementId, measurementCategoryId, setupId, userId, name, description, max, count, startTime, endTime, stringStartTime, stringEndTime));
-                }
-                else if (measurementMode == START_MEASUREMENT_FROM_LIST_MODE && mMeasurementId == measurementId){
-                    measurementArrayList.add(new Measurement(measurementId, measurementCategoryId, setupId, userId, name, description, max, count, startTime, endTime, stringStartTime, stringEndTime));
-                    measurementIndex = measurementArrayList.size() - 1;
-                    break;
-                }
-            }
-
-            if (measurementArrayList.size() > 0){
-
-                if (measurementMode == SEND_MEASUREMENT_LIST_MODE){
-                    selectEligibleMeasurements();
-                }
-                else if (measurementMode == START_MEASUREMENT_FROM_LIST_MODE) {
-                    Measurement measurement = measurementArrayList.get(measurementIndex);
-
-                    currentUserId = measurement.getUserId();
-                    currentSetupId = measurement.getSetupId();
-                    measurementName = measurement.getName();
-                    startTime = measurement.getStartTime();
-                    endTime = measurement.getEndTime();
-
-                    measurementRunning = true;
-
-                    if (manualMeasurement) {
-                        sendMessageToUI(MessageCodes.USB_MSG_MANUAL_MEASUREMENT_STARTED);
-                    }
-
-                    statusCode = StatusCodes.UTS_MEASUREMENT_BUSY;
-                    sendMessageToUI(MessageCodes.USB_MSG_STATUS_UPDATE);
-
-                    tcpConnect("parseMeasurementList");
-                }
-
-            }
-            else {
-                localLog(TAG, "parseMeasurementList: The measurement list on the database is empty!");
-            }
-        }
-        catch (JSONException e){
-            MyLog.e(TAG, "JSONException Error: " + e.toString() + ", " + e.getMessage());
-            Utilities.displayToast(context, "JSONException Error: " + e.toString() + ", " + e.getMessage());
-        }
-    }
-
-    /**
-     * Selects eligible Measurements to be transferred based on the currently logged in user and
-     * the setup that is in the DMU.
-     */
-    private void selectEligibleMeasurements(){
-
-        long currentTimeMillis = System.currentTimeMillis();
-
-        for (int i = measurementArrayList.size() - 1; i >= 0; i--){
-
-            Measurement measurement = measurementArrayList.get(i);
-
-            // remove ineligible measurements from the list (user ID's don't correspond, setup ID's don't correspond, the end time is before the current time)
-            if (measurement.getUserId() != currentUserId || measurement.getSetupId() != currentSetupId || measurement.getEndTime() < currentTimeMillis){
-                measurementArrayList.remove(i);
-            }
-        }
-
-        if (measurementArrayList.size() > 0){
-
-            byte asciiSoh = (byte) 0x01;
-            byte asciiEtx = (byte) 0x03;
-            byte asciiEot = (byte) 0x04;
-
-            int amountOfMeasurements = measurementArrayList.size();
-
-            int duLength = 11 + measurementArrayList.size() * 20 + 2;
-
-            byte[] du = new byte[duLength];
-            int index = 0;
-
-            du[index] = asciiSoh;
-            index += 1;
-            System.arraycopy(ByteBuffer.allocate(4).putInt(currentSetupId).array(), 2, du, index, 2);
-            index += 2;
-            System.arraycopy(ByteBuffer.allocate(4).putInt(currentUserId).array(), 2, du, index, 2);
-            index += 2;
-            System.arraycopy(ByteBuffer.allocate(4).putInt(currentSetupVersion).array(), 2, du, index, 2);
-            index += 2;
-            System.arraycopy(ByteBuffer.allocate(4).putInt(currentUserCompanyId).array(), 2, du, index, 2);
-            index += 2;
-            System.arraycopy(ByteBuffer.allocate(4).putInt(amountOfMeasurements).array(), 2, du, index, 2);
-            index += 2;
-
-            for (int i = 0; i < measurementArrayList.size(); i++){
-                Measurement measurement = measurementArrayList.get(i);
-                System.arraycopy(ByteBuffer.allocate(4).putInt(measurement.getMeasurementId()).array(), 0, du, index, 4);
-                index += 4;
-                System.arraycopy(ByteBuffer.allocate(8).putLong(measurement.getStartTime()).array(), 0, du, index, 8);
-                index += 8;
-                System.arraycopy(ByteBuffer.allocate(8).putLong(measurement.getEndTime()).array(), 0, du, index, 8);
-                index += 8;
-            }
-
-            du[index] = asciiEtx;
-            index += 1;
-            du[index] = asciiEot;
-            index += 1;
-
-            if (index != duLength){
-                MyLog.w(TAG, "selectEligibleMeasurements: Final index is not equal to the DU length");
-            }
-
-            MyLog.d(TAG, "selectEligibleMeasurements: Measurement list: " + Utilities.bytesToHex(du));
-
-            sendMeasurementList(du);
-        }
-        else {
-            MyLog.e(TAG, "No eligible measurements for this user and setup");
-            Utilities.displayToast(context, "No eligible measurements for this user and setup");
-        }
     }
 
     /**
