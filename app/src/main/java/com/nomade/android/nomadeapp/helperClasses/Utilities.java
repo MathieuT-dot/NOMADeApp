@@ -176,6 +176,7 @@ public class Utilities {
         }
         catch (RuntimeException e) {
             MyLog.e(TAG, "RuntimeException while making toast: " + text);
+            Toast.makeText(context, text, duration).show();
         }
     }
 
@@ -1465,51 +1466,123 @@ public class Utilities {
 
                                 case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMU_QUAT_QUAT_ONLY__0XB4:
                                     outputDataType = (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMU_QUAT_QUAT_ONLY__0XB4;
-                                    variableArrayList.add(new Variable("real", "0,001", 1f, Variable.SHORT, 7, valueIndex++));
-                                    variableArrayList.add(new Variable("i", "0,001", 1f, Variable.SHORT, 5, valueIndex++));
-                                    variableArrayList.add(new Variable("j", "0,001", 1f, Variable.SHORT, 3, valueIndex++));
-                                    variableArrayList.add(new Variable("k", "0,001", 1f, Variable.SHORT, 1, valueIndex++));
+                                    variableArrayList.add(new Variable("a", "real", 10000f, Variable.SHORT, 7, valueIndex++));
+                                    variableArrayList.add(new Variable("b", "i", 10000f, Variable.SHORT, 5, valueIndex++));
+                                    variableArrayList.add(new Variable("c", "j", 10000f, Variable.SHORT, 3, valueIndex++));
+                                    variableArrayList.add(new Variable("d", "k", 10000f, Variable.SHORT, 1, valueIndex++));
                                     indexOffset = 9;
                                     break;
 
                                 case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMU_QUAT_GYRO_ACC_0XB5:
                                     outputDataType = (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMU_QUAT_GYRO_ACC_0XB5;
-                                    variableArrayList.add(new Variable("q0", "?", 1f, Variable.SHORT, 19, valueIndex++));
-                                    variableArrayList.add(new Variable("q1", "?", 1f, Variable.SHORT, 17, valueIndex++));
-                                    variableArrayList.add(new Variable("q2", "?", 1f, Variable.SHORT, 15, valueIndex++));
-                                    variableArrayList.add(new Variable("q3", "?", 1f, Variable.SHORT, 13, valueIndex++));
-                                    variableArrayList.add(new Variable("GYRO X", "?", 1f, Variable.SHORT, 11, valueIndex++));
-                                    variableArrayList.add(new Variable("GYRO Y", "?", 1f, Variable.SHORT, 9, valueIndex++));
-                                    variableArrayList.add(new Variable("GYRO Z", "?", 1f, Variable.SHORT, 7, valueIndex++));
-                                    variableArrayList.add(new Variable("ACC X", "?", 1f, Variable.SHORT, 5, valueIndex++));
-                                    variableArrayList.add(new Variable("ACC Y", "?", 1f, Variable.SHORT, 3, valueIndex++));
-                                    variableArrayList.add(new Variable("ACC Z", "?", 1f, Variable.SHORT, 1, valueIndex++));
+                                    variableArrayList.add(new Variable("a", "real", 10000f, Variable.SHORT, 19, valueIndex++));
+                                    variableArrayList.add(new Variable("b", "i", 10000f, Variable.SHORT, 17, valueIndex++));
+                                    variableArrayList.add(new Variable("c", "j", 10000f, Variable.SHORT, 15, valueIndex++));
+                                    variableArrayList.add(new Variable("d", "k", 10000f, Variable.SHORT, 13, valueIndex++));
+                                    variableArrayList.add(new Variable("GYRO X", "dps", 10f, Variable.SHORT, 11, valueIndex++));
+                                    variableArrayList.add(new Variable("GYRO Y", "dps", 10f, Variable.SHORT, 9, valueIndex++));
+                                    variableArrayList.add(new Variable("GYRO Z", "dps", 10f, Variable.SHORT, 7, valueIndex++));
+                                    variableArrayList.add(new Variable("ACC X", "m/s²", 1000f, Variable.SHORT, 5, valueIndex++));
+                                    variableArrayList.add(new Variable("ACC Y", "m/s²", 1000f, Variable.SHORT, 3, valueIndex++));
+                                    variableArrayList.add(new Variable("ACC Z", "m/s²", 1000f, Variable.SHORT, 1, valueIndex++));
                                     indexOffset = 21;
                                     break;
 
                                 case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMU_QUAT_GYRO_ACC_100Hz_0XB6:
                                     outputDataType = (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMU_QUAT_GYRO_ACC_100Hz_0XB6;
-                                    variableArrayList.add(new Variable("q0", "?", 1f, Variable.SHORT, 39, valueIndex++, true, 10));
-                                    variableArrayList.add(new Variable("q1", "?", 1f, Variable.SHORT, 37, valueIndex++, true, 10));
-                                    variableArrayList.add(new Variable("q2", "?", 1f, Variable.SHORT, 35, valueIndex++, true, 10));
-                                    variableArrayList.add(new Variable("q3", "?", 1f, Variable.SHORT, 33, valueIndex++, true, 10));
-                                    variableArrayList.add(new Variable("GYRO X", "?", 1f, Variable.SHORT, 31, valueIndex++, true, 10));
-                                    variableArrayList.add(new Variable("GYRO Y", "?", 1f, Variable.SHORT, 29, valueIndex++, true, 10));
-                                    variableArrayList.add(new Variable("GYRO Z", "?", 1f, Variable.SHORT, 27, valueIndex++, true, 10));
-                                    variableArrayList.add(new Variable("ACC X", "?", 1f, Variable.SHORT, 25, valueIndex++, true, 10));
-                                    variableArrayList.add(new Variable("ACC Y", "?", 1f, Variable.SHORT, 23, valueIndex++, true, 10));
-                                    variableArrayList.add(new Variable("ACC Z", "?", 1f, Variable.SHORT, 21, valueIndex++, true, 10));
-                                    variableArrayList.add(new Variable("q0", "?", 1f, Variable.SHORT, 19, valueIndex++, true, -1));
-                                    variableArrayList.add(new Variable("q1", "?", 1f, Variable.SHORT, 17, valueIndex++, true, -1));
-                                    variableArrayList.add(new Variable("q2", "?", 1f, Variable.SHORT, 15, valueIndex++, true, -1));
-                                    variableArrayList.add(new Variable("q3", "?", 1f, Variable.SHORT, 13, valueIndex++, true, -1));
-                                    variableArrayList.add(new Variable("GYRO X", "?", 1f, Variable.SHORT, 11, valueIndex++, true, -1));
-                                    variableArrayList.add(new Variable("GYRO Y", "?", 1f, Variable.SHORT, 9, valueIndex++, true, -1));
-                                    variableArrayList.add(new Variable("GYRO Z", "?", 1f, Variable.SHORT, 7, valueIndex++, true, -1));
-                                    variableArrayList.add(new Variable("ACC X", "?", 1f, Variable.SHORT, 5, valueIndex++, true, -1));
-                                    variableArrayList.add(new Variable("ACC Y", "?", 1f, Variable.SHORT, 3, valueIndex++, true, -1));
-                                    variableArrayList.add(new Variable("ACC Z", "?", 1f, Variable.SHORT, 1, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("a", "real", 10000f, Variable.SHORT, 39, valueIndex++, true, 10));
+                                    variableArrayList.add(new Variable("b", "i", 10000f, Variable.SHORT, 37, valueIndex++, true, 10));
+                                    variableArrayList.add(new Variable("c", "j", 10000f, Variable.SHORT, 35, valueIndex++, true, 10));
+                                    variableArrayList.add(new Variable("d", "k", 10000f, Variable.SHORT, 33, valueIndex++, true, 10));
+                                    variableArrayList.add(new Variable("GYRO X", "dps", 10f, Variable.SHORT, 31, valueIndex++, true, 10));
+                                    variableArrayList.add(new Variable("GYRO Y", "dps", 10f, Variable.SHORT, 29, valueIndex++, true, 10));
+                                    variableArrayList.add(new Variable("GYRO Z", "dps", 10f, Variable.SHORT, 27, valueIndex++, true, 10));
+                                    variableArrayList.add(new Variable("ACC X", "m/s²", 1000f, Variable.SHORT, 25, valueIndex++, true, 10));
+                                    variableArrayList.add(new Variable("ACC Y", "m/s²", 1000f, Variable.SHORT, 23, valueIndex++, true, 10));
+                                    variableArrayList.add(new Variable("ACC Z", "m/s²", 1000f, Variable.SHORT, 21, valueIndex++, true, 10));
+                                    variableArrayList.add(new Variable("a", "real", 10000f, Variable.SHORT, 19, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("b", "i", 10000f, Variable.SHORT, 17, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("c", "j", 10000f, Variable.SHORT, 15, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("d", "k", 10000f, Variable.SHORT, 13, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("GYRO X", "dps", 10f, Variable.SHORT, 11, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("GYRO Y", "dps", 10f, Variable.SHORT, 9, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("GYRO Z", "dps", 10f, Variable.SHORT, 7, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("ACC X", "m/s²", 1000f, Variable.SHORT, 5, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("ACC Y", "m/s²", 1000f, Variable.SHORT, 3, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("ACC Z", "m/s²", 1000f, Variable.SHORT, 1, valueIndex++, true, -1));
                                     indexOffset = 41;
+                                    break;
+
+                                case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT100HZ_0XB7:
+                                    outputDataType = (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT100HZ_0XB7;
+                                    variableArrayList.add(new Variable("a", "real", 10000f, Variable.SHORT, 15, valueIndex++, true, 4));
+                                    variableArrayList.add(new Variable("b", "i", 10000f, Variable.SHORT, 13, valueIndex++, true, 4));
+                                    variableArrayList.add(new Variable("c", "j", 10000f, Variable.SHORT, 11, valueIndex++, true, 4));
+                                    variableArrayList.add(new Variable("d", "k", 10000f, Variable.SHORT, 9, valueIndex++, true, 4));
+                                    variableArrayList.add(new Variable("a", "real", 10000f, Variable.SHORT, 7, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("b", "i", 10000f, Variable.SHORT, 5, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("c", "j", 10000f, Variable.SHORT, 3, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("d", "k", 10000f, Variable.SHORT, 1, valueIndex++, true, -1));
+                                    indexOffset = 17;
+                                    break;
+
+                                case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT9DOF_0XB8:
+                                    outputDataType = (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT9DOF_0XB8;
+                                    variableArrayList.add(new Variable("a", "real", 10000f, Variable.SHORT, 7, valueIndex++));
+                                    variableArrayList.add(new Variable("b", "i", 10000f, Variable.SHORT, 5, valueIndex++));
+                                    variableArrayList.add(new Variable("c", "j", 10000f, Variable.SHORT, 3, valueIndex++));
+                                    variableArrayList.add(new Variable("d", "k", 10000f, Variable.SHORT, 1, valueIndex++));
+                                    indexOffset = 9;
+                                    break;
+
+                                case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT9DOF100HZ_0XB9:
+                                    outputDataType = (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT9DOF100HZ_0XB9;
+                                    variableArrayList.add(new Variable("a", "real", 10000f, Variable.SHORT, 15, valueIndex++, true, 4));
+                                    variableArrayList.add(new Variable("b", "i", 10000f, Variable.SHORT, 13, valueIndex++, true, 4));
+                                    variableArrayList.add(new Variable("c", "j", 10000f, Variable.SHORT, 11, valueIndex++, true, 4));
+                                    variableArrayList.add(new Variable("d", "k", 10000f, Variable.SHORT, 9, valueIndex++, true, 4));
+                                    variableArrayList.add(new Variable("a", "real", 10000f, Variable.SHORT, 7, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("b", "i", 10000f, Variable.SHORT, 5, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("c", "j", 10000f, Variable.SHORT, 3, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("d", "k", 10000f, Variable.SHORT, 1, valueIndex++, true, -1));
+                                    indexOffset = 17;
+                                    break;
+
+                                case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUGYROACCMAG_0XBA:
+                                    outputDataType = (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUGYROACCMAG_0XBA;
+                                    variableArrayList.add(new Variable("GYRO X", "dps", 10f, Variable.SHORT, 17, valueIndex++));
+                                    variableArrayList.add(new Variable("GYRO Y", "dps", 10f, Variable.SHORT, 15, valueIndex++));
+                                    variableArrayList.add(new Variable("GYRO Z", "dps", 10f, Variable.SHORT, 13, valueIndex++));
+                                    variableArrayList.add(new Variable("ACC X", "m/s²", 1000f, Variable.SHORT, 11, valueIndex++));
+                                    variableArrayList.add(new Variable("ACC Y", "m/s²", 1000f, Variable.SHORT, 9, valueIndex++));
+                                    variableArrayList.add(new Variable("ACC Z", "m/s²", 1000f, Variable.SHORT, 7, valueIndex++));
+                                    variableArrayList.add(new Variable("MAG X", "µT", 1f, Variable.SHORT, 5, valueIndex++));
+                                    variableArrayList.add(new Variable("MAG Y", "µT", 1f, Variable.SHORT, 3, valueIndex++));
+                                    variableArrayList.add(new Variable("MAG Z", "µT", 1f, Variable.SHORT, 1, valueIndex++));
+                                    indexOffset = 19;
+                                    break;
+
+                                case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUGYROACCMAG100HZ_0XBB:
+                                    outputDataType = (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUGYROACCMAG100HZ_0XBB;
+                                    variableArrayList.add(new Variable("GYRO X", "dps", 10f, Variable.SHORT, 35, valueIndex++, true, 9));
+                                    variableArrayList.add(new Variable("GYRO Y", "dps", 10f, Variable.SHORT, 33, valueIndex++, true, 9));
+                                    variableArrayList.add(new Variable("GYRO Z", "dps", 10f, Variable.SHORT, 31, valueIndex++, true, 9));
+                                    variableArrayList.add(new Variable("ACC X", "m/s²", 1000f, Variable.SHORT, 29, valueIndex++, true, 9));
+                                    variableArrayList.add(new Variable("ACC Y", "m/s²", 1000f, Variable.SHORT, 27, valueIndex++, true, 9));
+                                    variableArrayList.add(new Variable("ACC Z", "m/s²", 1000f, Variable.SHORT, 25, valueIndex++, true, 9));
+                                    variableArrayList.add(new Variable("MAG X", "µT", 1f, Variable.SHORT, 23, valueIndex++, true, 9));
+                                    variableArrayList.add(new Variable("MAG Y", "µT", 1f, Variable.SHORT, 21, valueIndex++, true, 9));
+                                    variableArrayList.add(new Variable("MAG Z", "µT", 1f, Variable.SHORT, 19, valueIndex++, true, 9));
+                                    variableArrayList.add(new Variable("GYRO X", "dps", 10f, Variable.SHORT, 17, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("GYRO Y", "dps", 10f, Variable.SHORT, 15, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("GYRO Z", "dps", 10f, Variable.SHORT, 13, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("ACC X", "m/s²", 1000f, Variable.SHORT, 11, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("ACC Y", "m/s²", 1000f, Variable.SHORT, 9, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("ACC Z", "m/s²", 1000f, Variable.SHORT, 7, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("MAG X", "µT", 1f, Variable.SHORT, 5, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("MAG Y", "µT", 1f, Variable.SHORT, 3, valueIndex++, true, -1));
+                                    variableArrayList.add(new Variable("MAG Z", "µT", 1f, Variable.SHORT, 1, valueIndex++, true, -1));
+                                    indexOffset = 37;
                                     break;
 
                                 case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_NONE:
@@ -1799,6 +1872,8 @@ public class Utilities {
 
         i = 0;
 
+        int nullValueCount = 0;
+
         // For every instrument in the setup
         for (Instrument instrument : instrumentArrayList){
 
@@ -1840,11 +1915,20 @@ public class Utilities {
                         bytes[index++] = floatBytes[2];
                         bytes[index++] = floatBytes[3];
 
-                        Utilities.displayToast(context, "Warning: one or more parameters have a \"null\" value assigned, which is replaced with a zero value");
+                        nullValueCount++;
                     }
                 }
             }
             i++;
+        }
+
+        if (nullValueCount > 0) {
+            if (nullValueCount == 1) {
+                Utilities.displayToast(context, "Warning: one parameter has a \"null\" value assigned, which is replaced with a zero value in the RAW setup");
+            }
+            else {
+                Utilities.displayToast(context, "Warning: " + nullValueCount + " parameters have a \"null\" value assigned, which is replaced with a zero value in the RAW setup");
+            }
         }
 
         // End of text (ETX)

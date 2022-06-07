@@ -45,6 +45,8 @@ import com.nomade.android.nomadeapp.setups.Setup;
 import com.nomade.android.nomadeapp.setups.Variable;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -137,7 +139,7 @@ public class GraphActivity extends AppCompatActivity {
             memorySetup = Utilities.parseJsonSetup(context, jsonMemorySetup, jsonTypeInfoList, jsonParameterInfoList);
         }
 
-        String jsonLastSetup = setupSharedPreferences.getString("last_setup_in_memory_3", "");
+        String jsonLastSetup = setupSharedPreferences.getString("last_setup_in_memory", "");
 
         String jsonStreamSetup = setupSharedPreferences.getString("stream_setup", "");
         if (jsonStreamSetup != null && !jsonStreamSetup.equals("")){
@@ -191,8 +193,12 @@ public class GraphActivity extends AppCompatActivity {
             }
         }
         else {
+            // setup changed, remove streamSetup
+            setupSharedPreferences.edit().remove("stream_setup").apply();
+            streamSetup = null;
+
             if (memorySetup != null){
-                setupSharedPreferences.edit().putString("last_setup_in_memory_3", jsonMemorySetup).apply();
+                setupSharedPreferences.edit().putString("last_setup_in_memory", jsonMemorySetup).apply();
                 streamSetup = Utilities.generateStreamSetup(memorySetup);
 
                 if (streamSetup.getInstrumentArrayList() == null) {
@@ -311,20 +317,22 @@ public class GraphActivity extends AppCompatActivity {
 
                 variable = instrument.getVariableArrayList().get(j);
 
-                if (instrument.getOutputDataType() == (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMU_QUAT_GYRO_ACC_100Hz_0XB6) {
-                    variable.setHundredHertz(true);
-                }
-
                 if (variable.getChartIndex() > 0){
 
                     if (!enableGraphs[variable.getChartIndex() - 1]){
                         enableGraphs[variable.getChartIndex() - 1] = true;
                     }
 
+                    // special case for the quaternions, they have no units, but real, i, j and k are used instead, they are assigned the same unit so they use one vertical axis
+                    String currentUnit = variable.getUnit();
+                    if (currentUnit.equals("real") || currentUnit.equals("i") || currentUnit.equals("j") || currentUnit.equals("k")) {
+                        currentUnit = "real, i, j, k";
+                    }
+
                     // check if the left axis already has a unit
                     if (units[variable.getChartIndex() - 1][0] != null && !units[variable.getChartIndex() - 1][0].equals("")){
                         // check if the unit of the current variable is the same as the unit of the left axis
-                        if (units[variable.getChartIndex() - 1][0].equals(variable.getUnit())){
+                        if (units[variable.getChartIndex() - 1][0].equals(currentUnit)){
                             // set the left axis for the variable
                             variable.setAxisIndex(1);
                             graphVariableArrayList.add(variable);
@@ -333,7 +341,7 @@ public class GraphActivity extends AppCompatActivity {
                             // check if the right axis already has a unit
                             if (units[variable.getChartIndex() - 1][1] != null && !units[variable.getChartIndex() - 1][1].equals("")){
                                 // check if the unit of the current variable is the same as the unit of the right axis
-                                if (units[variable.getChartIndex() - 1][1].equals(variable.getUnit())){
+                                if (units[variable.getChartIndex() - 1][1].equals(currentUnit)){
                                     // set the right axis for the variable
                                     variable.setAxisIndex(2);
                                     graphVariableArrayList.add(variable);
@@ -345,7 +353,7 @@ public class GraphActivity extends AppCompatActivity {
                             else {
                                 // set the unit of the current variable for the right axis
                                 variable.setAxisIndex(2);
-                                units[variable.getChartIndex() - 1][1] = variable.getUnit();
+                                units[variable.getChartIndex() - 1][1] = currentUnit;
                                 graphVariableArrayList.add(variable);
                             }
                         }
@@ -353,7 +361,7 @@ public class GraphActivity extends AppCompatActivity {
                     else {
                         // set the unit of the current variable for the left axis
                         variable.setAxisIndex(1);
-                        units[variable.getChartIndex() - 1][0] = variable.getUnit();
+                        units[variable.getChartIndex() - 1][0] = currentUnit;
                         graphVariableArrayList.add(variable);
                     }
                 }
@@ -513,7 +521,13 @@ public class GraphActivity extends AppCompatActivity {
         }
         else {
             // TODO check special codes implementation (big decimal = null)
-            BigDecimal bigDecimal = bigDecimalArrayList.get(bigDecimalArrayList.size() - realTimeClockValueIndex);
+            BigDecimal bigDecimal;
+            try {
+                bigDecimal = bigDecimalArrayList.get(bigDecimalArrayList.size() - realTimeClockValueIndex);
+            }
+            catch (ArrayIndexOutOfBoundsException e) {
+                bigDecimal = null;
+            }
             if (bigDecimal != null){
                 if (timeStampArrayList.size() > 0) {
                     timeStampArrayList.add((timeStampArrayList.get(timeStampArrayList.size()-1) + bigDecimal.longValue()) / 2);
@@ -579,7 +593,7 @@ public class GraphActivity extends AppCompatActivity {
                 if (!variable.isHundredHertz()) {
                     bigDecimal = bigDecimalArrayList.get(bigDecimalArrayListSize - variable.getValueIndex());
                     if (bigDecimal != null){
-                        data.addEntry(new Entry(entryCount, bigDecimal.floatValue()), setIndexes[variable.getChartIndex()-1]);
+                        data.addEntry(new Entry(entryCount, bigDecimal.divide(BigDecimal.valueOf(variable.getFactor()), MathContext.DECIMAL128).floatValue()), setIndexes[variable.getChartIndex()-1]);
                     }
                     else {
                         data.addEntry(new Entry(entryCount, 0f), setIndexes[variable.getChartIndex()-1]);
@@ -589,7 +603,7 @@ public class GraphActivity extends AppCompatActivity {
                     if (entryCount > 0) {
                         bigDecimal = bigDecimalArrayList.get(bigDecimalArrayListSize - variable.getValueIndex());
                         if (bigDecimal != null){
-                            data.addEntry(new Entry(entryCount - 1, bigDecimal.floatValue()), setIndexes[variable.getChartIndex()-1]);
+                            data.addEntry(new Entry(entryCount - 1, bigDecimal.divide(BigDecimal.valueOf(variable.getFactor()), MathContext.DECIMAL128).floatValue()), setIndexes[variable.getChartIndex()-1]);
                         }
                         else {
                             data.addEntry(new Entry(entryCount - 1, 0f), setIndexes[variable.getChartIndex()-1]);
@@ -597,7 +611,7 @@ public class GraphActivity extends AppCompatActivity {
                     }
                     bigDecimal = bigDecimalArrayList.get(bigDecimalArrayListSize - variable.getValueIndex() - variable.getOversampledOffset());
                     if (bigDecimal != null){
-                        data.addEntry(new Entry(entryCount, bigDecimal.floatValue()), setIndexes[variable.getChartIndex()-1]);
+                        data.addEntry(new Entry(entryCount, bigDecimal.divide(BigDecimal.valueOf(variable.getFactor()), MathContext.DECIMAL128).floatValue()), setIndexes[variable.getChartIndex()-1]);
                     }
                     else {
                         data.addEntry(new Entry(entryCount, 0f), setIndexes[variable.getChartIndex()-1]);
@@ -847,14 +861,14 @@ public class GraphActivity extends AppCompatActivity {
         //If the service is running when the activity starts, we want to automatically bind to it.
         if (UsbAndTcpService.isRunning()) {
             doBindService();
-            Utilities.displayToast(context, R.string.connection_to_the_dmu_is_active);
+            Utilities.displayToast(context, R.string.connection_to_the_dcu_is_active);
 
             if (UsbAndTcpService.isMeasurementRunning()){
                 setTitle(String.format("%s (meas. ID: %s)", getTitle(), UsbAndTcpService.getMeasurementId()));
             }
         }
         else {
-            Utilities.displayToast(context, R.string.no_connection_to_the_dmu);
+            Utilities.displayToast(context, R.string.no_connection_to_the_dcu);
         }
     }
 

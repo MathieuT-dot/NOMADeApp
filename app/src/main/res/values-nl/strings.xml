@@ -315,8 +315,8 @@
     <string name="title">Titel</string>
     <string name="remove_site_x">Verwijder plaats %1$d</string>
     <string name="_for_">" voor "</string>
-    <string name="connection_to_the_dmu_is_active">Verbinding met de DMU is actief</string>
-    <string name="no_connection_to_the_dmu">Geen verbinding met de DMU</string>
+    <string name="connection_to_the_dcu_is_active">Verbinding met de DMU is actief</string>
+    <string name="no_connection_to_the_dcu">Geen verbinding met de DMU</string>
     <string name="pdf_not_saved">PDF niet opgeslagen</string>
     <string name="pdf_saved">PDF succesvol opgeslagen</string>
     <string name="pdf_failed">Het opslaan van de PDF is mislukt</string>
@@ -364,4 +364,11 @@
     <string name="only_enable_relevant_buttons_summary">Indien ingeschakeld, zal de app automatisch de knoppen voor de USB-communicatie in- en uitschakelen</string>
     <string name="hide_unchangeable_parameters_title">Onveranderlijke parameters verbergen</string>
     <string name="hide_unchangeable_parameters_summary">Indien ingeschakeld, zal de app onveranderlijke parameters verbergen tijdens het configureren van een instrument</string>
+    <string name="control_panel">Controlepaneel</string>
+    <string name="usb_connection">USB-verbinding</string>
+    <string name="setup_name">Naam van de setup</string>
+    <string name="measurement_name">Naam van de meting</string>
+    <string name="measurement_time">Meettijd</string>
+    <string name="database_connection">Databaseverbinding</string>
+    <string name="missing_cycle_counters">Ontbrekende cycle counters</string>
 </resources>

@@ -32,4 +32,6 @@ public class MessageCodes {
     public static final int USB_MSG_MANUAL_MEASUREMENT_STOPPED = 124;
     public static final int USB_MSG_INIT = 125;
     public static final int USB_MSG_STATUS_UPDATE = 126;
+    public static final int USB_MSG_UI_FEEDBACK = 127;
+
 }

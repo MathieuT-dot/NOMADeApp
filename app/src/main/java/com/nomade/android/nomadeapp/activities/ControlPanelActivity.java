@@ -2,6 +2,7 @@ package com.nomade.android.nomadeapp.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.preference.PreferenceManager;
 
 import android.app.ProgressDialog;
@@ -19,22 +20,26 @@ import android.os.RemoteException;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
+import com.kuleuven.android.kuleuvenlibrary.LibUtilities;
 import com.nomade.android.nomadeapp.R;
 import com.nomade.android.nomadeapp.adapters.StringListAdapter;
 import com.nomade.android.nomadeapp.helperClasses.AppController;
 import com.nomade.android.nomadeapp.helperClasses.Constants;
+import com.nomade.android.nomadeapp.helperClasses.MessageCodes;
 import com.nomade.android.nomadeapp.helperClasses.MyLog;
 import com.nomade.android.nomadeapp.helperClasses.StatusCodes;
-import com.nomade.android.nomadeapp.setups.Setup;
-import com.nomade.android.nomadeapp.helperClasses.MessageCodes;
 import com.nomade.android.nomadeapp.helperClasses.Utilities;
 import com.nomade.android.nomadeapp.services.UsbAndTcpService;
-import com.kuleuven.android.kuleuvenlibrary.LibUtilities;
+import com.nomade.android.nomadeapp.setups.Setup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,19 +58,29 @@ import eltos.simpledialogfragment.form.SimpleFormDialog;
 import eltos.simpledialogfragment.form.Spinner;
 
 /**
- * UsbActivity
+ * ControlPanelActivity
  *
- * Activity to manage the USB connection to the main board
+ * Activity with control panel for USB communication and measurements
  */
-public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDialogResultListener {
+public class ControlPanelActivity extends AppCompatActivity implements SimpleDialog.OnDialogResultListener {
 
-    private static final String TAG = "UsbActivity";
+    private static final String TAG = "ControlPanelActivity";
     private final Context context = this;
     private ProgressDialog pDialog;
 
     private SharedPreferences defaultSharedPreferences;
 
-    private Button initButton, setupRawButton, startStreamButton, stopStreamButton, startMeasurementButton, stopMeasurementButton;
+    private LinearLayout logLinearLayout, statusLinearLayout;
+
+    private Button initButton, sendSetupButton;
+    private Button startStreamButton, stopStreamButton;
+    private Button startMeasurementButton, stopMeasurementButton;
+
+    private TextView connectionStatusTextView, setupNameTextView;
+    private TextView measurementNameTextView, measurementTimeTextView;
+    private TextView missingCycleCountersTextView, databaseConnectionTextView;
+
+    private ImageView connectionStatusImageView, databaseConnectionImageView;
 
     private static SimpleDateFormat timeFormatter;
 
@@ -83,7 +98,6 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
     private static final int SEND_RAW = 2;
 
     public static final int PICK_SETUP_REQUEST = 1;
-    public static final int PICK_MEASUREMENT_REQUEST = 2;
 
     private static final String NEW_MEASUREMENT_DIALOG = "dialogTagNewMeasurement";
     private static final String STORE_OR_DELETE_DIALOG = "dialogTagStoreOrDelete";
@@ -103,8 +117,10 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
     private int[] setupIdArray;
 
     private Menu menu;
+    private boolean showStatus = true;
+    private boolean showLog = false;
     private boolean dataViewIsRunning = true;
-    private boolean showDetailedData = false;
+    private boolean showDetailedLog = false;
 
     private int currentUserId = -1;
     private int currentUserIndex = -1;
@@ -114,7 +130,7 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_usb);
+        setContentView(R.layout.activity_control_panel);
 
         // Progress dialog
         pDialog = new ProgressDialog(this);
@@ -128,6 +144,9 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
 
         timeFormatter = new SimpleDateFormat("hh:mm:ss,SSS", Locale.getDefault());
 
+        logLinearLayout = findViewById(R.id.log_linear_layout);
+        statusLinearLayout = findViewById(R.id.status_linear_layout);
+
         if (savedInstanceState != null){
             arrayList = savedInstanceState.getStringArrayList("LOG_ARRAY");
         }
@@ -137,10 +156,22 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
 
         pauseArrayList = new ArrayList<>();
 
-        //relate the listView from java to the one created in xml
-        listView = findViewById(R.id.list);
         adapter = new StringListAdapter(this, arrayList);
-        listView.setAdapter(adapter);
+
+        if (getSharedPreferences(Constants.PERMISSIONS_CACHE, MODE_PRIVATE).getBoolean(Constants.PERMISSION_DEBUG_CONSOLE, false)) {
+            listView = findViewById(R.id.list);
+            listView.setAdapter(adapter);
+        }
+
+        connectionStatusTextView = findViewById(R.id.usb_connection_textView);
+        setupNameTextView = findViewById(R.id.setup_name_textView);
+        measurementNameTextView = findViewById(R.id.measurement_name_textView);
+        measurementTimeTextView = findViewById(R.id.measurement_time_textView);
+        missingCycleCountersTextView = findViewById(R.id.missing_cycle_counters_textView);
+        databaseConnectionTextView = findViewById(R.id.database_connection_textView);
+
+        connectionStatusImageView = findViewById(R.id.usb_connection_imageView);
+        databaseConnectionImageView = findViewById(R.id.database_connection_imageView);
 
         initButton = findViewById(R.id.init_button);
         initButton.setOnClickListener(v -> {
@@ -148,44 +179,8 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
             sendMessageToService(MessageCodes.USB_MSG_INIT);
         });
 
-        Button configButton = findViewById(R.id.config_button);
-        configButton.setOnClickListener(v -> {
-            // Sends the message to configure the USB chip.
-            sendMessageToService(MessageCodes.USB_MSG_CONFIG);
-        });
-
-        Button autoButton = findViewById(R.id.auto_button);
-        autoButton.setOnClickListener(v -> {
-            // Sends the message to automatically go through all communication needed for the streaming.
-            sendMessageToService(MessageCodes.USB_MSG_AUTO);
-        });
-
-        Button askAddressButton = findViewById(R.id.ask_address_button);
-        askAddressButton.setOnClickListener(v -> {
-            // Sends the message to ask an address from the main board.
-            sendMessageToService(MessageCodes.USB_MSG_ASK_ADDRESS);
-        });
-
-        Button ackMissConfigButton = findViewById(R.id.ack_miss_config_button);
-        ackMissConfigButton.setOnClickListener(v -> {
-            // Sends the message to acknowledge a missing configuration.
-            sendMessageToService(MessageCodes.USB_MSG_ACK_MISS_CONFIG);
-        });
-
-        Button ackExisConfigButton = findViewById(R.id.ack_exis_config_button);
-        ackExisConfigButton.setOnClickListener(v -> {
-            // Sends the message to acknowledge an existing configuration.
-            sendMessageToService(MessageCodes.USB_MSG_ACK_EXIS_CONFIG);
-        });
-
-        Button setupJsonButton = findViewById(R.id.setup_json_button);
-        setupJsonButton.setOnClickListener(v -> {
-            sendWhat = SEND_JSON;
-            pickSetup();
-        });
-
-        setupRawButton = findViewById(R.id.send_setup_button);
-        setupRawButton.setOnClickListener(v -> {
+        sendSetupButton = findViewById(R.id.send_setup_button);
+        sendSetupButton.setOnClickListener(v -> {
             sendWhat = SEND_RAW;
             pickSetup();
         });
@@ -200,12 +195,6 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
         stopStreamButton.setOnClickListener(v -> {
             // Sends the message to stop the streaming of the data.
             sendMessageToService(MessageCodes.USB_MSG_STOP_STREAM);
-        });
-
-        Button requestJsonButton = findViewById(R.id.request_json_button);
-        requestJsonButton.setOnClickListener(v -> {
-            // Sends the message to request the JSON setup from the DMU
-            sendMessageToService(MessageCodes.USB_MSG_REQUEST_JSON_SETUP);
         });
 
         startMeasurementButton = findViewById(R.id.start_measurement_button);
@@ -236,7 +225,7 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
     protected void onResume() {
         super.onResume();
 
-        showDetailedData = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Constants.SETTING_SHOW_DETAILED_DATA, false);
+        showDetailedLog = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Constants.SETTING_SHOW_DETAILED_DATA, false);
     }
 
     /**
@@ -245,8 +234,6 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
     class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-
-            MyLog.d(TAG, "Incoming: MessageCode: " + msg.what);
 
             switch (msg.what) {
                 case MessageCodes.USB_MSG_SEND_STRING:
@@ -284,6 +271,9 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
                 case MessageCodes.USB_MSG_STATUS_UPDATE:
                     updateUi();
                     break;
+                case MessageCodes.USB_MSG_UI_FEEDBACK:
+                    updateFeedback(msg.getData());
+                    break;
                 default:
                     super.handleMessage(msg);
             }
@@ -291,15 +281,12 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
     }
 
     private void updateUi() {
-
-        MyLog.d(TAG, "Update_UI: StatusCode: " + UsbAndTcpService.getStatusCode());
-
         if (UsbAndTcpService.isRunning()) {
             if (defaultSharedPreferences.getBoolean(Constants.SETTING_ONLY_ENABLE_RELEVANT_BUTTONS, true)) {
                 switch (UsbAndTcpService.getStatusCode()) {
                     case StatusCodes.UTS_NOT_INIT:
                         initButton.setEnabled(true);
-                        setupRawButton.setEnabled(false);
+                        sendSetupButton.setEnabled(false);
                         startStreamButton.setEnabled(false);
                         stopStreamButton.setEnabled(false);
                         startMeasurementButton.setEnabled(false);
@@ -307,7 +294,7 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
                         break;
                     case StatusCodes.UTS_INIT:
                         initButton.setEnabled(false);
-                        setupRawButton.setEnabled(false);
+                        sendSetupButton.setEnabled(false);
                         startStreamButton.setEnabled(false);
                         stopStreamButton.setEnabled(false);
                         startMeasurementButton.setEnabled(false);
@@ -315,7 +302,7 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
                         break;
                     case StatusCodes.UTS_ADDRESS:
                         initButton.setEnabled(false);
-                        setupRawButton.setEnabled(true);
+                        sendSetupButton.setEnabled(true);
                         startStreamButton.setEnabled(false);
                         stopStreamButton.setEnabled(false);
                         startMeasurementButton.setEnabled(false);
@@ -323,7 +310,7 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
                         break;
                     case StatusCodes.UTS_WATCHDOG:
                         initButton.setEnabled(false);
-                        setupRawButton.setEnabled(true);
+                        sendSetupButton.setEnabled(true);
                         startStreamButton.setEnabled(false);
                         stopStreamButton.setEnabled(false);
                         startMeasurementButton.setEnabled(false);
@@ -331,7 +318,7 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
                         break;
                     case StatusCodes.UTS_NO_SETUP:
                         initButton.setEnabled(false);
-                        setupRawButton.setEnabled(true);
+                        sendSetupButton.setEnabled(true);
                         startStreamButton.setEnabled(false);
                         stopStreamButton.setEnabled(false);
                         startMeasurementButton.setEnabled(false);
@@ -339,7 +326,7 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
                         break;
                     case StatusCodes.UTS_UNLOCKED_SETUP:
                         initButton.setEnabled(false);
-                        setupRawButton.setEnabled(true);
+                        sendSetupButton.setEnabled(true);
                         startStreamButton.setEnabled(true);
                         stopStreamButton.setEnabled(false);
                         startMeasurementButton.setEnabled(false);
@@ -347,7 +334,7 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
                         break;
                     case StatusCodes.UTS_LOCKED_SETUP:
                         initButton.setEnabled(false);
-                        setupRawButton.setEnabled(true);
+                        sendSetupButton.setEnabled(true);
                         startStreamButton.setEnabled(true);
                         stopStreamButton.setEnabled(false);
                         startMeasurementButton.setEnabled(true);
@@ -355,7 +342,7 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
                         break;
                     case StatusCodes.UTS_STREAM_BUSY:
                         initButton.setEnabled(false);
-                        setupRawButton.setEnabled(false);
+                        sendSetupButton.setEnabled(false);
                         startStreamButton.setEnabled(false);
                         stopStreamButton.setEnabled(true);
                         startMeasurementButton.setEnabled(false);
@@ -363,15 +350,23 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
                         break;
                     case StatusCodes.UTS_MEASUREMENT_BUSY:
                         initButton.setEnabled(false);
-                        setupRawButton.setEnabled(false);
+                        sendSetupButton.setEnabled(false);
                         startStreamButton.setEnabled(false);
                         stopStreamButton.setEnabled(false);
                         startMeasurementButton.setEnabled(false);
                         stopMeasurementButton.setEnabled(true);
                         break;
+                    case StatusCodes.UTS_NEW_SETUP:
+                        initButton.setEnabled(false);
+                        sendSetupButton.setEnabled(true);
+                        startStreamButton.setEnabled(false);
+                        stopStreamButton.setEnabled(false);
+                        startMeasurementButton.setEnabled(false);
+                        stopMeasurementButton.setEnabled(false);
+                        break;
                     default:
                         initButton.setEnabled(true);
-                        setupRawButton.setEnabled(true);
+                        sendSetupButton.setEnabled(true);
                         startStreamButton.setEnabled(true);
                         stopStreamButton.setEnabled(true);
                         startMeasurementButton.setEnabled(true);
@@ -381,7 +376,7 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
             }
             else {
                 initButton.setEnabled(true);
-                setupRawButton.setEnabled(true);
+                sendSetupButton.setEnabled(true);
                 startStreamButton.setEnabled(true);
                 stopStreamButton.setEnabled(true);
                 startMeasurementButton.setEnabled(true);
@@ -390,11 +385,105 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
         }
         else {
             initButton.setEnabled(false);
-            setupRawButton.setEnabled(false);
+            sendSetupButton.setEnabled(false);
             startStreamButton.setEnabled(false);
             stopStreamButton.setEnabled(false);
             startMeasurementButton.setEnabled(false);
             stopMeasurementButton.setEnabled(false);
+        }
+    }
+
+    private void updateFeedback(Bundle b) {
+
+        if (b.getLong("cycle_counter") > 0) {
+
+            long totalSecs = b.getLong("cycle_counter") / 50;
+
+            long hours = totalSecs / 3600;
+            long minutes = (totalSecs % 3600) / 60;
+            long seconds = totalSecs % 60;
+
+            if (hours > 0) {
+                measurementTimeTextView.setText(String.format("%02dh:%02dm:%02ds", hours, minutes, seconds));
+            }
+            else if (minutes > 0) {
+                measurementTimeTextView.setText(String.format("%02dm:%02ds", minutes, seconds));
+            }
+            else {
+                measurementTimeTextView.setText(String.format("%02ds", seconds));
+            }
+        }
+        else {
+            measurementTimeTextView.setText("/");
+        }
+
+        if (b.getInt("missing_cycle_counters") >= 0) {
+            missingCycleCountersTextView.setText("" + b.getInt("missing_cycle_counters"));
+        }
+        else {
+            missingCycleCountersTextView.setText("/");
+        }
+
+        switch (b.getInt("connection_status")) {
+            case StatusCodes.UNKNOWN:
+                connectionStatusTextView.setText("/");
+                connectionStatusImageView.setVisibility(View.GONE);
+                break;
+            case StatusCodes.PENDING:
+                connectionStatusTextView.setText("Pending");
+                connectionStatusImageView.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.yellow_light));
+                connectionStatusImageView.setVisibility(View.VISIBLE);
+                break;
+            case StatusCodes.ACTIVE:
+                connectionStatusTextView.setText("Active");
+                connectionStatusImageView.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.green_light));
+                connectionStatusImageView.setVisibility(View.VISIBLE);
+                break;
+            case StatusCodes.INACTIVE:
+                connectionStatusTextView.setText("Inactive!");
+                connectionStatusImageView.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.red_light));
+                connectionStatusImageView.setVisibility(View.VISIBLE);
+                break;
+        }
+
+        switch (b.getInt("database_connection")) {
+            case StatusCodes.UNKNOWN:
+                databaseConnectionTextView.setText("/");
+                databaseConnectionImageView.setVisibility(View.GONE);
+                break;
+            case StatusCodes.PENDING:
+                databaseConnectionTextView.setText("Pending");
+                databaseConnectionImageView.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.yellow_light));
+                databaseConnectionImageView.setVisibility(View.VISIBLE);
+                break;
+            case StatusCodes.ACTIVE:
+                databaseConnectionTextView.setText("Active");
+                databaseConnectionImageView.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.green_light));
+                databaseConnectionImageView.setVisibility(View.VISIBLE);
+                break;
+            case StatusCodes.INACTIVE:
+                databaseConnectionTextView.setText("Inactive!");
+                databaseConnectionImageView.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.red_light));
+                databaseConnectionImageView.setVisibility(View.VISIBLE);
+                break;
+        }
+
+        if (b.containsKey("setup_name")) {
+           if (getSharedPreferences(Constants.PERMISSIONS_CACHE, MODE_PRIVATE).getBoolean(Constants.PERMISSION_DEBUG_CONSOLE, false) && b.containsKey("setup_id")) {
+               setupNameTextView.setText(b.getString("setup_name") + " (" + b.getInt("setup_id") + ")");
+           }
+           else {
+               setupNameTextView.setText(b.getString("setup_name"));
+           }
+        }
+
+        if (b.containsKey("measurement_name")) {
+            if (getSharedPreferences(Constants.PERMISSIONS_CACHE, MODE_PRIVATE).getBoolean(Constants.PERMISSION_DEBUG_CONSOLE, false) && b.containsKey("measurement_id") && !b.getString("measurement_name").equals("/")) {
+                measurementNameTextView.setText(b.getString("measurement_name") + " (" + b.getInt("measurement_id") + ")");
+            }
+            else {
+                measurementNameTextView.setText(b.getString("measurement_name"));
+            }
         }
     }
 
@@ -644,6 +733,7 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
                     int setupIndex = extras.getInt(SETUP_ID);
                     String description = extras.getString(DESCRIPTION);
 
+                    // TODO userIdArray and setupIdArray are null after orientation change!
                     int selectedUserId = userIdArray[userIndex];
                     int selectedSetupId = setupIdArray[setupIndex];
 
@@ -899,10 +989,21 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_usb_communication, menu);
+        getMenuInflater().inflate(R.menu.menu_control_panel, menu);
         this.menu = menu;
 
-        this.menu.findItem(R.id.action_show_detailed_data).setChecked(showDetailedData);
+        if (getSharedPreferences(Constants.PERMISSIONS_CACHE, MODE_PRIVATE).getBoolean(Constants.PERMISSION_DEBUG_CONSOLE, false)) {
+            this.menu.findItem(R.id.action_show_status).setChecked(showStatus);
+            this.menu.findItem(R.id.action_show_log).setChecked(showLog);
+            this.menu.findItem(R.id.action_pause_resume).setChecked(dataViewIsRunning);
+            this.menu.findItem(R.id.action_show_detailed_log).setChecked(showDetailedLog);
+        }
+        else {
+            this.menu.findItem(R.id.action_show_status).setVisible(false);
+            this.menu.findItem(R.id.action_show_log).setVisible(false);
+            this.menu.findItem(R.id.action_pause_resume).setVisible(false);
+            this.menu.findItem(R.id.action_show_detailed_log).setVisible(false);
+        }
 
         invalidateOptionsMenu();
         return true;
@@ -911,24 +1012,48 @@ public class UsbActivity extends AppCompatActivity implements SimpleDialog.OnDia
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        if (itemId == R.id.action_pause_resume) {
+        if (itemId == R.id.action_show_status) {
+            if (showStatus) {
+                showStatus = false;
+                statusLinearLayout.setVisibility(View.GONE);
+                item.setChecked(false);
+            }
+            else {
+                showStatus = true;
+                statusLinearLayout.setVisibility(View.VISIBLE);
+                item.setChecked(true);
+            }
+        }
+        else if (itemId == R.id.action_show_log) {
+            if (showLog) {
+                showLog = false;
+                logLinearLayout.setVisibility(View.GONE);
+                item.setChecked(false);
+            }
+            else {
+                showLog = true;
+                logLinearLayout.setVisibility(View.VISIBLE);
+                item.setChecked(true);
+            }
+        }
+        else if (itemId == R.id.action_pause_resume) {
             if (dataViewIsRunning) {
                 dataViewIsRunning = false;
-                setOptionTitle(R.id.action_pause_resume, getString(R.string.resume));
-                setOptionIcon(R.id.action_pause_resume, R.drawable.ic_action_play_arrow);
+                setOptionTitle(R.id.action_pause_resume, "Resume log");
+                item.setChecked(false);
             } else {
                 dataViewIsRunning = true;
-                setOptionTitle(R.id.action_pause_resume, getString(R.string.pause));
-                setOptionIcon(R.id.action_pause_resume, R.drawable.ic_action_pause);
+                setOptionTitle(R.id.action_pause_resume, "Pause log");
                 adapter.notifyDataSetChanged();
+                item.setChecked(true);
             }
-        } else if (itemId == R.id.action_show_detailed_data) {
-            if (showDetailedData) {
-                showDetailedData = false;
+        } else if (itemId == R.id.action_show_detailed_log) {
+            if (showDetailedLog) {
+                showDetailedLog = false;
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(Constants.SETTING_SHOW_DETAILED_DATA, false).apply();
                 item.setChecked(false);
             } else {
-                showDetailedData = true;
+                showDetailedLog = true;
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(Constants.SETTING_SHOW_DETAILED_DATA, true).apply();
                 item.setChecked(true);
             }

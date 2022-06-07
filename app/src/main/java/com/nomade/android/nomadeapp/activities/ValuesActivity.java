@@ -32,6 +32,10 @@ import com.nomade.android.nomadeapp.helperClasses.Utilities;
 import com.nomade.android.nomadeapp.services.UsbAndTcpService;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,9 +66,14 @@ public class ValuesActivity extends AppCompatActivity implements SimpleDialog.On
 
     private TextView[] valueTextViews;
 
+//    private TextView debugTextView;
+//    private int debugCounter;
+//    private StringBuilder debugStringBuilder;
+
     private static final String CHOICE_DIALOG = "dialogTagChoice";
 
     private static SimpleDateFormat timeFormatter;
+    private DecimalFormat df;
 
     private Setup memorySetup;
     private Setup streamSetup;
@@ -82,12 +91,18 @@ public class ValuesActivity extends AppCompatActivity implements SimpleDialog.On
         jsonParameterInfoList = setupSharedPreferences.getString(Constants.API_PARAMETERS, "");
 
         timeFormatter = new SimpleDateFormat("d MMM yyyy HH:mm:ss,SSS", Locale.getDefault());
+        df = new DecimalFormat("0");
+        df.setMaximumFractionDigits(340);
 
         if (savedInstanceState != null){
             convertedFrequency = savedInstanceState.getInt("CONVERTED_FREQUENCY");
         }
 
         variablesContainer = findViewById(R.id.variables_container);
+
+//        debugTextView = findViewById(R.id.debug_text_view);
+//        debugCounter = 1;
+//        debugStringBuilder = new StringBuilder();
 
         init();
 
@@ -195,7 +210,7 @@ public class ValuesActivity extends AppCompatActivity implements SimpleDialog.On
                             valueTextViews[textViewIndex++].setText(timeFormatter.format(new Date(bigDecimal.longValue())));
                         }
                         else {
-                            valueTextViews[textViewIndex++].setText(bigDecimal.stripTrailingZeros().toPlainString());
+                            valueTextViews[textViewIndex++].setText(df.format(bigDecimal.divide(BigDecimal.valueOf(variable.getFactor()), MathContext.DECIMAL128)));
                         }
                     }
                     else {
@@ -207,6 +222,16 @@ public class ValuesActivity extends AppCompatActivity implements SimpleDialog.On
                 }
             }
         }
+
+//        debugStringBuilder.append(df.format(bigDecimalArrayList.get(bigDecimalArrayList.size() - 5))).append("\n");
+//        if (debugCounter < 50) {
+//            debugCounter++;
+//        }
+//        else {
+//            debugCounter = 1;
+//            debugTextView.setText(debugStringBuilder.toString());
+//            debugStringBuilder.setLength(0);
+//        }
     }
 
     /**
@@ -345,14 +370,14 @@ public class ValuesActivity extends AppCompatActivity implements SimpleDialog.On
         //If the service is running when the activity starts, we want to automatically bind to it.
         if (UsbAndTcpService.isRunning()) {
             doBindService();
-            Utilities.displayToast(context, R.string.connection_to_the_dmu_is_active);
+            Utilities.displayToast(context, R.string.connection_to_the_dcu_is_active);
 
             if (UsbAndTcpService.isMeasurementRunning()){
                 setTitle(String.format("%s (meas. ID: %s)", getTitle(), UsbAndTcpService.getMeasurementId()));
             }
         }
         else {
-            Utilities.displayToast(context, R.string.no_connection_to_the_dmu);
+            Utilities.displayToast(context, R.string.no_connection_to_the_dcu);
         }
     }
 

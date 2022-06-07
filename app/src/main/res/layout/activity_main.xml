@@ -95,6 +95,16 @@
                     android:gravity="center_horizontal"/>
 
                 <Button
+                    android:id="@+id/control_panel_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/control_panel"
+                    android:textSize="@dimen/font_size_normal"
+                    android:textStyle="bold"
+                    android:padding="@dimen/padding_button"
+                    android:visibility="gone"/>
+
+                <Button
                     android:id="@+id/view_questionnaires_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -124,15 +134,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/measurement_menu"
-                    android:textSize="@dimen/font_size_normal"
-                    android:padding="@dimen/padding_button"
-                    android:visibility="gone"/>
-
-                <Button
-                    android:id="@+id/usb_communication_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/usb_communication"
                     android:textSize="@dimen/font_size_normal"
                     android:padding="@dimen/padding_button"
                     android:visibility="gone"/>

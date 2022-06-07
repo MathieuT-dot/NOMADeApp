@@ -3,6 +3,8 @@ package com.nomade.android.nomadeapp.setups;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.math.BigDecimal;
+
 /**
  * Variable
  *

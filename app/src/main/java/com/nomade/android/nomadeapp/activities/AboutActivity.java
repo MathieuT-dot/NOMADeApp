@@ -11,8 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.nomade.android.nomadeapp.R;
 import com.nomade.android.nomadeapp.helperClasses.Constants;
 
-import java.util.Locale;
-
 /**
  * AboutActivity
  *
@@ -41,20 +39,17 @@ public class AboutActivity extends AppCompatActivity {
         TextView appNameTextView = findViewById(R.id.about_app_name_text_view);
         appNameTextView.setText(getString(R.string.app_name));
 
-
         TextView urlKeyTextView = findViewById(R.id.about_link_key_text_view);
         urlKeyTextView.setText(getString(R.string.about_website_key));
 
         TextView urlValueTextView = findViewById(R.id.about_link_value_text_view);
         urlValueTextView.setText(Constants.NOMADE_URL);
 
-
         TextView versionKeyTextView = findViewById(R.id.about_version_key_text_view);
         versionKeyTextView.setText(getString(R.string.about_version_key));
 
         TextView versionValueTextView = findViewById(R.id.about_version_value_text_view);
-        versionValueTextView.setText(String.format("%s (%s)", versionName, versionCode));
-
+        versionValueTextView.setText(String.format("%s", versionName));
 
         TextView changelogKeyTextView = findViewById(R.id.changelog_key_text_view);
         changelogKeyTextView.setText(getString(R.string.about_changelog_key));

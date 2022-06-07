@@ -441,15 +441,23 @@ public class MeasurementMenuActivity extends AppCompatActivity implements Simple
                         stopCurrentMeasurementButton.setEnabled(false);
                         break;
                     case StatusCodes.UTS_ADDRESS:
-                        startNewMeasurementButton.setEnabled(true);
+                        startNewMeasurementButton.setEnabled(false);
                         stopCurrentMeasurementButton.setEnabled(false);
                         break;
                     case StatusCodes.UTS_WATCHDOG:
-                        startNewMeasurementButton.setEnabled(true);
+                        startNewMeasurementButton.setEnabled(false);
                         stopCurrentMeasurementButton.setEnabled(false);
                         break;
                     case StatusCodes.UTS_NO_SETUP:
                         startNewMeasurementButton.setEnabled(false);
+                        stopCurrentMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_UNLOCKED_SETUP:
+                        startNewMeasurementButton.setEnabled(false);
+                        stopCurrentMeasurementButton.setEnabled(false);
+                        break;
+                    case StatusCodes.UTS_LOCKED_SETUP:
+                        startNewMeasurementButton.setEnabled(true);
                         stopCurrentMeasurementButton.setEnabled(false);
                         break;
                     case StatusCodes.UTS_STREAM_BUSY:
@@ -459,6 +467,10 @@ public class MeasurementMenuActivity extends AppCompatActivity implements Simple
                     case StatusCodes.UTS_MEASUREMENT_BUSY:
                         startNewMeasurementButton.setEnabled(false);
                         stopCurrentMeasurementButton.setEnabled(true);
+                        break;
+                    case StatusCodes.UTS_NEW_SETUP:
+                        startNewMeasurementButton.setEnabled(false);
+                        stopCurrentMeasurementButton.setEnabled(false);
                         break;
                     default:
                         startNewMeasurementButton.setEnabled(true);
@@ -524,7 +536,7 @@ public class MeasurementMenuActivity extends AppCompatActivity implements Simple
         //If the service is running when the activity starts, we want to automatically bind to it.
         if (UsbAndTcpService.isRunning()) {
             doBindService();
-            Utilities.displayToast(context, R.string.connection_to_the_dmu_is_active);
+            Utilities.displayToast(context, R.string.connection_to_the_dcu_is_active);
         }
         else {
             MyLog.d(TAG, "CheckIfServiceIsRunning: UsbAndTcpService is not running");

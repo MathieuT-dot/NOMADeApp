@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
@@ -665,6 +666,11 @@ public class SetupEditInstrumentActivity extends AppCompatActivity {
         {
             Parameter parameter = instrument.getParameterArrayList().get(i);
 
+            String parameterDescription = parameter.getDescription();
+            if (parameterDescription == null || parameterDescription.equals("null")) {
+                parameterDescription = parameter.getName();
+            }
+
             switch (parameter.getDataType())
             {
                 case 0: // Strict
@@ -683,7 +689,7 @@ public class SetupEditInstrumentActivity extends AppCompatActivity {
                                 parameter.setValue(value);
                             }
                             else {
-                                Utilities.displayToast(context, getString(R.string.parameter_value_greater, parameter.getDescription(), Float.toString(parameter.getMin())));
+                                Utilities.displayToast(context, getString(R.string.parameter_value_greater, parameterDescription, Float.toString(parameter.getMin())));
                                 return false;
                             }
 
@@ -691,7 +697,7 @@ public class SetupEditInstrumentActivity extends AppCompatActivity {
                                 parameter.setValue(value);
                             }
                             else {
-                                Utilities.displayToast(context, getString(R.string.parameter_value_less, parameter.getDescription(), Float.toString(parameter.getMax())));
+                                Utilities.displayToast(context, getString(R.string.parameter_value_less, parameterDescription, Float.toString(parameter.getMax())));
                                 return false;
                             }
                         }
@@ -711,7 +717,7 @@ public class SetupEditInstrumentActivity extends AppCompatActivity {
                                 parameter.setValue(value);
                             }
                             else {
-                                Utilities.displayToast(context, getString(R.string.parameter_value_greater, parameter.getDescription(), Float.toString(parameter.getMin())));
+                                Utilities.displayToast(context, getString(R.string.parameter_value_greater, parameterDescription, Float.toString(parameter.getMin())));
                                 return false;
                             }
 
@@ -719,7 +725,7 @@ public class SetupEditInstrumentActivity extends AppCompatActivity {
                                 parameter.setValue(value);
                             }
                             else {
-                                Utilities.displayToast(context, getString(R.string.parameter_value_less, parameter.getDescription(), Float.toString(parameter.getMax())));
+                                Utilities.displayToast(context, getString(R.string.parameter_value_less, parameterDescription, Float.toString(parameter.getMax())));
                                 return false;
                             }
                         }
@@ -749,7 +755,8 @@ public class SetupEditInstrumentActivity extends AppCompatActivity {
                     if (parameterValueEditTexts[i].isEnabled()) {
                         String s = parameterValueEditTexts[i].getText().toString();
                         if (s.length() != 6) {
-                            Utilities.displayToast(context, "Parameter " + parameter.getDescription() + " should contain 6 characters");
+                            // TODO add text resource
+                            Utilities.displayToast(context, "Parameter " + parameterDescription + " should contain 6 characters");
                             return false;
                         }
                         else {
@@ -757,6 +764,21 @@ public class SetupEditInstrumentActivity extends AppCompatActivity {
                         }
                     }
                     break;
+            }
+
+            if (parameter.getId() == Constants.SETUP_PRM_SAMPLERATE) {
+                if (parameter.getValue() != null) {
+                    if (parameter.getValue() != 10 && parameter.getValue() != 25 && parameter.getValue() != 50 && parameter.getValue() != 100) {
+                        // TODO add text resource
+                        Utilities.displayToast(context, "The samplerate must be 10 Hz, 25 Hz, 50 Hz or 100 Hz");
+                        return false;
+                    }
+                }
+                else {
+                    // TODO add text resource
+                    Utilities.displayToast(context, "The samplerate is required");
+                    return false;
+                }
             }
 
             if (parameter.getId() == Constants.SETUP_PRM_OAS_SLOPE_START) {

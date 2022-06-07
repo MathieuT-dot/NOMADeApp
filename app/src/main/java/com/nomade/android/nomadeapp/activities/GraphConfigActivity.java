@@ -152,10 +152,16 @@ public class GraphConfigActivity extends AppCompatActivity {
 
                     boolean axisSet = false;
 
+                    // special case for the quaternions, they have no units, but real, i, j and k are used instead, they are assigned the same unit so they use one vertical axis
+                    String currentUnit = streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getUnit();
+                    if (currentUnit.equals("real") || currentUnit.equals("i") || currentUnit.equals("j") || currentUnit.equals("k")) {
+                        currentUnit = "real, i, j, k";
+                    }
+
                     // check if the left axis already has a unit
                     if (units[streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getChartIndex() - 1][0] != null && !units[streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getChartIndex() - 1][0].equals("")){
                         // check if the unit of the current variable is the same as the unit of the left axis
-                        if (units[streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getChartIndex() - 1][0].equals(streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getUnit())){
+                        if (units[streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getChartIndex() - 1][0].equals(currentUnit)){
                             // set the left axis for the variable
                             streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).setAxisIndex(1);
                             axisSet = true;
@@ -164,7 +170,7 @@ public class GraphConfigActivity extends AppCompatActivity {
                             // check if the right axis already has a unit
                             if (units[streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getChartIndex() - 1][1] != null && !units[streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getChartIndex() - 1][1].equals("")){
                                 // check if the unit of the current variable is the same as the unit of the right axis
-                                if (units[streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getChartIndex() - 1][1].equals(streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getUnit())){
+                                if (units[streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getChartIndex() - 1][1].equals(currentUnit)){
                                     // set the right axis for the variable
                                     streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).setAxisIndex(2);
                                     axisSet = true;
@@ -177,7 +183,7 @@ public class GraphConfigActivity extends AppCompatActivity {
                                 // set the unit of the current variable for the right axis
                                 streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).setAxisIndex(2);
                                 axisSet = true;
-                                units[streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getChartIndex() - 1][1] = streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getUnit();
+                                units[streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getChartIndex() - 1][1] = currentUnit;
                             }
                         }
                     }
@@ -185,7 +191,7 @@ public class GraphConfigActivity extends AppCompatActivity {
                         // set the unit of the current variable for the left axis
                         streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).setAxisIndex(1);
                         axisSet = true;
-                        units[streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getChartIndex() - 1][0] = streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getUnit();
+                        units[streamSetup.getInstrumentArrayList().get(i).getVariableArrayList().get(j).getChartIndex() - 1][0] = currentUnit;
                     }
 
                     final int graphInstrumentIndex = i;

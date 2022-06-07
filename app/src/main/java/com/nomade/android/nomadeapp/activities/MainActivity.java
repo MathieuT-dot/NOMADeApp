@@ -2,8 +2,10 @@ package com.nomade.android.nomadeapp.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.splashscreen.SplashScreen;
 import androidx.preference.PreferenceManager;
 
+import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
@@ -74,11 +76,11 @@ public class MainActivity extends AppCompatActivity implements SimpleDialog.OnDi
     private EditText usernameEditText;
     private EditText passwordEditText;
 
+    private Button controlPanelButton;
     private Button viewQuestionnairesButton;
     private Button viewSubmittedQuestionnairesButton;
     private Button setupMenuButton;
     private Button measurementMenuButton;
-    private Button usbCommunicationButton;
     private Button graphButton;
     private Button valuesButton;
 
@@ -113,6 +115,9 @@ public class MainActivity extends AppCompatActivity implements SimpleDialog.OnDi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Handle the splash screen transition.
+        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         setContentView(R.layout.activity_main);
 
         if(getIntent().getBooleanExtra("KILL_APP", false)){
@@ -174,6 +179,13 @@ public class MainActivity extends AppCompatActivity implements SimpleDialog.OnDi
             }
         });
 
+        controlPanelButton = findViewById(R.id.control_panel_button);
+        controlPanelButton.setOnClickListener(v -> {
+            enableButtons(false);
+            Intent intent = new Intent(context, ControlPanelActivity.class);
+            startActivity(intent);
+        });
+
         viewQuestionnairesButton = findViewById(R.id.view_questionnaires_button);
         viewQuestionnairesButton.setOnClickListener(v -> {
             enableButtons(false);
@@ -216,13 +228,6 @@ public class MainActivity extends AppCompatActivity implements SimpleDialog.OnDi
             startActivity(intent);
         });
 
-        usbCommunicationButton = findViewById(R.id.usb_communication_button);
-        usbCommunicationButton.setOnClickListener(v -> {
-            enableButtons(false);
-            Intent intent = new Intent(context, UsbActivity.class);
-            startActivity(intent);
-        });
-
         TextView buttonTermsAndConditionsTextView = findViewById(R.id.button_terms_and_conditions_text_view);
         buttonTermsAndConditionsTextView.setOnClickListener(v -> {
             Intent intent = new Intent(context, TermsAndConditionsActivity.class);
@@ -235,6 +240,9 @@ public class MainActivity extends AppCompatActivity implements SimpleDialog.OnDi
         else {
             String actionString = getIntent().getAction();
             if (actionString != null && actionString.contains("android.hardware.usb.action.USB_ACCESSORY_ATTACHED") && !UsbAndTcpService.isRunning()){
+                if (permissionsSharedPreferences.getBoolean(Constants.PERMISSION_SETUP_CREATE, false)) {
+                    controlPanelButton.setVisibility(View.VISIBLE);
+                }
                 startUsbService();
             }
         }
@@ -242,6 +250,19 @@ public class MainActivity extends AppCompatActivity implements SimpleDialog.OnDi
         prepareNotificationChannels();
 
         showPrivacyPolicy();
+
+        // memory debugging
+        Runtime rt = Runtime.getRuntime();
+        // currently available memory in bytes
+        long maxMemory = rt.maxMemory();
+        MyLog.v("onCreate", "maxMemory: " + Long.toString(maxMemory) + " bytes");
+        ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        // available memory in megabytes without largeHeap
+        int memoryClass = am.getMemoryClass();
+        MyLog.v("onCreate", "memoryClass: " + Integer.toString(memoryClass) + " megabytes");
+        // available memory in megabytes with largeHeap
+        int largeMemoryClass = am.getLargeMemoryClass();
+        MyLog.v("onCreate", "largeMemoryClass: " + Integer.toString(largeMemoryClass) + " megabytes");
     }
 
     @Override
@@ -249,6 +270,10 @@ public class MainActivity extends AppCompatActivity implements SimpleDialog.OnDi
         super.onResume();
         enableButtons(true);
         checkLoginStatusOnDevice();
+
+        if (UsbAndTcpService.isRunning()) {
+            controlPanelButton.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -268,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements SimpleDialog.OnDi
         viewSubmittedQuestionnairesButton.setEnabled(b);
         setupMenuButton.setEnabled(b);
         measurementMenuButton.setEnabled(b);
-        usbCommunicationButton.setEnabled(b);
+        controlPanelButton.setEnabled(b);
         graphButton.setEnabled(b);
         valuesButton.setEnabled(b);
     }
@@ -905,12 +930,10 @@ public class MainActivity extends AppCompatActivity implements SimpleDialog.OnDi
 
         if (permissionsSharedPreferences.getBoolean(Constants.PERMISSION_SETUP_CREATE, false)) {
             setupMenuButton.setVisibility(View.VISIBLE);
-            usbCommunicationButton.setVisibility(View.VISIBLE);
             graphButton.setVisibility(View.VISIBLE);
             valuesButton.setVisibility(View.VISIBLE);
         } else {
             setupMenuButton.setVisibility(View.GONE);
-            usbCommunicationButton.setVisibility(View.GONE);
             graphButton.setVisibility(View.GONE);
             valuesButton.setVisibility(View.GONE);
         }

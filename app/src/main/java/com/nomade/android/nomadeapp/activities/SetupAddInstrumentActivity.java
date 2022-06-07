@@ -39,6 +39,7 @@ import org.json.JSONObject;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -148,6 +149,7 @@ public class SetupAddInstrumentActivity extends AppCompatActivity {
                 typeInfoArrayList.remove(i);
             }
         }
+        Collections.reverse(typeInfoArrayList);
 
         ArrayList<String> spinnerArray = new ArrayList<>();
 

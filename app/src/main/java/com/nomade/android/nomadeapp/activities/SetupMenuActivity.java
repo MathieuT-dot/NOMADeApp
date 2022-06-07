@@ -104,8 +104,8 @@ public class SetupMenuActivity extends AppCompatActivity implements SimpleDialog
                     .msg(R.string.please_provide_details)
                     .fields(
                             Input.plain(NAME).hint(R.string.name).required().inputType(InputType.TYPE_CLASS_TEXT).min(5),
-                            Input.plain(HARDWARE_ID).hint(R.string.hardware_identifier).required().inputType(InputType.TYPE_CLASS_NUMBER),
-                            Input.plain(VERSION).hint(R.string.version).required().inputType(InputType.TYPE_CLASS_NUMBER)
+                            Input.plain(HARDWARE_ID).hint(R.string.hardware_identifier).required().inputType(InputType.TYPE_CLASS_NUMBER)
+//                            Input.plain(VERSION).hint(R.string.version).required().inputType(InputType.TYPE_CLASS_NUMBER)
                     )
                     .pos(R.string.create)
                     .neg(R.string.cancel)
@@ -123,8 +123,8 @@ public class SetupMenuActivity extends AppCompatActivity implements SimpleDialog
                     .msg(R.string.please_provide_details_template)
                     .fields(
                             Input.plain(NAME).hint(R.string.name).required().inputType(InputType.TYPE_CLASS_TEXT).min(5),
-                            Input.plain(HARDWARE_ID).hint(R.string.hardware_identifier).required().inputType(InputType.TYPE_CLASS_NUMBER),
-                            Input.plain(VERSION).hint(R.string.version).required().inputType(InputType.TYPE_CLASS_NUMBER)
+                            Input.plain(HARDWARE_ID).hint(R.string.hardware_identifier).required().inputType(InputType.TYPE_CLASS_NUMBER)
+//                            Input.plain(VERSION).hint(R.string.version).required().inputType(InputType.TYPE_CLASS_NUMBER)
                     )
                     .pos(R.string.pick_setup_template)
                     .neg(R.string.cancel)
@@ -272,14 +272,14 @@ public class SetupMenuActivity extends AppCompatActivity implements SimpleDialog
             JSONObject jData = new JSONObject();
             jData.put("name_en", name);
             jData.put("hw_identifier", hardwareId);
-            jData.put("version", version);
+            jData.put("version", 2);
             jData.put("locked", false);
 
             // TODO change later
             jData.put("setup_group_id", 1);
 
             // TODO change later (1 Uncategorized / 2 Development / 3 Production)
-            jData.put("setup_category_id", 2);
+            jData.put("setup_category_id", version);
 
             JSONObject jObj = new JSONObject();
             jObj.put("data", jData);
@@ -377,7 +377,9 @@ public class SetupMenuActivity extends AppCompatActivity implements SimpleDialog
                 case BUTTON_POSITIVE:
                     name = extras.getString(NAME);
                     hardwareId = Integer.parseInt(extras.getString(HARDWARE_ID));
-                    version = Integer.parseInt(extras.getString(VERSION));
+
+//                    version = Integer.parseInt(extras.getString(VERSION));
+                    version = 2;
 
                     MyLog.d(TAG, "New setup | Name: " + name + ", Hardware ID: " + hardwareId + ", Version: " + version);
 
@@ -399,7 +401,9 @@ public class SetupMenuActivity extends AppCompatActivity implements SimpleDialog
                 case BUTTON_POSITIVE:
                     name = extras.getString(NAME);
                     hardwareId = Integer.parseInt(extras.getString(HARDWARE_ID));
-                    version = Integer.parseInt(extras.getString(VERSION));
+
+//                    version = Integer.parseInt(extras.getString(VERSION));
+                    version = 2;
 
                     MyLog.d(TAG, "New setup from template | Name: " + name + ", Hardware ID: " + hardwareId + ", Version: " + version);
 

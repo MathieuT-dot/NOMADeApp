@@ -6,17 +6,13 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
-import android.media.ToneGenerator;
 import android.os.AsyncTask;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.provider.Settings;
 
 import androidx.core.app.NotificationCompat;
 import androidx.preference.PreferenceManager;
@@ -57,7 +53,6 @@ import com.xuhao.didi.socket.client.sdk.client.connection.NoneReconnect;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -70,7 +65,6 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,6 +98,7 @@ public class UsbAndTcpService extends Service {
 
     private static boolean isRunning = false;
     private static int statusCode = StatusCodes.UTS_NOT_INIT;
+    private boolean newSetupSent = false;
 
     private final Messenger mMessenger = new Messenger(new IncomingHandler()); // Target we publish for clients to send messages to IncomingHandler.
     private ArrayList<Messenger> mClients = new ArrayList<>(); // Keeps track of all current registered clients.
@@ -169,6 +164,9 @@ public class UsbAndTcpService extends Service {
     private long lastSentCycleCounter = 0;
     private int missingCycleCounters = 0;
     private boolean tcpReadyForData = false;
+    private long logLastCycleCounterInDatabase = 0;
+    private long lastCheckedCycleCounter = 0;
+    private long lastCycleCounter = 0;
 
     private static final int tcpBufferSize = 15000;
     private TcpTelegram[] tcpTelegramsOutput = new TcpTelegram[tcpBufferSize];
@@ -185,8 +183,6 @@ public class UsbAndTcpService extends Service {
     private int delayIndex = 0;
     private Timer reconnectTimer;
     private boolean reconnectDelayInProgress = false;
-
-    private int actualSpeedValueIndex = -1;
 
     private static byte sensorsStatus = 0x00;
 
@@ -346,18 +342,18 @@ public class UsbAndTcpService extends Service {
         MyLog.d(TAG, "onDestroy");
 
         if (uartInterface != null){
-            MyLog.d(TAG, "stopForegroundService: Destroy Accessory");
+            MyLog.d(TAG, "onDestroy: Destroy Accessory");
             uartInterface.DestroyAccessory(true);
         }
 
         if (uartInterface != null){
-            MyLog.d(TAG, "stopForegroundService: Close Accessory");
+            MyLog.d(TAG, "onDestroy: Close Accessory");
             uartInterface.CloseAccessory();
             uartInterface = null;
         }
 
         if (usbReadThread != null){
-            MyLog.d(TAG, "stopForegroundService: Interrupt usbReadThread");
+            MyLog.d(TAG, "onDestroy: Interrupt usbReadThread");
             usbReadThread.interrupt();
             usbReadThread = null;
         }
@@ -365,10 +361,10 @@ public class UsbAndTcpService extends Service {
         try {
             if (mManager != null) {
                 if (mManager.isConnect()){
-                    MyLog.d(TAG, "stopForegroundService: Disconnect mManager");
+                    MyLog.d(TAG, "onDestroy: Disconnect mManager");
                     mManager.disconnect();
                 }
-                MyLog.d(TAG, "stopForegroundService: Unregister mManager receiver");
+                MyLog.d(TAG, "onDestroy: Unregister mManager receiver");
                 mManager.unRegisterReceiver(adapter);
                 mManager = null;
             }
@@ -386,7 +382,7 @@ public class UsbAndTcpService extends Service {
 
         // Create notification default intent.
         Intent intent = new Intent();
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         // Create notification builder.
         NotificationCompat.Builder builder;
@@ -454,6 +450,8 @@ public class UsbAndTcpService extends Service {
             }, 500);
         }
 
+        new Thread(new UIRunnable()).start();
+
         resolveServerIp();
     }
 
@@ -461,8 +459,11 @@ public class UsbAndTcpService extends Service {
 
         MyLog.d(TAG, "Stop foreground service.");
 
+        if (watchDogRunnableActive) {
+            watchDogRunnableActive = false;
+        }
+
         if (isRunning) {
-            MyLog.d(TAG, "stopForegroundService: isRunning = " + isRunning);
             isRunning = false;
             MyLog.d(TAG, "stopForegroundService: isRunning = " + isRunning);
 
@@ -580,6 +581,7 @@ public class UsbAndTcpService extends Service {
                     previousCycleCounter = 0;
                     currentCycleCounter = 1;
                     lastSentCycleCounter = 0;
+                    lastCheckedCycleCounter = 0;
                     missingCycleCounters = 0;
                     tcpReadyForData = false;
                     writeTcpTelegramIndex = 0;
@@ -731,7 +733,7 @@ public class UsbAndTcpService extends Service {
                 if (uartInterface != null){
                     byte status = uartInterface.readUsbTelegrams(usbTelegramList);
 
-                    if (status == (byte) 0xFF){
+                    if (status == (byte) 0xFF && isRunning){
                         MyLog.d(TAG, "uartInterface.readUsbTelegrams(usbTelegramList) status = 0xFF");
                         stopForegroundService();
                     }
@@ -875,6 +877,22 @@ public class UsbAndTcpService extends Service {
                                             sendMessageToUI(MessageCodes.USB_MSG_CURRENT_SETUP);
                                             streamSetup = Utilities.generateStreamSetup(setup);
 
+                                            if (newSetupSent) {
+                                                statusCode = StatusCodes.UTS_NEW_SETUP;
+                                            }
+                                            else if (streamSetup != null) {
+                                                if (streamSetup.isLocked()) {
+                                                    statusCode = StatusCodes.UTS_LOCKED_SETUP;
+                                                }
+                                                else {
+                                                    statusCode = StatusCodes.UTS_UNLOCKED_SETUP;
+                                                }
+                                            }
+                                            else {
+                                                statusCode = StatusCodes.UTS_NO_SETUP;
+                                            }
+                                            sendMessageToUI(MessageCodes.USB_MSG_STATUS_UPDATE);
+
 //                                            if (automaticFlow) {
 //                                                ackExistingConfig();
 //                                            }
@@ -990,7 +1008,7 @@ public class UsbAndTcpService extends Service {
                                         // check to see if the stream data list is empty
                                         if (streamDataArrayList.size() > 0){
                                             // if the stream data list is not empty, check the last cycle counter in the list, if this is not the current one - 1, add the missing cycle counters first
-                                            long lastCycleCounter = streamDataArrayList.get(streamDataArrayList.size() - 1).getCycleCounter();
+                                            lastCycleCounter = streamDataArrayList.get(streamDataArrayList.size() - 1).getCycleCounter();
                                             lastCycleCounter++;
                                             while (lastCycleCounter < cycleCounter){
                                                 streamDataArrayList.add(
@@ -1146,7 +1164,17 @@ public class UsbAndTcpService extends Service {
                                         new Thread(new WatchdogRunnable()).start();
                                     }
 
-                                    statusCode = StatusCodes.UTS_WATCHDOG;
+                                    if (streamSetup != null) {
+                                        if (streamSetup.isLocked()) {
+                                            statusCode = StatusCodes.UTS_LOCKED_SETUP;
+                                        }
+                                        else {
+                                            statusCode = StatusCodes.UTS_UNLOCKED_SETUP;
+                                        }
+                                    }
+                                    else {
+                                        statusCode = StatusCodes.UTS_NO_SETUP;
+                                    }
                                     sendMessageToUI(MessageCodes.USB_MSG_STATUS_UPDATE);
                                 }
 
@@ -1769,6 +1797,10 @@ public class UsbAndTcpService extends Service {
 
                 localLog(TAG, "S: Setup RAW is being sent | Total length: " + bytes.length);
 
+                newSetupSent = true;
+                statusCode = StatusCodes.UTS_NEW_SETUP;
+                sendMessageToUI(MessageCodes.USB_MSG_STATUS_UPDATE);
+
                 prepareBigData256(bytes, (byte) 0x04, (byte) 0x80, 2);
             }
             else {
@@ -2355,6 +2387,36 @@ public class UsbAndTcpService extends Service {
                             dataLength++;
                             break;
 
+                        case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT100HZ_0XB7:
+                            dataOrder.add(Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT100HZ_0XB7);
+                            dataLength += 16;
+                            dataLength++;
+                            break;
+
+                        case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT9DOF_0XB8:
+                            dataOrder.add(Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT9DOF_0XB8);
+                            dataLength += 8;
+                            dataLength++;
+                            break;
+
+                        case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT9DOF100HZ_0XB9:
+                            dataOrder.add(Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT9DOF100HZ_0XB9);
+                            dataLength += 16;
+                            dataLength++;
+                            break;
+
+                        case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUGYROACCMAG_0XBA:
+                            dataOrder.add(Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUGYROACCMAG_0XBA);
+                            dataLength += 18;
+                            dataLength++;
+                            break;
+
+                        case (int) Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUGYROACCMAG100HZ_0XBB:
+                            dataOrder.add(Constants.SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUGYROACCMAG100HZ_0XBB);
+                            dataLength += 36;
+                            dataLength++;
+                            break;
+
                         default:
                     }
                 }
@@ -2409,6 +2471,22 @@ public class UsbAndTcpService extends Service {
                             sendMessageToUI(MessageCodes.USB_MSG_CURRENT_SETUP);
 
                             streamSetup = Utilities.generateStreamSetup(setup);
+
+                            if (newSetupSent) {
+                                statusCode = StatusCodes.UTS_NEW_SETUP;
+                            }
+                            else if (streamSetup != null) {
+                                if (streamSetup.isLocked()) {
+                                    statusCode = StatusCodes.UTS_LOCKED_SETUP;
+                                }
+                                else {
+                                    statusCode = StatusCodes.UTS_UNLOCKED_SETUP;
+                                }
+                            }
+                            else {
+                                statusCode = StatusCodes.UTS_NO_SETUP;
+                            }
+                            sendMessageToUI(MessageCodes.USB_MSG_STATUS_UPDATE);
 
 //                            if (automaticFlow) {
 //                                ackExistingConfig();
@@ -2990,7 +3068,7 @@ public class UsbAndTcpService extends Service {
                             localLog(TAG, "R: FC 0xD2 contains last cycle counter: " + Utilities.bytesToHex(tcpTelegram.ConvertToByteArray()));
                             // message contains the last cycle counter for logging purposes (every 10000th cycle counter)
 
-                            long logLastCycleCounterInDatabase = Utilities.longFromByteArray(new byte[]{(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, du[0], du[1], du[2], du[3]});
+                            logLastCycleCounterInDatabase = Utilities.longFromByteArray(new byte[]{(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, du[0], du[1], du[2], du[3]});
                             localLog(TAG, "Android processed cycle = " + lastSentCycleCounter + " | Server processed cycle = " + logLastCycleCounterInDatabase);
 
                             break;
@@ -3043,6 +3121,153 @@ public class UsbAndTcpService extends Service {
     }
 
     /**
+     * Thread to send UI updates to activities
+     */
+    private class UIRunnable implements Runnable {
+
+        public void run() {
+
+            while (true) {
+
+                try {
+                    Thread.sleep(1000);
+                }
+                catch (InterruptedException e){
+                    // thread is interrupted
+                    return;
+                }
+
+                // Prepare bundle to be sent
+                Bundle b = new Bundle();
+
+                // cycle counter and missing cycle counters
+                if (measurementRunning) {
+                    b.putLong("cycle_counter", currentCycleCounter);
+                    b.putInt("missing_cycle_counters", missingCycleCounters);
+                }
+                else {
+                    b.putLong("cycle_counter", -1);
+                    b.putInt("missing_cycle_counters", -1);
+                }
+
+                // connection status check
+                if (statusCode > 202) {
+                    switch (statusCode) {
+                        case StatusCodes.UTS_MEASUREMENT_BUSY:
+                            // measurement running, check data messages
+                            if (currentCycleCounter > lastCheckedCycleCounter) {
+                                // connection status active
+                                b.putInt("connection_status", StatusCodes.ACTIVE);
+                                lastCheckedCycleCounter = currentCycleCounter;
+                            }
+                            else {
+                                // connection status inactive
+                                b.putInt("connection_status", StatusCodes.INACTIVE);
+                            }
+                            break;
+
+                        case StatusCodes.UTS_STREAM_BUSY:
+                            // stream running, check data messages
+                            if (lastCycleCounter > lastCheckedCycleCounter) {
+                                // connection status active
+                                b.putInt("connection_status", StatusCodes.ACTIVE);
+                                lastCheckedCycleCounter = lastCycleCounter;
+                            }
+                            else {
+                                // connection status inactive
+                                b.putInt("connection_status", StatusCodes.INACTIVE);
+                            }
+                            break;
+
+                        default:
+                            // no measurement or stream running, check watchdog messages
+                            if (System.currentTimeMillis() - lastWatchdogMessage < 500) {
+                                // connection status active
+                                b.putInt("connection_status", StatusCodes.ACTIVE);
+                            }
+                            else {
+                                // connection status inactive
+                                b.putInt("connection_status", StatusCodes.INACTIVE);
+                            }
+                    }
+                }
+                else {
+                    // connection status pending
+                    b.putInt("connection_status", StatusCodes.PENDING);
+                }
+
+                // database connection check
+                if (measurementRunning) {
+                    if (logLastCycleCounterInDatabase != 0) {
+                        if (logLastCycleCounterInDatabase > currentCycleCounter - 2000) {
+                            // database connection active
+                            b.putInt("database_connection", StatusCodes.ACTIVE);
+                        }
+                        else {
+                            // database connection inactive!
+                            b.putInt("database_connection", StatusCodes.INACTIVE);
+                        }
+                    }
+                    else {
+                        if (currentCycleCounter < 2000) {
+                            // database connection pending
+                            b.putInt("database_connection", StatusCodes.PENDING);
+                        }
+                        else {
+                            // database connection inactive!
+                            b.putInt("database_connection", StatusCodes.INACTIVE);
+                        }
+                    }
+                }
+                else {
+                    // database connection unknown
+                    b.putInt("database_connection", StatusCodes.UNKNOWN);
+                }
+
+                // setup info
+                if (setup != null) {
+                    b.putString("setup_name", setup.getName());
+                    b.putInt("setup_id", setup.getId());
+                }
+
+                // measurement info
+                if (measurementName != null && !measurementName.equals("")) {
+                    if (measurementRunning) {
+                        b.putString("measurement_name", measurementName);
+                    }
+                    else {
+                        b.putString("measurement_name", "/");
+                    }
+                }
+                if (measurementId > -1) {
+                    b.putInt("measurement_id", measurementId);
+                }
+
+                // Loop through all registered clients from back to front
+                for (int i = mClients.size() - 1; i >= 0; i--){
+                    try {
+                        // Prepare data to be sent
+                        Message msg = Message.obtain(null, MessageCodes.USB_MSG_UI_FEEDBACK);
+                        msg.setData(b);
+
+                        // Send the data to the client.
+                        try {
+                            mClients.get(i).send(msg);
+                        }
+                        catch (IndexOutOfBoundsException e) {
+
+                        }
+                    }
+                    catch (RemoteException e){
+                        // The client is dead. Remove it from the list; we are going through the list from back to front so this is safe to do inside the loop.
+                        mClients.remove(i);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Thread to send watchdog messages over USB to keep the connection alive.
      */
     private class WatchdogRunnable implements Runnable {
@@ -3063,7 +3288,7 @@ public class UsbAndTcpService extends Service {
                     return;
                 }
 
-                if (watchDogRunnableActive){
+                if (watchDogRunnableActive && isRunning){
                     if (uartInterface != null){
                         uartInterface.SendData(bytes.length, bytes);
 

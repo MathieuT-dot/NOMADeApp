@@ -65,7 +65,7 @@ public class FT311UARTInterface {
         writeIndex = 0;
 
         usbmanager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
-        mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
+        mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
         IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
         filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
         context.registerReceiver(mUsbReceiver, filter);
@@ -580,11 +580,12 @@ public class FT311UARTInterface {
      */
     private void SendPacket(int numBytes) {
         try {
-            if(outputstream != null){
+            if(outputstream != null && !disconnected){
                 outputstream.write(writeusbdata, 0, numBytes);
             }
         } catch (IOException e) {
             e.printStackTrace();
+            disconnected = true;
         }
     }
 

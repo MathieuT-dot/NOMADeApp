@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.nomade.android.nomadeapp">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature android:name="android.hardware.usb.accessory" />
 
@@ -15,12 +14,15 @@
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:allowBackup">
-        <activity android:name=".activities.MainActivity">
+        <activity android:name=".activities.MainActivity"
+            android:theme="@style/Theme.App.Starting"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -44,8 +46,15 @@
             android:name=".activities.AboutActivity"
             android:label="@string/menu_about"
             android:windowSoftInputMode="stateAlwaysHidden" />
-        <activity android:name=".activities.BodyDragAndDropActivity" />
-        <activity android:name=".activities.GraphActivity"
+        <activity
+            android:name=".activities.BodyDragAndDropActivity"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
+        <activity
+            android:name=".activities.ControlPanelActivity"
+            android:label="@string/control_panel"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
+        <activity
+            android:name=".activities.GraphActivity"
             android:label="@string/graphs"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity

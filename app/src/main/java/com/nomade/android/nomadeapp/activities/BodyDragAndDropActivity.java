@@ -9,15 +9,28 @@ import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipDescription;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Outline;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.MediaStore;
+import android.text.TextPaint;
 import android.util.DisplayMetrics;
 import android.view.DragEvent;
 import android.view.Gravity;
@@ -43,17 +56,32 @@ import com.nomade.android.nomadeapp.helperClasses.Utilities;
 import com.nomade.android.nomadeapp.setups.Instrument;
 import com.nomade.android.nomadeapp.setups.Parameter;
 import com.nomade.android.nomadeapp.setups.Setup;
+import com.tom_roush.pdfbox.pdmodel.PDDocument;
+import com.tom_roush.pdfbox.pdmodel.PDPage;
+import com.tom_roush.pdfbox.pdmodel.PDPageContentStream;
+import com.tom_roush.pdfbox.pdmodel.common.PDRectangle;
+import com.tom_roush.pdfbox.pdmodel.font.PDFont;
+import com.tom_roush.pdfbox.pdmodel.font.PDType1Font;
+import com.tom_roush.pdfbox.pdmodel.graphics.image.LosslessFactory;
+import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import eltos.simpledialogfragment.SimpleDialog;
 
@@ -112,6 +140,25 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
     private static final String QUIT_DIALOG = "dialogTagQuit";
     private static final String LOCK_SETUP_DIALOG = "dialogTagLockSetup";
 
+    private PDDocument document;
+    private PDPage page;
+    private PDPageContentStream contentStream;
+    private float width;
+    private float startY;
+    private float endY;
+    private float heightCounter;
+    private float currentXPosition;
+    private float wrapOffsetY;
+
+    private boolean downloadingAllPdfs = false;
+    private ArrayList<Integer> setupIdArrayList;
+    private int downloadPdfIndex;
+    private int requestErrors = 0;
+    private List<Integer> requestErrorIds = new ArrayList<>();
+    private int pdfErrors = 0;
+    private List<Integer> pdfErrorIds = new ArrayList<>();
+    private int setupId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,7 +182,7 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
 
         dragViewContainerTextView = findViewById(R.id.drag_view_container_text_view);
 
-        addRelativeLayout();
+//        addRelativeLayout();
 
         jsonTypeInfoList = setupSharedPreferences.getString(Constants.API_INSTRUMENT_TYPES, "");
         jsonParameterInfoList = setupSharedPreferences.getString(Constants.API_PARAMETERS, "");
@@ -144,7 +191,18 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
             setup = savedInstanceState.getParcelable("STATE_SETUP");
             oldSetup = savedInstanceState.getParcelable("STATE_OLD_SETUP");
             jsonSetup = savedInstanceState.getString("STATE_JSON_SETUP");
+            addRelativeLayout();
             addDragViewsFromSetup();
+        }
+        else if (getIntent().hasExtra("DOWNLOAD_PDF_IDS")) {
+            downloadingAllPdfs = true;
+            setupIdArrayList = getIntent().getIntegerArrayListExtra("DOWNLOAD_PDF_IDS");
+            if (setupIdArrayList != null) {
+                downloadPdfIndex = 0;
+                pDialog.setMessage("Downloading all pdf files (" + (downloadPdfIndex + 1) + "/" + setupIdArrayList.size() + ")");
+                showDialog();
+                downloadAllPdfFiles();
+            }
         }
         else {
             int setupId = getIntent().getIntExtra("SETUP_ID", 0);
@@ -201,23 +259,40 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
         int width = getResources().getDisplayMetrics().widthPixels;
 
         int gridSize = 15;
+//        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+//            // Landscape
+//            childSize = (height - getHeightStatusActionSoft() - 100) / gridSize;
+//
+//            if (childSize * gridSize + 100 > width / 2){
+//                childSize = (width - 200) / 2 / gridSize;
+//            }
+//
+//        }
+//        else {
+//            // Portrait
+//            childSize = (height - getHeightStatusActionSoft()) / (gridSize + 3);
+//
+//            if (childSize * gridSize + 300 > width){
+//                childSize = (width - 300) / gridSize;
+//            }
+//        }
+
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             // Landscape
-            childSize = (height - getHeightStatusActionSoft() - 100) / gridSize;
-
-            if (childSize * gridSize + 100 > width / 2){
-                childSize = (width - 200) / 2 / gridSize;
-            }
-
+            childSize = (height - getHeightStatusActionSoft()) / (gridSize + 2);
+            MyLog.d("Landscape", "");
         }
         else {
             // Portrait
-            childSize = (height - getHeightStatusActionSoft()) / (gridSize + 3);
-
-            if (childSize * gridSize + 300 > width){
-                childSize = (width - 300) / gridSize;
-            }
+            childSize = width / (gridSize + 2);
+            MyLog.d("Portrait", "");
         }
+
+        MyLog.d("height", "" + height);
+        MyLog.d("width", "" + width);
+        MyLog.d("getHeightStatusActionSoft", "" + getHeightStatusActionSoft());
+        MyLog.d("gridSize", "" + gridSize);
+        MyLog.d("childSize", "" + childSize);
 
         parentSize = childSize * gridSize;
 
@@ -240,7 +315,17 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
 //        String jsonString = "{\"coords\":[{\"x\":-4,\"y\":3},{\"x\":-3,\"y\":4},{\"x\":-4,\"y\":4},{\"x\":4,\"y\":4},{\"x\":4,\"y\":3},{\"x\":3,\"y\":4},{\"x\":-3,\"y\":-6},{\"x\":-4,\"y\":-6},{\"x\":-4,\"y\":-5},{\"x\":3,\"y\":-6},{\"x\":4,\"y\":-6},{\"x\":4,\"y\":-5},{\"x\":4,\"y\":-1},{\"x\":-4,\"y\":-1},{\"x\":0,\"y\":-6}]}";
 //        String jsonString = "{\"coords\":[{\"x\":-4,\"y\":4,\"r\":-45},{\"x\":-4,\"y\":3,\"r\":-90},{\"x\":-4,\"y\":2,\"r\":-90},{\"x\":-4,\"y\":1,\"r\":-90},{\"x\":-4,\"y\":0,\"r\":-90},{\"x\":-4,\"y\":-1,\"r\":-90},{\"x\":-4,\"y\":-2,\"r\":-90},{\"x\":-4,\"y\":-3,\"r\":-90},{\"x\":-4,\"y\":-4,\"r\":-90},{\"x\":-4,\"y\":-5,\"r\":-90},{\"x\":-4,\"y\":-6,\"r\":-135},{\"x\":-3,\"y\":4,\"r\":0},{\"x\":-3,\"y\":-6,\"r\":180},{\"x\":-2,\"y\":4,\"r\":0},{\"x\":-2,\"y\":-6,\"r\":180},{\"x\":-1,\"y\":4,\"r\":0},{\"x\":-1,\"y\":-6,\"r\":180},{\"x\":0,\"y\":4,\"r\":0},{\"x\":0,\"y\":-6,\"r\":180},{\"x\":1,\"y\":4,\"r\":0},{\"x\":1,\"y\":-6,\"r\":180},{\"x\":2,\"y\":4,\"r\":0},{\"x\":2,\"y\":-6,\"r\":180},{\"x\":3,\"y\":4,\"r\":0},{\"x\":3,\"y\":-6,\"r\":180},{\"x\":4,\"y\":4,\"r\":45},{\"x\":4,\"y\":3,\"r\":90},{\"x\":4,\"y\":2,\"r\":90},{\"x\":4,\"y\":1,\"r\":90},{\"x\":4,\"y\":0,\"r\":90},{\"x\":4,\"y\":-1,\"r\":90},{\"x\":4,\"y\":-2,\"r\":90},{\"x\":4,\"y\":-3,\"r\":90},{\"x\":4,\"y\":-4,\"r\":90},{\"x\":4,\"y\":-5,\"r\":90},{\"x\":4,\"y\":-6,\"r\":135}]}";
 //        String jsonString = "{\"coords\":[{\"x\":-50,\"y\":50,\"r\":0},{\"x\":-40,\"y\":50,\"r\":0},{\"x\":-30,\"y\":50,\"r\":0},{\"x\":-20,\"y\":50,\"r\":0},{\"x\":-10,\"y\":50,\"r\":0},{\"x\":0,\"y\":50,\"r\":0},{\"x\":10,\"y\":50,\"r\":0},{\"x\":20,\"y\":50,\"r\":0},{\"x\":30,\"y\":50,\"r\":0},{\"x\":40,\"y\":50,\"r\":0},{\"x\":50,\"y\":50,\"r\":0},{\"x\":-50,\"y\":40,\"r\":0},{\"x\":-40,\"y\":40,\"r\":0},{\"x\":-30,\"y\":40,\"r\":0},{\"x\":-20,\"y\":40,\"r\":0},{\"x\":-10,\"y\":40,\"r\":0},{\"x\":0,\"y\":40,\"r\":0},{\"x\":10,\"y\":40,\"r\":0},{\"x\":20,\"y\":40,\"r\":0},{\"x\":30,\"y\":40,\"r\":0},{\"x\":40,\"y\":40,\"r\":0},{\"x\":50,\"y\":40,\"r\":0},{\"x\":-50,\"y\":30,\"r\":0},{\"x\":-40,\"y\":30,\"r\":0},{\"x\":-30,\"y\":30,\"r\":0},{\"x\":-20,\"y\":30,\"r\":0},{\"x\":-10,\"y\":30,\"r\":0},{\"x\":0,\"y\":30,\"r\":0},{\"x\":10,\"y\":30,\"r\":0},{\"x\":20,\"y\":30,\"r\":0},{\"x\":30,\"y\":30,\"r\":0},{\"x\":40,\"y\":30,\"r\":0},{\"x\":50,\"y\":30,\"r\":0},{\"x\":-50,\"y\":20,\"r\":0},{\"x\":-40,\"y\":20,\"r\":0},{\"x\":-30,\"y\":20,\"r\":0},{\"x\":-20,\"y\":20,\"r\":0},{\"x\":-10,\"y\":20,\"r\":0},{\"x\":0,\"y\":20,\"r\":0},{\"x\":10,\"y\":20,\"r\":0},{\"x\":20,\"y\":20,\"r\":0},{\"x\":30,\"y\":20,\"r\":0},{\"x\":40,\"y\":20,\"r\":0},{\"x\":50,\"y\":20,\"r\":0},{\"x\":-50,\"y\":10,\"r\":0},{\"x\":-40,\"y\":10,\"r\":0},{\"x\":-30,\"y\":10,\"r\":0},{\"x\":-20,\"y\":10,\"r\":0},{\"x\":-10,\"y\":10,\"r\":0},{\"x\":0,\"y\":10,\"r\":0},{\"x\":10,\"y\":10,\"r\":0},{\"x\":20,\"y\":10,\"r\":0},{\"x\":30,\"y\":10,\"r\":0},{\"x\":40,\"y\":10,\"r\":0},{\"x\":50,\"y\":10,\"r\":0},{\"x\":-50,\"y\":0,\"r\":0},{\"x\":-40,\"y\":0,\"r\":0},{\"x\":-30,\"y\":0,\"r\":0},{\"x\":-20,\"y\":0,\"r\":0},{\"x\":-10,\"y\":0,\"r\":0},{\"x\":0,\"y\":0,\"r\":0},{\"x\":10,\"y\":0,\"r\":0},{\"x\":20,\"y\":0,\"r\":0},{\"x\":30,\"y\":0,\"r\":0},{\"x\":40,\"y\":0,\"r\":0},{\"x\":50,\"y\":0,\"r\":0},{\"x\":-50,\"y\":-10,\"r\":0},{\"x\":-40,\"y\":-10,\"r\":0},{\"x\":-30,\"y\":-10,\"r\":0},{\"x\":-20,\"y\":-10,\"r\":0},{\"x\":-10,\"y\":-10,\"r\":0},{\"x\":0,\"y\":-10,\"r\":0},{\"x\":10,\"y\":-10,\"r\":0},{\"x\":20,\"y\":-10,\"r\":0},{\"x\":30,\"y\":-10,\"r\":0},{\"x\":40,\"y\":-10,\"r\":0},{\"x\":50,\"y\":-10,\"r\":0},{\"x\":-50,\"y\":-20,\"r\":0},{\"x\":-40,\"y\":-20,\"r\":0},{\"x\":-30,\"y\":-20,\"r\":0},{\"x\":-20,\"y\":-20,\"r\":0},{\"x\":-10,\"y\":-20,\"r\":0},{\"x\":0,\"y\":-20,\"r\":0},{\"x\":10,\"y\":-20,\"r\":0},{\"x\":20,\"y\":-20,\"r\":0},{\"x\":30,\"y\":-20,\"r\":0},{\"x\":40,\"y\":-20,\"r\":0},{\"x\":50,\"y\":-20,\"r\":0},{\"x\":-50,\"y\":-30,\"r\":0},{\"x\":-40,\"y\":-30,\"r\":0},{\"x\":-30,\"y\":-30,\"r\":0},{\"x\":-20,\"y\":-30,\"r\":0},{\"x\":-10,\"y\":-30,\"r\":0},{\"x\":0,\"y\":-30,\"r\":0},{\"x\":10,\"y\":-30,\"r\":0},{\"x\":20,\"y\":-30,\"r\":0},{\"x\":30,\"y\":-30,\"r\":0},{\"x\":40,\"y\":-30,\"r\":0},{\"x\":50,\"y\":-30,\"r\":0},{\"x\":-50,\"y\":-40,\"r\":0},{\"x\":-40,\"y\":-40,\"r\":0},{\"x\":-30,\"y\":-40,\"r\":0},{\"x\":-20,\"y\":-40,\"r\":0},{\"x\":-10,\"y\":-40,\"r\":0},{\"x\":0,\"y\":-40,\"r\":0},{\"x\":10,\"y\":-40,\"r\":0},{\"x\":20,\"y\":-40,\"r\":0},{\"x\":30,\"y\":-40,\"r\":0},{\"x\":40,\"y\":-40,\"r\":0},{\"x\":50,\"y\":-40,\"r\":0},{\"x\":-50,\"y\":-50,\"r\":0},{\"x\":-40,\"y\":-50,\"r\":0},{\"x\":-30,\"y\":-50,\"r\":0},{\"x\":-20,\"y\":-50,\"r\":0},{\"x\":-10,\"y\":-50,\"r\":0},{\"x\":0,\"y\":-50,\"r\":0},{\"x\":10,\"y\":-50,\"r\":0},{\"x\":20,\"y\":-50,\"r\":0},{\"x\":30,\"y\":-50,\"r\":0},{\"x\":40,\"y\":-50,\"r\":0},{\"x\":50,\"y\":-50,\"r\":0}]}";
-        String jsonString = "{\"coords\":[{\"x\":-27,\"y\":55,\"r\":0,\"d\":\"front head\"},{\"x\":26,\"y\":54,\"r\":0,\"d\":\"back head\"},{\"x\":-39,\"y\":25,\"r\":0,\"d\":\"front right upper arm\"},{\"x\":-15,\"y\":25,\"r\":0,\"d\":\"front left upper arm\"},{\"x\":14,\"y\":25,\"r\":0,\"d\":\"back left upper arm\"},{\"x\":38,\"y\":25,\"r\":0,\"d\":\"back right upper arm\"},{\"x\":-41,\"y\":10,\"r\":0,\"d\":\"front right lower arm\"},{\"x\":-12,\"y\":10,\"r\":0,\"d\":\"front left lower arm\"},{\"x\":11,\"y\":10,\"r\":0,\"d\":\"back left lower arm\"},{\"x\":40,\"y\":10,\"r\":0,\"d\":\"back right lower arm\"},{\"x\":-32,\"y\":-8,\"r\":0,\"d\":\"front right upper leg\"},{\"x\":-22,\"y\":-8,\"r\":0,\"d\":\"front left upper leg\"},{\"x\":21,\"y\":-8,\"r\":0,\"d\":\"back left upper leg\"},{\"x\":31,\"y\":-8,\"r\":0,\"d\":\"back right upper leg\"},{\"x\":-31,\"y\":-35,\"r\":0,\"d\":\"front right lower leg\"},{\"x\":-22,\"y\":-35,\"r\":0,\"d\":\"front left lower leg\"},{\"x\":22,\"y\":-35,\"r\":0,\"d\":\"back left lower leg\"},{\"x\":30,\"y\":-35,\"r\":0,\"d\":\"back right lower leg\"},{\"x\":-27,\"y\":30,\"r\":0,\"d\":\"front upper body\"},{\"x\":26,\"y\":30,\"r\":0,\"d\":\"back upper body\"},{\"x\":-27,\"y\":18,\"r\":0,\"d\":\"front lower body\"},{\"x\":26,\"y\":18,\"r\":0,\"d\":\"back lower body\"}]}";
+        String oldLocations = "{\"coords\":[{\"x\":-27,\"y\":55,\"r\":0,\"d\":\"front head\"},{\"x\":26,\"y\":54,\"r\":0,\"d\":\"back head\"},{\"x\":-39,\"y\":25,\"r\":0,\"d\":\"front right upper arm\"},{\"x\":-15,\"y\":25,\"r\":0,\"d\":\"front left upper arm\"},{\"x\":14,\"y\":25,\"r\":0,\"d\":\"back left upper arm\"},{\"x\":38,\"y\":25,\"r\":0,\"d\":\"back right upper arm\"},{\"x\":-41,\"y\":10,\"r\":0,\"d\":\"front right lower arm\"},{\"x\":-12,\"y\":10,\"r\":0,\"d\":\"front left lower arm\"},{\"x\":11,\"y\":10,\"r\":0,\"d\":\"back left lower arm\"},{\"x\":40,\"y\":10,\"r\":0,\"d\":\"back right lower arm\"},{\"x\":-32,\"y\":-8,\"r\":0,\"d\":\"front right upper leg\"},{\"x\":-22,\"y\":-8,\"r\":0,\"d\":\"front left upper leg\"},{\"x\":21,\"y\":-8,\"r\":0,\"d\":\"back left upper leg\"},{\"x\":31,\"y\":-8,\"r\":0,\"d\":\"back right upper leg\"},{\"x\":-31,\"y\":-35,\"r\":0,\"d\":\"front right lower leg\"},{\"x\":-22,\"y\":-35,\"r\":0,\"d\":\"front left lower leg\"},{\"x\":22,\"y\":-35,\"r\":0,\"d\":\"back left lower leg\"},{\"x\":30,\"y\":-35,\"r\":0,\"d\":\"back right lower leg\"},{\"x\":-27,\"y\":30,\"r\":0,\"d\":\"front upper body\"},{\"x\":26,\"y\":30,\"r\":0,\"d\":\"back upper body\"},{\"x\":-27,\"y\":18,\"r\":0,\"d\":\"front lower body\"},{\"x\":26,\"y\":18,\"r\":0,\"d\":\"back lower body\"}]}";
+        String newLocations = "{\"coords\":[{\"n\":1,\"x\":-27,\"y\":60,\"d\":\"Top of the head\"},{\"n\":2,\"x\":26,\"y\":48,\"d\":\"Back of the head\"},{\"n\":3,\"x\":-27,\"y\":51,\"d\":\"Front of the head\"},{\"n\":4,\"x\":-20,\"y\":51,\"d\":\"Left Temple\"},{\"n\":4,\"x\":-34,\"y\":51,\"d\":\"Right Temple\"},{\"n\":8,\"x\":-27,\"y\":43,\"d\":\"Chin\"},{\"n\":9,\"x\":26,\"y\":41,\"d\":\"Vertebrae name (C1 to C7)\"},{\"n\":10,\"x\":26,\"y\":29,\"d\":\"Vertebrae name (T1 to T12)\"},{\"n\":11,\"x\":26,\"y\":13,\"d\":\"Vertebrae name (L1 to L5)\"},{\"n\":12,\"x\":26,\"y\":6,\"d\":\"Pelvis S2\"},{\"n\":13,\"x\":32,\"y\":6,\"d\":\"Right Pelvis SIPS\"},{\"n\":14,\"x\":20,\"y\":6,\"d\":\"Left Pelvis SIPS\"},{\"n\":15,\"x\":-34,\"y\":10,\"d\":\"Right Pelvis SIAS\"},{\"n\":16,\"x\":-20,\"y\":10,\"d\":\"Left Pelvis SIAS\"},{\"n\":17,\"x\":-27,\"y\":27,\"d\":\"Body of Sternum\"},{\"n\":18,\"x\":-34,\"y\":22,\"d\":\"Right Rib (T5 to T10)\"},{\"n\":19,\"x\":-20,\"y\":22,\"d\":\"Left Rib (T5 to T10)\"},{\"n\":20,\"x\":-16,\"y\":37,\"d\":\"Left Acromion(superior face)\"},{\"n\":20,\"x\":-38,\"y\":37,\"d\":\"Right Acromion (superior face)\"},{\"n\":21,\"x\":-12,\"y\":24,\"d\":\"Left Humerus (lateraly)\"},{\"n\":21,\"x\":-42,\"y\":24,\"d\":\"Right Humerus (lateraly)\"},{\"n\":23,\"x\":2,\"y\":2,\"d\":\"Left Radius (distally and laterally)\"},{\"n\":23,\"x\":49,\"y\":2,\"d\":\"Right Radius (distally and laterally)\"},{\"n\":24,\"x\":13,\"y\":14,\"d\":\"Left Ulna (olecranon posteriorly)\"},{\"n\":24,\"x\":39,\"y\":15,\"d\":\"Right Ulna (olecranon posteriorly)\"},{\"n\":25,\"x\":14,\"y\":2,\"d\":\"Left Ulna (distally and laterally)\"},{\"n\":25,\"x\":37,\"y\":2,\"d\":\"Right Ulna (distally and laterally)\"},{\"n\":26,\"x\":8,\"y\":2,\"d\":\"Left Distal radioulnar joint (dorsally)\"},{\"n\":26,\"x\":43,\"y\":2,\"d\":\"Right Distal radioulnar joint (dorsally)\"},{\"n\":27,\"x\":7,\"y\":-6,\"d\":\"Left Third metacarpal bone (dorsal face)\"},{\"n\":27,\"x\":45,\"y\":-6,\"d\":\"Right Third metacarpal bone (dorsal face)\"},{\"n\":28,\"x\":-16,\"y\":3,\"d\":\"Left Great trochanter\"},{\"n\":28,\"x\":-37,\"y\":3,\"d\":\"Right Great trochanter\"},{\"n\":29,\"x\":16,\"y\":-10,\"d\":\"Left Lateral face of the thigh\"},{\"n\":29,\"x\":36,\"y\":-10,\"d\":\"Right Lateral face of the thigh\"},{\"n\":30,\"x\":-23,\"y\":-23,\"d\":\"Left Anterior face of the patella\"},{\"n\":30,\"x\":-30,\"y\":-23,\"d\":\"Right Anterior face of the patella\"},{\"n\":31,\"x\":-22,\"y\":-32,\"d\":\"Left Anterior border of the tibia under the tibial tuberosity\"},{\"n\":31,\"x\":-31,\"y\":-32,\"d\":\"Right Anterior border of the tibia under the tibial tuberosity\"},{\"n\":32,\"x\":-22,\"y\":-48,\"d\":\"Left Lateral malleolus\"},{\"n\":32,\"x\":-31,\"y\":-48,\"d\":\"Right Lateral malleolus\"},{\"n\":34,\"x\":-22,\"y\":-60,\"d\":\"Left Third metatarsal bone (dorsal face)\"},{\"n\":34,\"x\":-31,\"y\":-60,\"d\":\"Right Third metatarsal bone (dorsal face)\"}]}";
+
+        String jsonString;
+        if (setup == null || setup.getVersion() > 1) {
+            jsonString = newLocations;
+        }
+        else {
+            jsonString = oldLocations;
+        }
+
         MyLog.d(TAG, "jsonString: " + jsonString);
 
         try {
@@ -272,18 +357,27 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
                 }
 //                MyLog.d("JSON", "y: " + y);
 
-                Float r;
-                try {
-                    r = BigDecimal.valueOf(jCurrentCoord.getDouble("r")).floatValue();
-                }
-                catch (JSONException e){
-                    r = null;
-                }
+                Float r = 0F;
+//                Float r;
+//                try {
+//                    r = BigDecimal.valueOf(jCurrentCoord.getDouble("r")).floatValue();
+//                }
+//                catch (JSONException e){
+//                    r = null;
+//                }
 //                MyLog.d("JSON", "r: " + r);
+
+                String description;
+                try {
+                    description = jCurrentCoord.getString("d");
+                }
+                catch (JSONException e) {
+                    description = "";
+                }
 
 //                MyLog.d("JSON", "Add Snap " + i + ": x = " + x + " | y = " + y + " | r = " + r);
 
-                targetSnaps[i] = new Snap(context, x, y, r);
+                targetSnaps[i] = new Snap(context, x, y, r, description);
                 Float[] coords = calculateTargetBounds(x, y, parentSize, childSize, 1);
                 RelativeLayout.LayoutParams snapParams = new RelativeLayout.LayoutParams(childSize, childSize);
                 snapParams.setMargins(coords[0].intValue(), coords[1].intValue(), coords[2].intValue(), coords[3].intValue());
@@ -336,8 +430,10 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
     private void getSetupById(final int setupId) {
         String tag_string_req = "get_setup";
 
-        pDialog.setMessage(getString(R.string.getting_selected_setup_ellipsis));
-        showDialog();
+        if (!downloadingAllPdfs) {
+            pDialog.setMessage(getString(R.string.getting_selected_setup_ellipsis));
+            showDialog();
+        }
 
         MyLog.d("StringRequest", PreferenceManager.getDefaultSharedPreferences(AppController.getInstance().getApplicationContext()).getString(Constants.SETTING_SERVER_API_URL, Constants.API_URL) + "setups/" + setupId + "/");
 
@@ -355,11 +451,23 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
                         setupEditor.putString(Constants.API_SETUPS_ + setup.getId(), response).apply();
                     }
 
+                    addRelativeLayout();
+
                     prepareSetup();
                 }, e -> {
             MyLog.e(TAG, "Volley Error: " + e.toString() + ", " + e.getMessage() + ", " + e.getLocalizedMessage());
-            hideDialog();
-            Utilities.displayVolleyError(context, e);
+
+            if (!downloadingAllPdfs) {
+                hideDialog();
+                Utilities.displayVolleyError(context, e);
+            }
+            else {
+                requestErrors++;
+                requestErrorIds.add(setupId);
+
+                downloadPdfIndex++;
+                downloadAllPdfFiles();
+            }
         }) {
             @Override
             public Map<String, String> getHeaders() {
@@ -437,7 +545,12 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
             addDragViewsFromSetup();
         }
 
-        hideDialog();
+        if (!downloadingAllPdfs) {
+            hideDialog();
+        }
+        else {
+            new Handler(Looper.getMainLooper()).postDelayed(this::createPdfFile, 100);
+        }
     }
 
     /**
@@ -731,6 +844,10 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
                                 break;
                         }
                     }
+
+                    instrument.setName(snap.getDescription());
+                    Utilities.displayToast(context, snap.getDescription());
+
                     return true;
                 }
 
@@ -795,6 +912,9 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
                                 break;
                         }
                     }
+
+                    instrument.setName(instrument.getDescription());
+
                     return true;
                 }
 
@@ -818,36 +938,41 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
     @Override
     public void onBackPressed() {
 
-        if (setup.isLocked()){
-            finish();
-        }
-        else if (createListOfChangedInstruments()){
-            SimpleDialog.build()
-                    .title(R.string.save_changes)
-                    .msg(R.string.quit_save_changes)
-                    .pos(R.string.yes)
-                    .neg(R.string.no)
-                    .neut(R.string.cancel)
-                    .cancelable(false)
-                    .show(this, SAVE_CHANGES_DIALOG);
-        } else if (createListOfDeletedInstruments()){
-            SimpleDialog.build()
-                    .title(R.string.save_changes)
-                    .msg(R.string.quit_save_changes)
-                    .pos(R.string.yes)
-                    .neg(R.string.no)
-                    .neut(R.string.cancel)
-                    .cancelable(false)
-                    .show(this, SAVE_CHANGES_DIALOG);
+        if (setup != null) {
+            if (setup.isLocked()){
+                finish();
+            }
+            else if (createListOfChangedInstruments()){
+                SimpleDialog.build()
+                        .title(R.string.save_changes)
+                        .msg(R.string.quit_save_changes)
+                        .pos(R.string.yes)
+                        .neg(R.string.no)
+                        .neut(R.string.cancel)
+                        .cancelable(false)
+                        .show(this, SAVE_CHANGES_DIALOG);
+            } else if (createListOfDeletedInstruments()){
+                SimpleDialog.build()
+                        .title(R.string.save_changes)
+                        .msg(R.string.quit_save_changes)
+                        .pos(R.string.yes)
+                        .neg(R.string.no)
+                        .neut(R.string.cancel)
+                        .cancelable(false)
+                        .show(this, SAVE_CHANGES_DIALOG);
+            }
+            else {
+                SimpleDialog.build()
+                        .title(R.string.quit)
+                        .msg(R.string.quit_setup_screen)
+                        .pos(R.string.yes)
+                        .neg(R.string.no)
+                        .cancelable(false)
+                        .show(this, QUIT_DIALOG);
+            }
         }
         else {
-            SimpleDialog.build()
-                    .title(R.string.quit)
-                    .msg(R.string.quit_setup_screen)
-                    .pos(R.string.yes)
-                    .neg(R.string.no)
-                    .cancelable(false)
-                    .show(this, QUIT_DIALOG);
+            finish();
         }
     }
 
@@ -1022,20 +1147,20 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
         styledAttributes.recycle();
 
         // Soft Keys
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            DisplayMetrics metrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            int usableHeight = metrics.heightPixels;
-            getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-            int realHeight = metrics.heightPixels;
-            if (realHeight > usableHeight){
-                soft = realHeight - usableHeight;
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//            DisplayMetrics metrics = new DisplayMetrics();
+//            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//            int usableHeight = metrics.heightPixels;
+//            getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+//            int realHeight = metrics.heightPixels;
+//            if (realHeight > usableHeight){
+//                soft = realHeight - usableHeight;
+//            }
+//        }
 
         int value = status + action + soft;
 
-//        MyLog.d(TAG, "Height Status: " + status + ", Height Action: " + action + ", Height Soft: " + soft + ", Height Total: " + value);
+        MyLog.d(TAG, "Height Status: " + status + ", Height Action: " + action + ", Height Soft: " + soft + ", Height Total: " + value);
 
         return value;
     }
@@ -1646,6 +1771,397 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
 
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
+    }
+
+    private void downloadAllPdfFiles() {
+        clearSetup();
+        if (downloadPdfIndex < setupIdArrayList.size()) {
+            pDialog.setMessage("Downloading all pdf files (" + (downloadPdfIndex + 1) + "/" + setupIdArrayList.size() + ")");
+            MyLog.d(TAG, "Downloading all pdf files (" + (downloadPdfIndex + 1) + "/" + setupIdArrayList.size() + ")");
+            setupId = setupIdArrayList.get(downloadPdfIndex);
+            if (setupId > 0) {
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        getSetupById(setupId);
+                    }
+                }, 100);
+            }
+            else {
+                downloadPdfIndex++;
+                downloadAllPdfFiles();
+            }
+        }
+        else {
+            hideDialog();
+
+            MyLog.d(TAG, "requestErrors: " + requestErrors);
+            for (int i = 0; i < requestErrorIds.size(); i++) {
+                MyLog.d(TAG, "requestError ID " + (i+1) + ": " + requestErrorIds.get(i));
+            }
+            MyLog.d(TAG, "pdfErrors: " + pdfErrors);
+            for (int i = 0; i < pdfErrorIds.size(); i++) {
+                MyLog.d(TAG, "pdfError ID " + (i+1) + ": " + pdfErrorIds.get(i));
+            }
+
+            runOnUiThread(() -> Utilities.displayToast(context, "Downloading PDF files completed (Request errors: " + requestErrors + " | PDF errors: " + pdfErrors + ")"));
+        }
+    }
+
+    /**
+     * Creates and outputs the PDF file.
+     */
+    private void createPdfFile() {
+
+        // Enable Android asset loading
+        PDFBoxResourceLoader.init(getApplicationContext());
+
+        document = new PDDocument();
+        page = new PDPage(PDRectangle.A4);
+        document.addPage(page);
+
+        PDRectangle mediaBox = page.getMediaBox();
+        float marginY = 80;
+        float marginX = 60;
+        width = mediaBox.getWidth() - 2 * marginX;
+        float startX = mediaBox.getLowerLeftX() + marginX;
+        float endX = mediaBox.getUpperRightX() - marginX;
+        startY = mediaBox.getUpperRightY() - marginY;
+        endY = mediaBox.getLowerLeftY() + marginY;
+        heightCounter = startY;
+        currentXPosition = 0;
+
+        float smallOffsetY = 8;
+        float normalOffsetY = 20;
+        wrapOffsetY = 2;
+
+        Paint titleTextPaint = new TextPaint();
+        float titleFontSize = 20;
+        titleTextPaint.setTextSize(titleFontSize);
+        titleTextPaint.setTypeface(Typeface.create("Helvetica", Typeface.BOLD));
+        Paint.FontMetrics titleFontMetrics = titleTextPaint.getFontMetrics();
+        float titleFontHeight = titleFontMetrics.descent - titleFontMetrics.ascent;
+
+        Paint defaultTextPaint = new TextPaint();
+        float defaultFontSize = 12;
+        defaultTextPaint.setTextSize(defaultFontSize);
+        defaultTextPaint.setTypeface(Typeface.create("Helvetica", Typeface.NORMAL));
+        Paint.FontMetrics defaultFontMetrics = defaultTextPaint.getFontMetrics();
+        float defaultFontHeight = defaultFontMetrics.descent - defaultFontMetrics.ascent;
+
+        Paint smallTextPaint = new TextPaint();
+        float smallFontSize = 10;
+        smallTextPaint.setTextSize(smallFontSize);
+        smallTextPaint.setTypeface(Typeface.create("Helvetica", Typeface.NORMAL));
+        Paint.FontMetrics smallFontMetrics = smallTextPaint.getFontMetrics();
+        float smallFontHeight = smallFontMetrics.descent - defaultFontMetrics.ascent;
+
+        // Create font objects
+        PDFont titleFont = PDType1Font.HELVETICA_BOLD;
+        PDFont defaultFont = PDType1Font.HELVETICA;
+
+
+        try {
+            // Define a content stream for adding to the PDF
+            contentStream = new PDPageContentStream(document, page);
+
+            // Load in logo
+            InputStream in = getAssets().open("nomade_logo_small.png");
+
+            // Draw the logo
+            Bitmap bitmap = BitmapFactory.decodeStream(in);
+            PDImageXObject xImage = LosslessFactory.createFromImage(document, bitmap);
+            contentStream.drawImage(xImage, endX - 148, startY - 63, 148, 63);
+
+            // Write title
+            contentStream.beginText();
+
+            addParagraph(startX, 0, true, titleFont, titleFontSize, titleFontHeight, setup.getName(), width - 148);
+
+            // Write setup details
+            addParagraph(startX + 5, wrapOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.id_colon) + setup.getId());
+            addParagraph(startX + 5, wrapOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.hardware_identifier_colon) + setup.getHardwareIdentifier());
+            addParagraph(startX + 5, wrapOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.version_colon) + setup.getVersion());
+            addParagraph(startX + 5, wrapOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.locked_colon) + setup.isLocked());
+
+            // Print setup image
+            addParagraph(startX, normalOffsetY + 300 - titleFontHeight, titleFont, titleFontSize, titleFontHeight, " ");
+            contentStream.endText();
+
+            ImageView wheelchairImageView = findViewById(R.id.imageView);
+
+            Bitmap wheelchairBitmap = getBitmapFromView(wheelchairImageView);
+            PDImageXObject xImageWheelchair = LosslessFactory.createFromImage(document, wheelchairBitmap);
+            contentStream.drawImage(xImageWheelchair, startX, heightCounter, 300, 300);
+
+            Bitmap gridParentBitmap = getBitmapFromView(gridParent);
+            PDImageXObject xImageGridParent = LosslessFactory.createFromImage(document, gridParentBitmap);
+            contentStream.drawImage(xImageGridParent, startX, heightCounter, 300, 300);
+
+            if (dragViewContainer.getChildCount() > 0) {
+                Bitmap dragViewParentBitmap = getBitmapFromView(dragViewParent);
+                PDImageXObject xImageDragViewParent = LosslessFactory.createFromImage(document, dragViewParentBitmap);
+                contentStream.drawImage(xImageDragViewParent, startX, heightCounter - 20, 300, 30);
+            }
+
+            if (floatingContainer.getChildCount() > 0) {
+                Bitmap floatingParentBitmap = getBitmapFromView(floatingParent);
+                PDImageXObject xImageFloatingParent = LosslessFactory.createFromImage(document, floatingParentBitmap);
+                contentStream.drawImage(xImageFloatingParent, startX, heightCounter + 270, 300, 30);
+            }
+
+            contentStream.beginText();
+            addParagraph(startX, -defaultFontHeight, true, titleFont, titleFontSize, titleFontHeight, " ");
+
+            // Write instruments with type and parameters
+            Instrument instrument;
+            Parameter parameter;
+
+            for (int i = 0; i < setup.getInstrumentArrayList().size(); i++) {
+
+                instrument = setup.getInstrumentArrayList().get(i);
+
+                addParagraph(startX, normalOffsetY, defaultFont, defaultFontSize, defaultFontHeight, getString(R.string.instrument));
+                addParagraph(startX + 5, wrapOffsetY, defaultFont, smallFontSize, smallFontHeight, getString(R.string.name_colon) + instrument.getName());
+                addParagraph(startX + 5, wrapOffsetY, defaultFont, smallFontSize, smallFontHeight, getString(R.string.id_colon) + instrument.getId());
+                if (!instrument.getDescription().equals("")) {
+                    addParagraph(startX + 5, wrapOffsetY, defaultFont, smallFontSize, smallFontHeight, getString(R.string.description_colon) + instrument.getDescription());
+                }
+
+                addParagraph(startX + 20, smallOffsetY, defaultFont, smallFontSize, smallFontHeight, getString(R.string.type));
+                addParagraph(startX + 25, wrapOffsetY, defaultFont, smallFontSize, smallFontHeight, getString(R.string.name_colon) + instrument.getType().getName());
+                addParagraph(startX + 25, wrapOffsetY, defaultFont, smallFontSize, smallFontHeight, getString(R.string.id_colon) + instrument.getType().getId());
+                addParagraph(startX + 25, wrapOffsetY, defaultFont, smallFontSize, smallFontHeight, getString(R.string.category_colon) + instrument.getType().getCategory());
+                if (!instrument.getType().getDescription().equals("")) {
+                    addParagraph(startX + 25, wrapOffsetY, defaultFont, smallFontSize, smallFontHeight, getString(R.string.description_colon) + instrument.getType().getDescription());
+                }
+
+                for (int j = 0; j < instrument.getParameterArrayList().size(); j++) {
+
+                    parameter = instrument.getParameterArrayList().get(j);
+
+                    addParagraph(startX + 20, smallOffsetY, defaultFont, smallFontSize, smallFontHeight, getString(R.string.parameter));
+                    addParagraph(startX + 25, wrapOffsetY, defaultFont, smallFontSize, smallFontHeight, getString(R.string.name_colon) + parameter.getName());
+                    addParagraph(startX + 25, wrapOffsetY, defaultFont, smallFontSize, smallFontHeight, getString(R.string.id_colon) + parameter.getId());
+                    addParagraph(startX + 25, wrapOffsetY, defaultFont, smallFontSize, smallFontHeight, getString(R.string.value_colon) + parameter.getValue());
+                    if (!parameter.getValueDescription().equals("")) {
+                        addParagraph(startX + 25, wrapOffsetY, defaultFont, smallFontSize, smallFontHeight, getString(R.string.value_description_colon) + parameter.getValueDescription());
+                    }
+                }
+            }
+
+            contentStream.endText();
+
+            contentStream.close();
+
+            // Adding page numbers to the whole document
+            int pageCount = document.getNumberOfPages();
+            for (int i = 0; i < pageCount; i++) {
+                String pageNumberString = (i + 1) + " / " + pageCount;
+                float size = defaultFontSize * defaultFont.getStringWidth(pageNumberString) / 1000;
+                page = document.getPage(i);
+                contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true);
+                contentStream.beginText();
+                contentStream.setFont(defaultFont, defaultFontSize);
+                contentStream.newLineAtOffset(endX + marginX - endY + defaultFontHeight - size, endY - defaultFontHeight);
+                contentStream.showText(pageNumberString);
+                contentStream.endText();
+                contentStream.close();
+            }
+
+            // Make sure that the content stream is closed:
+            contentStream.close();
+
+            OutputStream outputStream;
+
+            String name = setup.getId() + "_" + setup.getName() + ".pdf";
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                MyLog.d(TAG, "MediaStore used");
+                ContentResolver resolver = context.getContentResolver();
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+                contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS);
+                Uri uri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues);
+                if (uri != null) {
+                    outputStream = getContentResolver().openOutputStream(uri);
+                    if (outputStream != null) {
+                        document.save(outputStream);
+                        outputStream.close();
+                        document.close();
+                    }
+                }
+            }
+
+            downloadPdfIndex++;
+            downloadAllPdfFiles();
+        } catch (IOException e) {
+            e.printStackTrace();
+
+            pdfErrors++;
+            pdfErrorIds.add(setupId);
+
+            downloadPdfIndex++;
+            downloadAllPdfFiles();
+        }
+    }
+
+    private void clearSetup() {
+        if (dragViewContainer != null && floatingContainer != null) {
+            dragViewContainer.removeAllViews();
+            floatingContainer.removeAllViews();
+            for (Snap s : targetSnaps) {
+                s.removeAllViews();
+            }
+        }
+    }
+
+    /**
+     * Adds one or multiple lines of text to the PDF
+     *
+     * @param positionX X position to write the text
+     * @param offsetY Y offset to write the text
+     * @param font to display the text
+     * @param fontSize to display the text
+     * @param fontHeight to determine the extra Y offset
+     * @param text string to write
+     */
+    private void addParagraph(float positionX, float offsetY, PDFont font, float fontSize, float fontHeight, String text) throws IOException {
+        addParagraph(positionX, offsetY, false, font, fontSize, fontHeight, text, width);
+    }
+
+    /**
+     * Adds one or multiple lines of text to the PDF
+     *
+     * @param positionX X position to write the text
+     * @param offsetY Y offset to write the text
+     * @param setYToHeightCounter set Y location to height counter
+     * @param font to display the text
+     * @param fontSize to display the text
+     * @param fontHeight to determine the extra Y offset
+     * @param text string to write
+     */
+    private void addParagraph(float positionX, float offsetY, boolean setYToHeightCounter, PDFont font, float fontSize, float fontHeight, String text) throws IOException {
+        addParagraph(positionX, offsetY, setYToHeightCounter, font, fontSize, fontHeight, text, width);
+    }
+
+    /**
+     * Adds one or multiple lines of text to the PDF
+     *
+     * @param positionX X position to write the text
+     * @param offsetY Y offset to write the text
+     * @param setYToHeightCounter set Y location to height counter
+     * @param font to display the text
+     * @param fontSize to display the text
+     * @param fontHeight to determine the extra Y offset
+     * @param text string to write
+     * @param width available width
+     */
+    private void addParagraph(float positionX, float offsetY, boolean setYToHeightCounter, PDFont font, float fontSize, float fontHeight, String text, float width) throws IOException {
+        List<String> lines = parseLines(text.replaceAll("\\p{Cntrl}", ""), width, font, fontSize);
+        contentStream.setFont(font, fontSize);
+
+        float neededHeight = lines.size() * (wrapOffsetY + fontHeight) + offsetY - wrapOffsetY;
+
+        if (heightCounter - neededHeight < endY) {
+            // Create new page
+            contentStream.endText();
+            contentStream.close();
+            page = new PDPage(PDRectangle.A4);
+            document.addPage(page);
+            contentStream = new PDPageContentStream(document, page);
+            contentStream.beginText();
+            contentStream.setFont(font, fontSize);
+
+            for (int i = 0; i < lines.size(); i++) {
+                if (i == 0) {
+                    contentStream.newLineAtOffset(positionX, startY - fontHeight);
+                    heightCounter = startY - fontHeight;
+                    currentXPosition = positionX;
+                }
+                else {
+                    contentStream.newLineAtOffset(0, - wrapOffsetY - fontHeight);
+                    heightCounter -= wrapOffsetY + fontHeight;
+                }
+                contentStream.showText(lines.get(i));
+            }
+        }
+        else if (setYToHeightCounter) {
+            for (int i = 0; i < lines.size(); i++) {
+                if (i == 0) {
+                    contentStream.newLineAtOffset(positionX, heightCounter - offsetY - fontHeight);
+                    heightCounter -= offsetY + fontHeight;
+                    currentXPosition = positionX;
+                }
+                else {
+                    contentStream.newLineAtOffset(0, - wrapOffsetY - fontHeight);
+                    heightCounter -= wrapOffsetY + fontHeight;
+                }
+                contentStream.showText(lines.get(i));
+            }
+        }
+        else {
+            for (int i = 0; i < lines.size(); i++) {
+                if (i == 0) {
+                    contentStream.newLineAtOffset(positionX - currentXPosition, - offsetY - fontHeight);
+                    heightCounter -= offsetY + fontHeight;
+                    currentXPosition += positionX - currentXPosition;
+                }
+                else {
+                    contentStream.newLineAtOffset(0, - wrapOffsetY - fontHeight);
+                    heightCounter -= wrapOffsetY + fontHeight;
+                }
+                contentStream.showText(lines.get(i));
+            }
+        }
+    }
+
+    /**
+     * Splits up the text depending on the available width, the font and the font size
+     *
+     * @param text string to split
+     * @param width available width
+     * @param font font for the text
+     * @param fontSize font size for the text
+     * @return a list of split strings
+     */
+    private static List<String> parseLines(String text, float width, PDFont font, float fontSize) throws IOException {
+        List<String> lines = new ArrayList<String>();
+        int lastSpace = -1;
+        while (text.length() > 0) {
+            int spaceIndex = text.indexOf(' ', lastSpace + 1);
+            if (spaceIndex < 0)
+                spaceIndex = text.length();
+            String subString = text.substring(0, spaceIndex);
+            float size = fontSize * font.getStringWidth(subString) / 1000;
+            if (size > width) {
+                if (lastSpace < 0){
+                    lastSpace = spaceIndex;
+                }
+                subString = text.substring(0, lastSpace);
+                lines.add(subString);
+                text = text.substring(lastSpace).trim();
+                lastSpace = -1;
+            } else if (spaceIndex == text.length()) {
+                lines.add(text);
+                text = "";
+            } else {
+                lastSpace = spaceIndex;
+            }
+        }
+        return lines;
+    }
+
+    public static Bitmap getBitmapFromView(View view) {
+        //Define a bitmap with the same size as the view
+        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),Bitmap.Config.ARGB_8888);
+        //Bind a canvas to it
+        Canvas canvas = new Canvas(returnedBitmap);
+        // draw the view on the canvas
+        view.draw(canvas);
+        //return the bitmap
+        return returnedBitmap;
     }
 
     /**

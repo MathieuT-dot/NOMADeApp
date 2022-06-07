@@ -570,10 +570,14 @@ public class SubmissionsActivity extends AppCompatActivity {
                         }
                     }
 
+                    // TODO comment to display all submitted questionnaires
                     if (filterStartDateBool && filterEndDateBool && filterQuestionnaireIdBool && filterUsernameBool && nextSubmissionId == 0)
                     {
                         submissionsArrayList.add(new SubmittedQuestionnaire(id, questionnaireId, questionnaireGroupId, version, title, description, userId, userName, createdAt, updatedAt, previousSubmissionId, nextSubmissionId));
                     }
+
+                    // TODO uncomment to display all submitted questionnaires
+//                    submissionsArrayList.add(new SubmittedQuestionnaire(id, questionnaireId, questionnaireGroupId, version, title, description, userId, userName, createdAt, updatedAt, previousSubmissionId, nextSubmissionId));
                 }
             }
 

@@ -306,6 +306,11 @@ public class Constants {
     public static final float SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMU_QUAT_QUAT_ONLY__0XB4 = 0x43340000; // IMU_QUAT (Quat only) (0xB4)
     public static final float SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMU_QUAT_GYRO_ACC_0XB5 = 0x43350000; // IMU_QUAT_GYRO_ACC (0xB5)
     public static final float SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMU_QUAT_GYRO_ACC_100Hz_0XB6 = 0x43360000; // IMU_QUAT_GYRO_ACC_100Hz (0xB6)
+    public static final float SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT100HZ_0XB7 = 0x43370000; // IMU_QUAT_100Hz (Quat only) (0xB7)
+    public static final float SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT9DOF_0XB8 = 0x43380000; // IMU_QUAT_9DOF (Quat only) (0xB8)
+    public static final float SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUQUAT9DOF100HZ_0XB9 = 0x43390000; // IMU_QUAT_9DOF_100Hz (Quat only) (0xB9)
+    public static final float SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUGYROACCMAG_0XBA = 0x433A0000; // IMU_GYRO_ACC_MAG (0xBA)
+    public static final float SETUP_PRM_DATA_OUTPUT_DATATYPE_option_IMUGYROACCMAG100HZ_0XBB = 0x433B0000; // IMU_GYRO_ACC_MAG_100Hz (0xBB)
     public static final short SETUP_PRM_SOFTWARE_FUNCTION = 0x0100; // Software function to be executed in case of software instrument (No datatype)
     public static final float SETUP_PRM_SOFTWARE_FUNCTION_option_NO_FUNCTION = 0x00000000; // No function
     public static final float SETUP_PRM_SOFTWARE_FUNCTION_option_SIMPLE_FUNCTION_THAT_CALCULATES_MIN_VALUE = 0x3F800000; // Simple function that calculates MIN value

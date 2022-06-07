@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.Menu;
@@ -462,7 +463,7 @@ public class SetupListActivity extends AppCompatActivity implements SimpleDialog
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_sort_and_refresh, menu);
+        inflater.inflate(R.menu.menu_setup_list, menu);
         return true;
     }
 
@@ -493,7 +494,27 @@ public class SetupListActivity extends AppCompatActivity implements SimpleDialog
                     .cancelable(false)
                     .show(this, SORT_DIALOG);
         }
+        else if (itemId == R.id.action_download_all_pdf_files) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 
+                ArrayList<Integer> setupIdArrayList = new ArrayList<>();
+                int setupId;
+
+                for (Setup s : setupArrayList) {
+                    setupId = s.getId();
+                    if (setupId > 0) {
+                        setupIdArrayList.add(setupId);
+                    }
+                }
+
+                Intent intent = new Intent(context, BodyDragAndDropActivity.class);
+                intent.putIntegerArrayListExtra("DOWNLOAD_PDF_IDS", setupIdArrayList);
+                startActivity(intent);
+            }
+            else {
+                Utilities.displayToast(context, "Android 10 is required to use this function");
+            }
+        }
         return true;
     }
 

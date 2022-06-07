@@ -23,6 +23,7 @@
     <string name="usb_and_tcp_communication">USB and TCP Communication</string>
     <string name="developer_console">Developer console</string>
     <string name="alarm_distance_simulation">Alarm Distance Simulation</string>
+    <string name="control_panel">Control Panel</string>
 
     <!--Setups-->
     <string name="setup_menu">Setup menu</string>
@@ -43,7 +44,7 @@
     <string name="id_colon">"ID: "</string>
     <string name="setup_id_colon">"Setup ID: "</string>
     <string name="address_colon">"Address: "</string>
-    <string name="name_colon">Name: </string>
+    <string name="name_colon">"Name: "</string>
     <string name="parameters_colon">"Parameters: "</string>
     <string name="no_parameters">No parameters for this type of instrument</string>
     <string name="type">Type</string>
@@ -89,7 +90,7 @@
     <string name="alarm_distance_colon">Alarm distance: %d cm</string>
     <string name="show_setup_info">Show the setup info</string>
     <string name="edit_setup_name">Edit the setup name</string>
-    <string name="graphs_error">There is a problem with the setup in the memory of the device, please reboot the PWC and restart the app. If the problem persists, check the setup and resend it to the DMU when necessary.</string>
+    <string name="graphs_error">There is a problem with the setup in the memory of the device, please reboot the PWC and restart the app. If the problem persists, check the setup and resend it to the DCU when necessary.</string>
 
     <!--ListView and ExpandableListView Items-->
     <string name="list_questionnaire_id_colon">Quest. ID: %1$d</string>
@@ -202,7 +203,7 @@
     <string name="menu_setup_info">Show setup info</string>
     <string name="menu_filter">Filter</string>
     <string name="menu_question_overview">Question overview</string>
-    <string translatable="false" name="menu_download_all_pdf_files">Download all PDF files</string>
+    <string name="menu_download_all_pdf_files" translatable="false">Download all PDF files</string>
 
     <!--QuestionnairesActivity-->
     <string name="continue_questionnaire">Continue with your last questionnaire:</string>
@@ -296,8 +297,8 @@
     <string name="username_password_fields_empty">The username and/or password field is empty</string>
     <string name="no_connection_to_server">No connection to the server, please check if you have an active internet connection.</string>
     <string name="cant_check_for_new_version">Can\'t check for a new version at the moment.</string>
-    <string name="connection_to_the_dmu_is_active">Connection to the DMU is active</string>
-    <string name="no_connection_to_the_dmu">No connection to the DMU</string>
+    <string name="connection_to_the_dcu_is_active">Connection to the DCU is active</string>
+    <string name="no_connection_to_the_dcu">No connection to the DCU</string>
     <string name="pdf_not_saved">PDF not saved</string>
     <string name="pdf_saved">PDF saved successfully</string>
     <string name="pdf_failed">Saving PDF failed</string>
@@ -394,7 +395,7 @@
     <string name="active">Active</string>
     <string name="inactive">Inactive</string>
 
-    <!--UsbActivity-->
+    <!--ControlPanelActivity-->
     <string name="initialise_communication">Initialise communication</string>
     <string name="config" translatable="false">Config</string>
     <string name="auto" translatable="false">Auto</string>
@@ -409,6 +410,12 @@
     <string name="start_measurement">Start measurement</string>
     <string name="stop_measurement">Stop measurement</string>
     <string name="send_measurement_list" translatable="false">Send measurement list</string>
+    <string name="usb_connection">USB connection</string>
+    <string name="setup_name">Setup name</string>
+    <string name="measurement_name">Measurement name</string>
+    <string name="measurement_time">Measurement time</string>
+    <string name="database_connection">Database connection</string>
+    <string name="missing_cycle_counters">Missing cycle counters</string>
 
     <!--Symbols-->
     <string name="lock_symbol" translatable="false">"\uD83D\uDD12"</string>
@@ -446,6 +453,41 @@
     <string name="about_changelog_key">Changelog</string>
     <string name="about_changelog_value" translatable="false"><Data>
         <![CDATA[
+
+        <b>Version 0.20</b><br/>
+        ??/??/2022<br/>
+        - ...<br/><br/>
+
+        <b>Version 0.19</b><br/>
+        09/05/2022<br/>
+        - Fixed a problem in the graph configuration when adding quaternions<br/>
+        - Improved the notation of the values in the Values Activity<br/>
+        - Improved the calculation of the values with their factor<br/>
+        - Added hidden options to download all submitted questionnaires and setups in a PDF format<br/>
+        - Fixed an crash caused by an orientation change in the Body Drag And Drop Activity<br/>
+        - Fixed an issue where the app would crash if there weren\'t enough values send by the DCU<br/>
+        - Enabled large heap to prevent OutOfMemoryError<br/><br/>
+
+        <b>Version 0.18</b><br/>
+        09/03/2022<br/>
+        - Fixed a special case which caused the app to crash<br/>
+        - Added new sensor locations on the body chart for the setups<br/>
+        - When a sensor is placed, the location description will be showed in a popup, the name of the sensor will also be changed to the location description<br/>
+        - Added factors to convert the values from the sensors to the real values<br/><br/>
+
+        <b>Version 0.17</b><br/>
+        25/11/2021<br/>
+        - Fixed an issue where the graph configuration wouldn\'t reset after loading a different setup<br/>
+        - Added more output datatypes for the wireless IMU<br/><br/>
+
+        <b>Version 0.16</b><br/>
+        12/10/2021<br/>
+        - Fixed an issue where the background service would get stuck in a loop after disconnecting the USB cable<br/><br/>
+
+        <b>Version 0.15</b><br/>
+        06/10/2021<br/>
+        - Changed the USB Communication activity to the Control Panel activity, simplifying the user interface for communicating with the DCU<br/>
+        - Added a splash screen<br/><br/>
 
         <b>Version 0.14</b><br/>
         20/09/2021<br/>
@@ -488,7 +530,7 @@
         19/05/2021<br/>
         - Fixed a crash that occurred very occasionally when trying to show a dialog for an Activity that was already finished<br/>
         - Fixed a bug in the exporting of the log files resulting in empty log files<br/>
-        - Fixed an app crash caused by a String that was nullified while communicating with the DMU<br/><br/>
+        - Fixed an app crash caused by a String that was nullified while communicating with the DCU<br/><br/>
 
         <b>Version 0.6</b><br/>
         11/05/2021<br/>

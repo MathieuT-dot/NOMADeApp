@@ -90,8 +90,8 @@
     <string name="couldnt_submit_questionnaire">Impossible de soumettre le questionnaire. Voulez-vous réessayer? Sinon, vos réponses seront enregistrées pour un téléchargement ultérieur.</string>
     <string name="questionnaire_saved">Vos réponses ont été enregistrées pour un téléchargement ultérieur</string>
     <string name="setup_menu">Setup menu</string>
-    <string name="view_setup_list">Afficher la liste de setup</string>
-    <string name="setup_list">Liste de setup</string>
+    <string name="view_setup_list">Afficher la liste des setups</string>
+    <string name="setup_list">Liste des setups</string>
     <string name="view_instrument_list">Voir la liste des instrumentArrayList</string>
     <string name="instrument_list">Liste d\'instrumentArrayList</string>
     <string name="instrumentArrayList">Instruments</string>
@@ -315,8 +315,8 @@
     <string name="title">Titre</string>
     <string name="remove_site_x">Supprimer le site %1$d</string>
     <string name="_for_">" pour "</string>
-    <string name="connection_to_the_dmu_is_active">La connexion à la DMU est active</string>
-    <string name="no_connection_to_the_dmu">Pas de connexion à la DMU</string>
+    <string name="connection_to_the_dcu_is_active">La connexion à la DMU est active</string>
+    <string name="no_connection_to_the_dcu">Pas de connexion à la DMU</string>
     <string name="pdf_not_saved">PDF non enregistré</string>
     <string name="pdf_saved">PDF enregistré avec succès</string>
     <string name="pdf_failed">L\'enregistrement du PDF a échoué</string>
@@ -336,7 +336,7 @@
     <string name="couldnt_add_all_instruments">Impossible d\'ajouter tous les instruments du modèle, souhaitez-vous réessayer?</string>
     <string name="please_provide_details_template">Veuillez fournir les détails suivants, puis vous pouvez choisir un setup à utiliser comme modèle.</string>
     <string name="pick_setup_template">Choisissez le setup comme modèle</string>
-    <string name="new_setup_template">Nouvelle setup de modèle</string>
+    <string name="new_setup_template">Nouveau setup du modèle</string>
     <string name="updating_failed">La mise à jour a échoué</string>
     <string name="couldnt_update_all_instruments">Impossible de mettre à jour tous les instruments à partir du modèle. Voulez-vous réessayer?</string>
     <string name="instruments_to_be_placed">Instruments à placer</string>
@@ -364,4 +364,11 @@
     <string name="only_enable_relevant_buttons_summary">Si activé, l\'application activera et désactivera automatiquement les boutons pour la communication USB</string>
     <string name="hide_unchangeable_parameters_title">Masquer les paramètres non modifiables</string>
     <string name="hide_unchangeable_parameters_summary">Si activé, l\'application masquera les paramètres non modifiables lors de la configuration d\'un instrument</string>
+    <string name="control_panel">Panneau de commande</string>
+    <string name="usb_connection">Connexion USB</string>
+    <string name="setup_name">Nom du setup</string>
+    <string name="measurement_name">Nom de la mesure</string>
+    <string name="measurement_time">Durée de mesure</string>
+    <string name="database_connection">Connexion à la base de données</string>
+    <string name="missing_cycle_counters">Compteurs de cycles manquants</string>
 </resources>

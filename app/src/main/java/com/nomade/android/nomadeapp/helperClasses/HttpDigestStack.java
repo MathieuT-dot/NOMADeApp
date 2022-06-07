@@ -277,13 +277,10 @@ class HttpDigestStack extends HurlStack {
                         throw new AuthFailureError("Unknown algorithm", e);
                     }
                     authValues.put("nc", incNonceCount(authValues.get("nc")));
-//                    MyLog.d(SUB_TAG, "Nonce Count Debug: " + authValues.get("nc"));
                     authValues.put("response", digest(md5, h1, authValues.get("nonce"), authValues.get("nc"), authValues.get("cnonce"), qop, h2));
                 }
 
                 authEditor.putString(Uri.parse(url).getHost(), MapUtil.mapToString(authValues)).apply();
-//                MyLog.d(SUB_TAG, "SHAREDPREF PUT " + Uri.parse(url).getHost() + " : " + MapUtil.mapToString(authValues));
-//                MyLog.d(SUB_TAG, "getAuthToken - " + Uri.parse(url).getHost() + ": " + authSharedPreferences.getString(Uri.parse(url).getHost(), "null"));
 
                 return Headers.Authorization.make(authValues, url);
             }
@@ -333,11 +330,11 @@ class HttpDigestStack extends HurlStack {
                 cnonce += etag + ":";
             cnonce += Calendar.getInstance().getTimeInMillis() + ":";
             cnonce += pwd;
-//            MyLog.d(SUB_TAG, "Input cnonce: " + cnonce);
+            MyLog.d(SUB_TAG, "Input cnonce: " + cnonce);
             cnonce = Base64.encodeToString(cnonce.getBytes(), Base64.URL_SAFE | Base64.NO_WRAP);
-//            MyLog.d(SUB_TAG, "Full cnonce: " + cnonce);
+            MyLog.d(SUB_TAG, "Full cnonce: " + cnonce);
             cnonce = cnonce.substring(10, 18);
-//            MyLog.d(SUB_TAG,"Substring cnonce: " + cnonce);
+            MyLog.d(SUB_TAG,"Substring cnonce: " + cnonce);
             return cnonce;
         }
 
@@ -376,10 +373,10 @@ class HttpDigestStack extends HurlStack {
                     res.append(str);
                 }
             }
-//            MyLog.d(SUB_TAG, res.toString());
+            MyLog.d(SUB_TAG, res.toString());
             res = new StringBuilder(String.format("%032x", new BigInteger(1, digest.digest(res.toString().getBytes()))));
 
-//            MyLog.d(SUB_TAG, res.toString());
+            MyLog.d(SUB_TAG, res.toString());
             return res.toString();
 
         }
@@ -393,7 +390,7 @@ class HttpDigestStack extends HurlStack {
 
                 for (Header header : headersList){
 
-//                    MyLog.d(SUB_TAG, header.getName() + ": " + header.getValue());
+                    MyLog.d(SUB_TAG, header.getName() + ": " + header.getValue());
 
                     if (header.getName().toLowerCase().equals(Headers.WWWAuthenticate.val().toLowerCase())){
                         headersMap.put(Headers.WWWAuthenticate.val(), header.getValue());
@@ -410,7 +407,7 @@ class HttpDigestStack extends HurlStack {
                 }
                 URL url = new URL(request.getUrl());
                 Map<String, String> header = Utilities.parseHeaderToMap(headersMap.get(Headers.WWWAuthenticate.val()));
-//                MyLog.d(SUB_TAG, "WWW-Authenticate header: " + headersMap.get(Headers.WWWAuthenticate.val()));
+                MyLog.d(SUB_TAG, "WWW-Authenticate header: " + headersMap.get(Headers.WWWAuthenticate.val()));
                 String realm = header.get("realm");
                 PasswordAuthentication auth = requestPasswordAuthentication(realm);
                 if (auth != null) {
@@ -426,11 +423,11 @@ class HttpDigestStack extends HurlStack {
 
                     if (MainActivity.loggedIn){
                         h1 = new String(MainActivity.secret2);
-//                        MyLog.d(SUB_TAG,"h1: " + h1);
+                        MyLog.d(SUB_TAG,"h1: " + h1);
                     }
                     else {
                         h1 = digest(md5, auth.getUserName(), realm, pwd);
-//                        MyLog.d(SUB_TAG, "h1: " + h1 + ", user: " + auth.getUserName() + ", realm: " + realm + ", password: " + pwd);
+                        MyLog.d(SUB_TAG, "h1: " + h1 + ", user: " + auth.getUserName() + ", realm: " + realm + ", password: " + pwd);
                         if ("MD5-sess".equalsIgnoreCase(algorithm)) {//should be done only once by the spec
                             String hetag = null;
                             if (headersMap.containsKey("Etag")){
@@ -438,7 +435,7 @@ class HttpDigestStack extends HurlStack {
                             }
                             header.put("cnonce", getCNonce(header, hetag, pwd));
                             h1 = digest(md5, h1, header.get("nonce"), header.get("cnonce"));
-//                            MyLog.d(SUB_TAG, "h1: " + h1 + ", nonce: " + header.get("nonce") + ", cnonce: " + header.get("cnonce"));
+                            MyLog.d(SUB_TAG, "h1: " + h1 + ", nonce: " + header.get("nonce") + ", cnonce: " + header.get("cnonce"));
                         }
                         MainActivity.secret2 = h1.toCharArray();
                     }
@@ -451,16 +448,16 @@ class HttpDigestStack extends HurlStack {
                     }
 
                     String qop = getQopValue(header.get("qop"));
-//                    MyLog.d(SUB_TAG, "Quality Of Protection: " + qop);
+                    MyLog.d(SUB_TAG, "Quality Of Protection: " + qop);
                     String h2;
                     if ("auth-int".equals(qop)) {
                         String method = requestMethod(request);
                         h2 = digest(md5, method, uri, request.getBody());
-//                        MyLog.d(SUB_TAG, "h2: " + h2 + ", method: " + method + ", uri: " + uri + ", body: " + request.getBody());
+                        MyLog.d(SUB_TAG, "h2: " + h2 + ", method: " + method + ", uri: " + uri + ", body: " + request.getBody());
                     } else {
                         String method = requestMethod(request);
                         h2 = digest(md5, method, uri);
-//                        MyLog.d(SUB_TAG, "h2: " + h2 + ", method: " + method + ", uri: " + uri);
+                        MyLog.d(SUB_TAG, "h2: " + h2 + ", method: " + method + ", uri: " + uri);
                     }
                     if ("auth".equals(qop) || "auth-int".equals(qop)) {
                         header.put("qop", qop);
@@ -487,9 +484,9 @@ class HttpDigestStack extends HurlStack {
                     header.put("username", auth.getUserName());
                     authCache.put(Uri.parse(request.getUrl()).getHost() , header);
                     authEditor.putString(Uri.parse(request.getUrl()).getHost(), MapUtil.mapToString(header)).apply();
-//                    MyLog.d(SUB_TAG, "SHAREDPREF PUT "  + Uri.parse(request.getUrl()).getHost() + ": " +  MapUtil.mapToString(header));
-//                    MyLog.d(SUB_TAG, "" + authCache);
-//                    MyLog.d(SUB_TAG,  "setAuthToken - " + Uri.parse(request.getUrl()).getHost() + ": " + authSharedPreferences.getString(Uri.parse(request.getUrl()).getHost(), "null"));
+                    MyLog.d(SUB_TAG, "SHAREDPREF PUT "  + Uri.parse(request.getUrl()).getHost() + ": " +  MapUtil.mapToString(header));
+                    MyLog.d(SUB_TAG, "" + authCache);
+                    MyLog.d(SUB_TAG,  "setAuthToken - " + Uri.parse(request.getUrl()).getHost() + ": " + authSharedPreferences.getString(Uri.parse(request.getUrl()).getHost(), "null"));
                     return true;
                 } else return false;
             } catch (NoSuchAlgorithmException | MalformedURLException e) {
@@ -499,12 +496,12 @@ class HttpDigestStack extends HurlStack {
 
         final Boolean updateAuthToken(Request request) throws AuthFailureError {
             try {
-//                MyLog.d(SUB_TAG, "host part of URL: " + Uri.parse(url).getHost());
+                MyLog.d(SUB_TAG, "host part of URL: " + Uri.parse(url).getHost());
                 Map<String, String> authValues = authCache.get(Uri.parse(url).getHost());
                 if (authValues == null){
                     String authValuesString = authSharedPreferences.getString(Uri.parse(request.getUrl()).getHost(), null);
                     if (authValuesString != null){
-//                        MyLog.d(SUB_TAG, "SHAREDPREF GET " + Uri.parse(request.getUrl()).getHost() + ": " + authValuesString);
+                        MyLog.d(SUB_TAG, "SHAREDPREF GET " + Uri.parse(request.getUrl()).getHost() + ": " + authValuesString);
                         authValues = MapUtil.stringToMap(authValuesString);
                         authCache.put(Uri.parse(url).getHost(), authValues);
                     }
@@ -534,7 +531,7 @@ class HttpDigestStack extends HurlStack {
                     if ("auth-int".equals(qop)) {
                         String method = requestMethod(request);
                         h2 = digest(md5, method, requestUrl, request.getBody());
-//                        MyLog.d(SUB_TAG, "h2: " + h2+ ", method: " + method + ", uri: " + requestUrl + ", body: " + request.getBody());
+                        MyLog.d(SUB_TAG, "h2: " + h2+ ", method: " + method + ", uri: " + requestUrl + ", body: " + request.getBody());
                     } else {
                         String method = requestMethod(request);
                         h2 = digest(md5, method, requestUrl);
