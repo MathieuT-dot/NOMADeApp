@@ -454,9 +454,10 @@
     <string name="about_changelog_value" translatable="false"><Data>
         <![CDATA[
 
-        <b>Version 0.20</b><br/>
-        ??/??/2022<br/>
-        - ...<br/><br/>
+        <b>Version 1.0</b><br/>
+        22/11/2022<br/>
+        - Fixed possible bug while opening the GraphActivity<br/>
+        - Fixed a crash caused by newer Android versions (12+)<br/><br/>
 
         <b>Version 0.19</b><br/>
         09/05/2022<br/>

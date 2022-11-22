@@ -307,22 +307,21 @@ public class SetupInfoActivity extends AppCompatActivity {
 
         }
 
-        byte[] setupRawBytes = Utilities.convertSetupToRawData(context, setup);
-
-        if (getSharedPreferences(Constants.PERMISSIONS_CACHE, MODE_PRIVATE).getBoolean(Constants.PERMISSION_DEBUG_CONSOLE, false)) {
-            // Setup
-            View rawInflatedLayout = inflater.inflate(R.layout.linear_layout_setup_info, null);
-            ((TextView) rawInflatedLayout.findViewById(R.id.text_view_top)).setText("RAW");
-            ((TextView) rawInflatedLayout.findViewById(R.id.text_view_bottom)).setText(Utilities.bytesToHex(setupRawBytes));
-            (rawInflatedLayout.findViewById(R.id.info_image_view)).setVisibility(View.GONE);
-
-            rawInflatedLayout.setOnClickListener(v -> {
-                setupEditor.putString("setup_in_memory", stringJsonResponse).apply();
-                Utilities.displayToast(context, "Setup loaded in memory!");
-            });
-
-            setupLinearLayout.addView(rawInflatedLayout);
-        }
+        // Uncomment to display the raw format of the setup at the bottom of the screen (bonus: clicking the raw format loads the setup in memory)
+//        if (getSharedPreferences(Constants.PERMISSIONS_CACHE, MODE_PRIVATE).getBoolean(Constants.PERMISSION_DEBUG_CONSOLE, false)) {
+//            // Setup
+//            View rawInflatedLayout = inflater.inflate(R.layout.linear_layout_setup_info, null);
+//            ((TextView) rawInflatedLayout.findViewById(R.id.text_view_top)).setText("RAW");
+//            ((TextView) rawInflatedLayout.findViewById(R.id.text_view_bottom)).setText(Utilities.bytesToHex(Utilities.convertSetupToRawData(context, setup)));
+//            (rawInflatedLayout.findViewById(R.id.info_image_view)).setVisibility(View.GONE);
+//
+//            rawInflatedLayout.setOnClickListener(v -> {
+//                setupEditor.putString("setup_in_memory", stringJsonResponse).apply();
+//                Utilities.displayToast(context, "Setup loaded in memory!");
+//            });
+//
+//            setupLinearLayout.addView(rawInflatedLayout);
+//        }
 
         handleLayoutChanges(LAYOUT_SETUP);
     }

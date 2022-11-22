@@ -32,6 +32,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.nomade.android.nomadeapp.R;
 import com.nomade.android.nomadeapp.graphs.CoupleChartGestureListener;
@@ -143,7 +144,12 @@ public class GraphActivity extends AppCompatActivity {
 
         String jsonStreamSetup = setupSharedPreferences.getString("stream_setup", "");
         if (jsonStreamSetup != null && !jsonStreamSetup.equals("")){
-            streamSetup = gson.fromJson(jsonStreamSetup, Setup.class);
+            try {
+                streamSetup = gson.fromJson(jsonStreamSetup, Setup.class);
+            }
+            catch (JsonSyntaxException e) {
+                jsonStreamSetup = null;
+            }
         }
 
         if (graphVariableArrayList == null){
