@@ -371,4 +371,7 @@
     <string name="measurement_time">Durée de mesure</string>
     <string name="database_connection">Connexion à la base de données</string>
     <string name="missing_cycle_counters">Compteurs de cycles manquants</string>
+    <string name="obsolete">Obsolète</string>
+    <string name="show_obsolete_setups">Afficher les setups obsolètes</string>
+    <string name="hide_obsolete_setups">Masquer les setups obsolètes</string>
 </resources>

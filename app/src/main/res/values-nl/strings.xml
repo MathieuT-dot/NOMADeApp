@@ -371,4 +371,7 @@
     <string name="measurement_time">Meettijd</string>
     <string name="database_connection">Databaseverbinding</string>
     <string name="missing_cycle_counters">Ontbrekende cycle counters</string>
+    <string name="obsolete">Verouderd</string>
+    <string name="show_obsolete_setups">Toon verouderde setups</string>
+    <string name="hide_obsolete_setups">Verberg verouderde setups</string>
 </resources>

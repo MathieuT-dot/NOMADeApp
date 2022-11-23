@@ -6,7 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,6 +31,8 @@ import com.nomade.android.nomadeapp.helperClasses.AppController;
 import com.nomade.android.nomadeapp.helperClasses.Constants;
 import com.nomade.android.nomadeapp.helperClasses.MyLog;
 import com.nomade.android.nomadeapp.helperClasses.Utilities;
+import com.nomade.android.nomadeapp.setups.Instrument;
+import com.nomade.android.nomadeapp.setups.Parameter;
 import com.nomade.android.nomadeapp.setups.Setup;
 
 import com.kuleuven.android.kuleuvenlibrary.LibUtilities;
@@ -42,6 +47,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import eltos.simpledialogfragment.SimpleDialog;
 import eltos.simpledialogfragment.form.Input;
@@ -91,6 +98,9 @@ public class SetupListActivity extends AppCompatActivity implements SimpleDialog
 
     private Setup selectedSetup;
     private ArrayList<Setup> setupArrayList;
+
+    private Menu menu;
+    private boolean showObsoleteSetups = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -243,7 +253,26 @@ public class SetupListActivity extends AppCompatActivity implements SimpleDialog
 //                String updatedAt = jCurrentSetup.getString("updated_at");
 //                String deletedAt = jCurrentSetup.getString("deleted_at");
 
-                setupArrayList.add(new Setup(setupId, setupGroupId, setupName, setupHardwareIdentifier, setupVersion, setupLocked));
+                // sets the obsolete boolean to true if the setup contains an obsolete output datatype
+                boolean obsolete = setupId == 1 || setupId == 2 || setupId == 5 || setupId == 8 ||
+                        setupId == 10 || setupId == 11 || setupId == 12 || setupId == 14 ||
+                        setupId == 15 || setupId == 16 || setupId == 17 || setupId == 18 ||
+                        setupId == 19 || setupId == 20 || setupId == 21 || setupId == 22 ||
+                        setupId == 23 || setupId == 24 || setupId == 25 || setupId == 35 ||
+                        setupId == 55 || setupId == 56 || setupId == 57 || setupId == 58 ||
+                        setupId == 59 || setupId == 60 || setupId == 61 || setupId == 62;
+
+                // add setup to the list if it is not obsolete or if all setups may be shown
+                if (pickSetup) {
+                    if (!obsolete) {
+                        setupArrayList.add(new Setup(setupId, setupGroupId, setupName, setupHardwareIdentifier, setupVersion, setupLocked, obsolete));
+                    }
+                }
+                else {
+                    if (!obsolete || showObsoleteSetups) {
+                        setupArrayList.add(new Setup(setupId, setupGroupId, setupName, setupHardwareIdentifier, setupVersion, setupLocked, obsolete));
+                    }
+                }
             }
 
             switch (sortIndex) {
@@ -276,7 +305,7 @@ public class SetupListActivity extends AppCompatActivity implements SimpleDialog
                         if (setupSharedPreferences.contains(Constants.API_SETUPS_ + setup.getId())){
                             String response = setupSharedPreferences.getString(Constants.API_SETUPS_ + setup.getId(), "");
 
-                            if (response != null && !response.equals("")){
+                            if (!response.equals("")){
                                 Intent returnIntent = new Intent();
                                 returnIntent.putExtra("json_setup", response);
                                 setResult(AppCompatActivity.RESULT_OK, returnIntent);
@@ -464,6 +493,8 @@ public class SetupListActivity extends AppCompatActivity implements SimpleDialog
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_setup_list, menu);
+        this.menu = menu;
+        this.menu.findItem(R.id.action_show_hide_obsolete).setVisible(!pickSetup);
         return true;
     }
 
@@ -493,6 +524,18 @@ public class SetupListActivity extends AppCompatActivity implements SimpleDialog
                     .choicePreset(sortIndex)
                     .cancelable(false)
                     .show(this, SORT_DIALOG);
+        }
+        else if (itemId == R.id.action_show_hide_obsolete) {
+            if (showObsoleteSetups) {
+                setOptionTitle(R.id.action_show_hide_obsolete, getString(R.string.show_obsolete_setups));
+                showObsoleteSetups = false;
+                parseJsonSetupList(jsonResponseString);
+            }
+            else {
+                setOptionTitle(R.id.action_show_hide_obsolete, getString(R.string.hide_obsolete_setups));
+                showObsoleteSetups = true;
+                parseJsonSetupList(jsonResponseString);
+            }
         }
         else if (itemId == R.id.action_download_all_pdf_files) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -711,6 +754,22 @@ public class SetupListActivity extends AppCompatActivity implements SimpleDialog
                 backgroundTextView.setText(getString(R.string.no_setups_available));
                 backgroundTextView.setVisibility(View.VISIBLE);
                 break;
+        }
+    }
+
+    /**
+     * Dynamically change the title of an option in the Action Bar Menu.
+     *
+     * @param id of the option of which to change the title
+     * @param title new title for the option
+     */
+    private void setOptionTitle(int id, String title) {
+        if (menu != null){
+            MenuItem item = menu.findItem(id);
+            item.setTitle(title);
+        }
+        else {
+            MyLog.e(TAG, "Menu is null!");
         }
     }
 

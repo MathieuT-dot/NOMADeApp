@@ -970,16 +970,9 @@ public class GraphActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_graph, menu);
         this.menu = menu;
-
-//        MyLog.d(TAG, "showPauseResume: %s", showPauseResume);
         this.menu.findItem(R.id.action_pause_resume).setVisible(showPauseResume && graphsActive);
-
-//        MyLog.d(TAG, "showClearConfiguration: %s", showClearConfiguration);
         this.menu.findItem(R.id.action_clear_configuration).setVisible(showClearConfiguration && graphsActive);
-
-//        MyLog.d(TAG, "showConfigure: %s", showConfigure);
         this.menu.findItem(R.id.action_configure).setVisible(showConfigure);
-
         invalidateOptionsMenu();
 
         return true;

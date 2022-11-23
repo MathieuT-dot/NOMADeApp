@@ -20,6 +20,7 @@ public class Setup implements Parcelable {
     private int version;
     private boolean locked;
     private ArrayList<Instrument> instrumentArrayList = new ArrayList<>();
+    private boolean obsolete;
 
 
     public Setup(int id, int groupId, String name, int hardwareIdentifier, int version, boolean locked) {
@@ -29,6 +30,7 @@ public class Setup implements Parcelable {
         this.hardwareIdentifier = hardwareIdentifier;
         this.version = version;
         this.locked = locked;
+        this.obsolete = false;
     }
 
     public Setup(int id, int groupId, String name, int hardwareIdentifier, int version, boolean locked, ArrayList<Instrument> instrumentArrayList) {
@@ -39,6 +41,28 @@ public class Setup implements Parcelable {
         this.version = version;
         this.locked = locked;
         this.instrumentArrayList = instrumentArrayList;
+        this.obsolete = false;
+    }
+
+    public Setup(int id, int groupId, String name, int hardwareIdentifier, int version, boolean locked, boolean obsolete) {
+        this.id = id;
+        this.groupId = groupId;
+        this.name = name;
+        this.hardwareIdentifier = hardwareIdentifier;
+        this.version = version;
+        this.locked = locked;
+        this.obsolete = obsolete;
+    }
+
+    public Setup(int id, int groupId, String name, int hardwareIdentifier, int version, boolean locked, ArrayList<Instrument> instrumentArrayList, boolean obsolete) {
+        this.id = id;
+        this.groupId = groupId;
+        this.name = name;
+        this.hardwareIdentifier = hardwareIdentifier;
+        this.version = version;
+        this.locked = locked;
+        this.instrumentArrayList = instrumentArrayList;
+        this.obsolete = obsolete;
     }
 
 
@@ -98,6 +122,13 @@ public class Setup implements Parcelable {
         this.instrumentArrayList = instrumentArrayList;
     }
 
+    public boolean isObsolete() {
+        return obsolete;
+    }
+
+    public void setObsolete(boolean obsolete) {
+        this.obsolete = obsolete;
+    }
 
     public static class IdComparator implements Comparator<Setup> {
         @Override
@@ -127,6 +158,7 @@ public class Setup implements Parcelable {
         } else {
             instrumentArrayList = null;
         }
+        obsolete = in.readByte() != 0x00;
     }
 
     @Override
@@ -148,6 +180,7 @@ public class Setup implements Parcelable {
             dest.writeByte((byte) (0x01));
             dest.writeList(instrumentArrayList);
         }
+        dest.writeByte((byte) (obsolete ? 0x01 : 0x00));
     }
 
     @SuppressWarnings("unused")

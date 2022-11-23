@@ -1097,7 +1097,16 @@ public class Utilities {
 
             }
 
-            return new Setup(setupId, setupGroupId, setupName, setupHardwareIdentifier, setupVersion, setupLocked, instrumentArrayList);
+            // sets the obsolete boolean to true if the setup contains an obsolete output datatype
+            boolean obsolete = setupId == 1 || setupId == 2 || setupId == 5 || setupId == 8 ||
+                    setupId == 10 || setupId == 11 || setupId == 12 || setupId == 14 ||
+                    setupId == 15 || setupId == 16 || setupId == 17 || setupId == 18 ||
+                    setupId == 19 || setupId == 20 || setupId == 21 || setupId == 22 ||
+                    setupId == 23 || setupId == 24 || setupId == 25 || setupId == 35 ||
+                    setupId == 55 || setupId == 56 || setupId == 57 || setupId == 58 ||
+                    setupId == 59 || setupId == 60 || setupId == 61 || setupId == 62;
+
+            return new Setup(setupId, setupGroupId, setupName, setupHardwareIdentifier, setupVersion, setupLocked, instrumentArrayList, obsolete);
 
         } catch (JSONException e) {
             e.printStackTrace();

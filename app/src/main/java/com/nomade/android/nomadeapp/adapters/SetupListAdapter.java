@@ -31,6 +31,7 @@ public class SetupListAdapter extends ArrayAdapter<Setup> {
         ImageView imageViewLock;
         TextView textViewName;
         TextView textViewId;
+        TextView textViewObsolete;
         TextView textViewDetails;
         ImageButton imageButtonPopup;
     }
@@ -54,6 +55,7 @@ public class SetupListAdapter extends ArrayAdapter<Setup> {
             viewHolder.imageViewLock = convertView.findViewById(R.id.lock_image_view);
             viewHolder.textViewName = convertView.findViewById(R.id.setup_name_text_view);
             viewHolder.textViewId = convertView.findViewById(R.id.setup_id_text_view);
+            viewHolder.textViewObsolete = convertView.findViewById(R.id.setup_obsolete_text_view);
             viewHolder.textViewDetails = convertView.findViewById(R.id.setup_details_text_view);
             viewHolder.imageButtonPopup = convertView.findViewById(R.id.popup_image_button);
 
@@ -63,11 +65,18 @@ public class SetupListAdapter extends ArrayAdapter<Setup> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if (setup.isLocked()){
+        if (setup.isLocked()) {
             viewHolder.imageViewLock.setVisibility(View.VISIBLE);
         }
         else {
             viewHolder.imageViewLock.setVisibility(View.GONE);
+        }
+
+        if (setup.isObsolete()) {
+            viewHolder.textViewObsolete.setVisibility(View.VISIBLE);
+        }
+        else {
+            viewHolder.textViewObsolete.setVisibility(View.GONE);
         }
 
         viewHolder.textViewName.setText(setup.getName());

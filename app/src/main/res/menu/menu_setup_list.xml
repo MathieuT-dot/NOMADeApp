@@ -16,6 +16,11 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/action_show_hide_obsolete"
+        android:title="@string/show_obsolete_setups"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_download_all_pdf_files"
         android:title="@string/menu_download_all_pdf_files"
         app:showAsAction="never"

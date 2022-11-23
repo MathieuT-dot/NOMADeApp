@@ -218,7 +218,7 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
 
         if (setup != null){
             setTitle(setup.getName());
-            if (setup.isLocked()){
+            if (setup.isLocked() || setup.isObsolete()){
                 ActionBar actionBar = getActionBar();
                 if (actionBar != null){
                     actionBar.setDisplayShowHomeEnabled(true);
@@ -491,7 +491,7 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
     private void prepareSetup() {
         if (setup != null){
             setTitle(setup.getName());
-            if (setup.isLocked()){
+            if (setup.isLocked() || setup.isObsolete()){
                 getSupportActionBar().setDisplayShowHomeEnabled(true);
                 getSupportActionBar().setIcon(R.drawable.ic_lock_light);
 
@@ -635,7 +635,7 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
     @Override
     public boolean onLongClick(View v) {
 
-        if (setup.isLocked()){
+        if (setup.isLocked() || setup.isObsolete()){
             return false;
         }
 
@@ -655,7 +655,7 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
     @Override
     public boolean onDrag(View receivingLayoutView, DragEvent dragEvent) {
 
-        if (setup.isLocked()){
+        if (setup.isLocked() || setup.isObsolete()){
             return false;
         }
 
@@ -939,7 +939,7 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
     public void onBackPressed() {
 
         if (setup != null) {
-            if (setup.isLocked()){
+            if (setup.isLocked() || setup.isObsolete()){
                 finish();
             }
             else if (createListOfChangedInstruments()){
@@ -981,7 +981,7 @@ public class BodyDragAndDropActivity extends AppCompatActivity implements View.O
         getMenuInflater().inflate(R.menu.menu_drag_and_drop, menu);
 
         if (setup != null){
-            if (setup.isLocked()){
+            if (setup.isLocked() || setup.isObsolete()){
                 menu.findItem(R.id.action_save_setup).setVisible(false);
                 menu.findItem(R.id.action_add_instrument).setVisible(false);
                 menu.findItem(R.id.action_lock_setup).setVisible(false);

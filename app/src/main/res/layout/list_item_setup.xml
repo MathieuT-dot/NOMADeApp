@@ -48,6 +48,16 @@
         android:layout_marginStart="4dp">
 
         <TextView
+            android:id="@+id/setup_obsolete_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/obsolete"
+            android:textStyle="bold"
+            android:textColor="@color/simpledialogfragment_error_color"
+            android:textSize="@dimen/font_size_small"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/setup_details_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -478,6 +479,15 @@ public class SetupEditInstrumentActivity extends AppCompatActivity {
                     if (parameter.getParameterOptionArrayList().size() > 0){
                         ArrayList<String> spinnerArray = new ArrayList<>();
                         int selectionIndex = -1;
+
+                        // removes the obsolete output data types
+                        for (int k = parameter.getParameterOptionArrayList().size() - 1; k >= 0; k--) {
+                            Float value = parameter.getParameterOptionArrayList().get(k).getValue();
+                            if (parameter.getId() == 33 && (value.equals(179F) || value.equals(181F) || value.equals(182F)) && !value.equals(parameter.getValue())) {
+                                parameter.getParameterOptionArrayList().remove(k);
+                            }
+                        }
+
                         for (ParameterOption parameterOption : parameter.getParameterOptionArrayList()){
                             spinnerArray.add(parameterOption.getValue().intValue() + ": " + parameterOption.getName());
                             if (parameterOption.getValue().equals(parameter.getValue())){

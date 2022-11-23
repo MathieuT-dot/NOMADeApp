@@ -91,6 +91,9 @@
     <string name="show_setup_info">Show the setup info</string>
     <string name="edit_setup_name">Edit the setup name</string>
     <string name="graphs_error">There is a problem with the setup in the memory of the device, please reboot the PWC and restart the app. If the problem persists, check the setup and resend it to the DCU when necessary.</string>
+    <string name="obsolete">Obsolete</string>
+    <string name="show_obsolete_setups">Show obsolete setups</string>
+    <string name="hide_obsolete_setups">Hide obsolete setups</string>
 
     <!--ListView and ExpandableListView Items-->
     <string name="list_questionnaire_id_colon">Quest. ID: %1$d</string>
@@ -453,6 +456,11 @@
     <string name="about_changelog_key">Changelog</string>
     <string name="about_changelog_value" translatable="false"><Data>
         <![CDATA[
+
+        <b>Version 1.1</b><br/>
+        23/11/2022<br/>
+        - Hid some output data types that were obsolete in the setups<br/>
+        - In accordance with the point above, hid some setups that used the obsolete output data types, these can no longer be used or adjusted, but they can be viewed using the menu in the top right corner of the setup list<br/><br/>
 
         <b>Version 1.0</b><br/>
         22/11/2022<br/>
